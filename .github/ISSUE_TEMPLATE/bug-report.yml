@@ -87,10 +87,10 @@ body:
     validations:
       required: false
   - type: input
-    id: reactiveui-version
+    id: plugin-version
     attributes:
-      label: ReactiveUI Version
-      description: e.g. 15.1.1
+      label: ReactiveUI.Avalonia Version
+      description: e.g. 11.3.4
     validations:
       required: false
   - type: textarea
