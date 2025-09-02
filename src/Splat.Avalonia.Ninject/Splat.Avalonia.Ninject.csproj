@@ -1,17 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>$(SplatTargetFrameworks)</TargetFrameworks>
+    <TargetFrameworks>$(BaseTargetFrameworks)</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <IsPackable>false</IsPackable>
+    <PackageDescription>Contains the ReactiveUI platform specific extensions for Avalonia</PackageDescription>
+    <PackageTags>mvvm;reactiveui;rx;reactive extensions;observable;LINQ;events;frp;avalonia;net;netcore</PackageTags>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\Splat.Ninject\NinjectDependencyResolver.cs" Link="NinjectDependencyResolver.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Avalonia.ReactiveUI" />
     <PackageReference Include="Ninject" />
     <PackageReference Include="System.Text.Json" />
-    <ProjectReference Include="..\Splat\Splat.csproj" />
+    <ProjectReference Include="..\ReactiveUI.Avalonia\ReactiveUI.Avalonia.csproj" />
   </ItemGroup>
 </Project>
