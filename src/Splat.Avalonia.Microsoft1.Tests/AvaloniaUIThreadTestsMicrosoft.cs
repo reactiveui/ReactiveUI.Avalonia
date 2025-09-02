@@ -1,7 +1,4 @@
-﻿using System.ComponentModel;
-using Avalonia;
-using Avalonia.ReactiveUI;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Avalonia;
 using ReactiveUI.Avalonia.Splat;
 using ReactiveUIDemo;
 using Splat;

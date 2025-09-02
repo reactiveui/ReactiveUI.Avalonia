@@ -7,14 +7,13 @@
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
     <DefineConstants>$(DefineConstants);MAIN</DefineConstants>
+    <PackageDescription>Contains the ReactiveUI platform specific extensions for Avalonia</PackageDescription>
+    <PackageTags>mvvm;reactiveui;rx;reactive extensions;observable;LINQ;events;frp;avalonia;net;netcore</PackageTags>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Splat.Avalonia.Microsoft.Extensions.DependencyInjection\Splat.Avalonia.Microsoft.Extensions.DependencyInjection.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <!--
-    <ProjectReference Include="..\ReactiveUI.Avalonia.Ninject\ReactiveUI.Avalonia.Ninject.csproj" />
-    -->
     <PackageReference Include="Avalonia.Desktop" />
     <PackageReference Include="Avalonia.Headless.XUnit" />
     <PackageReference Include="Avalonia.Themes.Fluent" />

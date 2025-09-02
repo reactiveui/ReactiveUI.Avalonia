@@ -1,17 +1,16 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>$(SplatTargetFrameworks)</TargetFrameworks>
+    <TargetFrameworks>$(BaseTargetFrameworks)</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <IsPackable>false</IsPackable>
+    <PackageDescription>Contains the ReactiveUI platform specific extensions for Avalonia</PackageDescription>
+    <PackageTags>mvvm;reactiveui;rx;reactive extensions;observable;LINQ;events;frp;avalonia;net;netcore</PackageTags>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\Splat.DryIoc\DryIocDependencyResolver.cs" Link="DryIocDependencyResolver.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Avalonia.ReactiveUI" />
     <PackageReference Include="DryIoc.Dll" />
     <PackageReference Include="System.Text.Json" />
-    <ProjectReference Include="..\Splat\Splat.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ReactiveUI.Avalonia\ReactiveUI.Avalonia.csproj" />
   </ItemGroup>
 </Project>

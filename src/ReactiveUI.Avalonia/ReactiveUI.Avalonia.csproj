@@ -1,14 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>$(BaseTargetFrameworks)</TargetFrameworks>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
     <PackageDescription>Contains the ReactiveUI platform specific extensions for Avalonia</PackageDescription>
     <PackageTags>mvvm;reactiveui;rx;reactive extensions;observable;LINQ;events;frp;avalonia;net;netcore</PackageTags>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
-    <PackageReference Include="System.Text.Json" />
-    <ProjectReference Include="..\ReactiveUI.Avalonia\ReactiveUI.Avalonia.csproj" />
+    <PackageReference Include="Avalonia" />
+    <PackageReference Include="ReactiveUI" />
   </ItemGroup>
 </Project>

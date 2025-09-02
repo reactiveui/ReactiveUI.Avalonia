@@ -7,6 +7,8 @@
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
     <DefineConstants>$(DefineConstants);DRYIOC1</DefineConstants>
+    <PackageDescription>Contains the ReactiveUI platform specific extensions for Avalonia</PackageDescription>
+    <PackageTags>mvvm;reactiveui;rx;reactive extensions;observable;LINQ;events;frp;avalonia;net;netcore</PackageTags>
   </PropertyGroup>
   <ItemGroup>
     <AvaloniaXaml Include="..\Splat.Avalonia.Tests\Mocks\App.axaml" Link="Mocks\App.axaml">
