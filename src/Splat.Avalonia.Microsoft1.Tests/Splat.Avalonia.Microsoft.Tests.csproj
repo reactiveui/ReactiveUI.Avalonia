@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -6,22 +6,25 @@
     <NoWarn>$(NoWarn);1591;CA1707;SA1600;SA1601;SA1633;CA2000;CA1515</NoWarn>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
-    <DefineConstants>$(DefineConstants);MAIN</DefineConstants>
+    <DefineConstants>$(DefineConstants);MICROSOFT1</DefineConstants>
     <PackageDescription>Contains the ReactiveUI platform specific extensions for Avalonia</PackageDescription>
     <PackageTags>mvvm;reactiveui;rx;reactive extensions;observable;LINQ;events;frp;avalonia;net;netcore</PackageTags>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Splat.Avalonia.Microsoft.Extensions.DependencyInjection\Splat.Avalonia.Microsoft.Extensions.DependencyInjection.csproj" />
-    <ProjectReference Include="..\Splat.Avalonia.DryIoc\Splat.Avalonia.DryIoc.csproj" />
-    <ProjectReference Include="..\Splat.Avalonia.Autofac\Splat.Avalonia.Autofac.csproj" />
+    <AvaloniaXaml Remove="Mocks\**" />
+    <Compile Remove="Mocks\**" />
+    <EmbeddedResource Remove="Mocks\**" />
+    <None Remove="Mocks\**" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Splat.Avalonia.Microsoft.Extensions.DependencyInjection\Splat.Avalonia.Microsoft.Extensions.DependencyInjection.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <!--
+    <ProjectReference Include="..\Splat.Avalonia.Ninject\ReactiveUI.Avalonia.Ninject.csproj" />
+    -->
     <PackageReference Include="Avalonia.Desktop" />
     <PackageReference Include="Avalonia.Themes.Fluent" />
     <PackageReference Include="Avalonia.Fonts.Inter" />
-    <PackageReference Include="coverlet.collector">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
   </ItemGroup>
 </Project>
