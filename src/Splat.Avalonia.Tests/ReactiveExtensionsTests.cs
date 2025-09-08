@@ -1,8 +1,8 @@
-using NUnit.Framework;
-using ReactiveUI.Avalonia;
 using System;
 using System.Reflection;
 using Avalonia;
+using NUnit.Framework;
+using ReactiveUI.Avalonia;
 
 namespace ReactiveUI.Avalonia.Tests
 {
@@ -24,8 +24,8 @@ namespace ReactiveUI.Avalonia.Tests
             // Test that the GetSubject extension method exists
             var type = typeof(AvaloniaObjectReactiveExtensions);
             var methods = type.GetMethods(BindingFlags.Public | BindingFlags.Static);
-            
-            bool hasGetSubjectMethod = false;
+
+            var hasGetSubjectMethod = false;
             foreach (var method in methods)
             {
                 if (method.Name == "GetSubject")
@@ -34,7 +34,7 @@ namespace ReactiveUI.Avalonia.Tests
                     break;
                 }
             }
-            
+
             Assert.That(hasGetSubjectMethod, Is.True);
         }
 
@@ -44,8 +44,8 @@ namespace ReactiveUI.Avalonia.Tests
             // Test that the GetBindingSubject extension method exists
             var type = typeof(AvaloniaObjectReactiveExtensions);
             var methods = type.GetMethods(BindingFlags.Public | BindingFlags.Static);
-            
-            bool hasGetBindingSubjectMethod = false;
+
+            var hasGetBindingSubjectMethod = false;
             foreach (var method in methods)
             {
                 if (method.Name == "GetBindingSubject")
@@ -54,7 +54,7 @@ namespace ReactiveUI.Avalonia.Tests
                     break;
                 }
             }
-            
+
             Assert.That(hasGetBindingSubjectMethod, Is.True);
         }
 
@@ -91,9 +91,9 @@ namespace ReactiveUI.Avalonia.Tests
             // Test that AutoDataTemplateBindingHook has expected methods
             var type = typeof(AutoDataTemplateBindingHook);
             var methods = type.GetMethods(BindingFlags.Public | BindingFlags.Instance);
-            
-            bool hasExecuteHookMethod = false;
-            
+
+            var hasExecuteHookMethod = false;
+
             foreach (var method in methods)
             {
                 if (method.Name == "ExecuteHook")
@@ -102,7 +102,7 @@ namespace ReactiveUI.Avalonia.Tests
                     break;
                 }
             }
-            
+
             Assert.That(hasExecuteHookMethod, Is.True);
         }
 
@@ -112,10 +112,10 @@ namespace ReactiveUI.Avalonia.Tests
             // Test that AvaloniaActivationForViewFetcher has expected methods
             var type = typeof(AvaloniaActivationForViewFetcher);
             var methods = type.GetMethods(BindingFlags.Public | BindingFlags.Instance);
-            
-            bool hasGetAffinityForViewMethod = false;
-            bool hasGetActivationForViewMethod = false;
-            
+
+            var hasGetAffinityForViewMethod = false;
+            var hasGetActivationForViewMethod = false;
+
             foreach (var method in methods)
             {
                 if (method.Name == "GetAffinityForView")
@@ -127,7 +127,7 @@ namespace ReactiveUI.Avalonia.Tests
                     hasGetActivationForViewMethod = true;
                 }
             }
-            
+
             Assert.That(hasGetAffinityForViewMethod, Is.True);
             Assert.That(hasGetActivationForViewMethod, Is.True);
         }
@@ -138,12 +138,12 @@ namespace ReactiveUI.Avalonia.Tests
             // Test that we have the expected number of public extension methods
             var type = typeof(AvaloniaObjectReactiveExtensions);
             var publicStaticMethods = type.GetMethods(BindingFlags.Public | BindingFlags.Static);
-            
+
             // Should have multiple extension methods
             Assert.That(publicStaticMethods.Length, Is.GreaterThan(0));
-            
+
             // All methods should have ExtensionAttribute
-            bool allAreExtensions = true;
+            var allAreExtensions = true;
             foreach (var method in publicStaticMethods)
             {
                 var extensionAttr = method.GetCustomAttribute<System.Runtime.CompilerServices.ExtensionAttribute>();
@@ -153,7 +153,7 @@ namespace ReactiveUI.Avalonia.Tests
                     break;
                 }
             }
-            
+
             Assert.That(allAreExtensions, Is.True);
         }
 
@@ -162,12 +162,12 @@ namespace ReactiveUI.Avalonia.Tests
         {
             // Test that AutoSuspendHelper has expected functionality (it's an instance class, not static)
             var type = typeof(AutoSuspendHelper);
-            
+
             // Should be a class that can be instantiated
             Assert.That(type.IsClass, Is.True);
             Assert.That(type.IsAbstract, Is.False);
             Assert.That(type.IsSealed, Is.True);
-            
+
             // Should have constructors
             var constructors = type.GetConstructors();
             Assert.That(constructors.Length, Is.GreaterThan(0));
@@ -180,7 +180,7 @@ namespace ReactiveUI.Avalonia.Tests
             var autoDataTemplateHookType = typeof(AutoDataTemplateBindingHook);
             var constructors = autoDataTemplateHookType.GetConstructors();
             Assert.That(constructors.Length, Is.GreaterThan(0));
-            
+
             var activationFetcherType = typeof(AvaloniaActivationForViewFetcher);
             var activationConstructors = activationFetcherType.GetConstructors();
             Assert.That(activationConstructors.Length, Is.GreaterThan(0));

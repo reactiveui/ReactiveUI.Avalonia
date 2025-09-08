@@ -1,7 +1,7 @@
-using NUnit.Framework;
-using ReactiveUI.Avalonia;
 using System;
 using Avalonia;
+using NUnit.Framework;
+using ReactiveUI.Avalonia;
 
 namespace ReactiveUI.Avalonia.Tests
 {
@@ -41,7 +41,7 @@ namespace ReactiveUI.Avalonia.Tests
             // Test that UseReactiveUI has the correct method signature
             var method = typeof(AppBuilderExtensions).GetMethod("UseReactiveUI");
             Assert.That(method, Is.Not.Null);
-            
+
             var parameters = method!.GetParameters();
             Assert.That(parameters.Length, Is.EqualTo(1));
             Assert.That(parameters[0].ParameterType, Is.EqualTo(typeof(AppBuilder)));

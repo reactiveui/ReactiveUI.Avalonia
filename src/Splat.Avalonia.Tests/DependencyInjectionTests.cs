@@ -1,6 +1,6 @@
-using NUnit.Framework;
 using System;
 using System.Reflection;
+using NUnit.Framework;
 
 namespace ReactiveUI.Avalonia.Tests
 {
@@ -29,12 +29,12 @@ namespace ReactiveUI.Avalonia.Tests
             var assembly = Assembly.GetAssembly(typeof(ReactiveUI.Avalonia.AvaloniaScheduler));
             Assert.That(assembly, Is.Not.Null);
             var types = assembly.GetTypes();
-            
-            bool hasAvaloniaScheduler = false;
-            bool hasReactiveUserControl = false;
-            bool hasReactiveWindow = false;
-            bool hasViewModelViewHost = false;
-            
+
+            var hasAvaloniaScheduler = false;
+            var hasReactiveUserControl = false;
+            var hasReactiveWindow = false;
+            var hasViewModelViewHost = false;
+
             foreach (var type in types)
             {
                 if (type.Name == "AvaloniaScheduler")
@@ -54,7 +54,7 @@ namespace ReactiveUI.Avalonia.Tests
                     hasViewModelViewHost = true;
                 }
             }
-            
+
             Assert.That(hasAvaloniaScheduler, Is.True);
             Assert.That(hasReactiveUserControl, Is.True);
             Assert.That(hasReactiveWindow, Is.True);
@@ -67,10 +67,10 @@ namespace ReactiveUI.Avalonia.Tests
             // Test that types are in the correct namespace
             var scheduler = typeof(ReactiveUI.Avalonia.AvaloniaScheduler);
             Assert.That(scheduler.Namespace, Is.EqualTo("ReactiveUI.Avalonia"));
-            
+
             var userControl = typeof(ReactiveUI.Avalonia.ReactiveUserControl<>);
             Assert.That(userControl.Namespace, Is.EqualTo("ReactiveUI.Avalonia"));
-            
+
             var window = typeof(ReactiveUI.Avalonia.ReactiveWindow<>);
             Assert.That(window.Namespace, Is.EqualTo("ReactiveUI.Avalonia"));
         }
@@ -81,7 +81,7 @@ namespace ReactiveUI.Avalonia.Tests
             // Test that assembly has expected metadata
             var assembly = Assembly.GetAssembly(typeof(ReactiveUI.Avalonia.AvaloniaScheduler));
             var assemblyName = assembly!.GetName();
-            
+
             Assert.That(assemblyName.Name, Is.EqualTo("ReactiveUI.Avalonia"));
             Assert.That(assemblyName.Version, Is.Not.Null);
         }
@@ -92,13 +92,13 @@ namespace ReactiveUI.Avalonia.Tests
             // Test that main types are public
             var scheduler = typeof(ReactiveUI.Avalonia.AvaloniaScheduler);
             Assert.That(scheduler.IsPublic, Is.True);
-            
+
             var userControl = typeof(ReactiveUI.Avalonia.ReactiveUserControl<>);
             Assert.That(userControl.IsPublic, Is.True);
-            
+
             var window = typeof(ReactiveUI.Avalonia.ReactiveWindow<>);
             Assert.That(window.IsPublic, Is.True);
-            
+
             var viewHost = typeof(ReactiveUI.Avalonia.ViewModelViewHost);
             Assert.That(viewHost.IsPublic, Is.True);
         }
@@ -111,7 +111,7 @@ namespace ReactiveUI.Avalonia.Tests
             Assert.That(appBuilderExts.IsPublic, Is.True);
             Assert.That(appBuilderExts.IsSealed, Is.True);
             Assert.That(appBuilderExts.IsAbstract, Is.True);
-            
+
             var avaloniaExts = typeof(ReactiveUI.Avalonia.AvaloniaObjectReactiveExtensions);
             Assert.That(avaloniaExts.IsPublic, Is.True);
             Assert.That(avaloniaExts.IsSealed, Is.True);
@@ -124,11 +124,11 @@ namespace ReactiveUI.Avalonia.Tests
             // Test that assembly references expected dependencies
             var assembly = Assembly.GetAssembly(typeof(ReactiveUI.Avalonia.AvaloniaScheduler));
             var referencedAssemblies = assembly!.GetReferencedAssemblies();
-            
-            bool hasAvaloniaBase = false;
-            bool hasReactiveUI = false;
-            bool hasSystemReactive = false;
-            
+
+            var hasAvaloniaBase = false;
+            var hasReactiveUI = false;
+            var hasSystemReactive = false;
+
             foreach (var refAssembly in referencedAssemblies)
             {
                 if (refAssembly.Name!.StartsWith("Avalonia.Base") || refAssembly.Name.StartsWith("Avalonia"))
@@ -144,7 +144,7 @@ namespace ReactiveUI.Avalonia.Tests
                     hasSystemReactive = true;
                 }
             }
-            
+
             Assert.That(hasAvaloniaBase, Is.True, "Should reference Avalonia");
             Assert.That(hasReactiveUI, Is.True, "Should reference ReactiveUI");
             Assert.That(hasSystemReactive, Is.True, "Should reference System.Reactive");
