@@ -1,4 +1,5 @@
 ﻿using Avalonia;
+using NUnit.Framework;
 using ReactiveUI.Avalonia.Splat;
 using ReactiveUIDemo;
 using Splat;
@@ -9,7 +10,7 @@ namespace ReactiveUI.Avalonia.Microsoft.Tests;
 public class AvaloniaUIThreadTestsMicrosoft
 {
 #if MICROSOFT1
-    [Fact]
+    [Test]
     public void Test1()
     {
         MicrosoftDependencyResolver? container = default;
@@ -19,10 +20,10 @@ public class AvaloniaUIThreadTestsMicrosoft
             .UseReactiveUIWithDIContainer<MicrosoftDependencyResolver>(() => new(), con => container = con, res => resolver = res)
             .LogToTrace()
             .SetupWithoutStarting();
-        Assert.IsType<AvaloniaScheduler>(RxApp.MainThreadScheduler);
-        Assert.NotNull(container);
-        Assert.NotNull(resolver);
-        Assert.IsType<MicrosoftDependencyResolver>(Locator.Current);
+        Assert.That(RxApp.MainThreadScheduler, Is.TypeOf<AvaloniaScheduler>());
+        Assert.That(container, Is.Not.Null);
+        Assert.That(resolver, Is.Not.Null);
+        Assert.That(Locator.Current, Is.TypeOf<MicrosoftDependencyResolver>());
     }
 #endif
 ////#if MICROSOFT2

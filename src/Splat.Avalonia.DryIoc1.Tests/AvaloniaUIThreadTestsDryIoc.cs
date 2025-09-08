@@ -1,6 +1,7 @@
 ﻿using Avalonia;
 using Avalonia.ReactiveUI.Splat;
 using DryIoc;
+using NUnit.Framework;
 using ReactiveUIDemo;
 using Splat;
 using Splat.DryIoc;
@@ -10,7 +11,7 @@ namespace ReactiveUI.Avalonia.DryIoc1.Tests
     public class AvaloniaUIThreadTestsDryIoc
     {
 #if DRYIOC1
-        [Fact]
+        [Test]
         public void Test1()
         {
             DryIocDependencyResolver? container = default;
@@ -20,14 +21,14 @@ namespace ReactiveUI.Avalonia.DryIoc1.Tests
                 .UseReactiveUIWithDIContainer<DryIocDependencyResolver>(() => new(), con => container = con, res => resolver = res)
                 .LogToTrace()
                 .SetupWithoutStarting();
-            Assert.IsType<AvaloniaScheduler>(RxApp.MainThreadScheduler);
-            Assert.NotNull(container);
-            Assert.NotNull(resolver);
-            Assert.IsType<DryIocDependencyResolver>(Locator.Current);
+            Assert.That(RxApp.MainThreadScheduler, Is.TypeOf<AvaloniaScheduler>());
+            Assert.That(container, Is.Not.Null);
+            Assert.That(resolver, Is.Not.Null);
+            Assert.That(Locator.Current, Is.TypeOf<DryIocDependencyResolver>());
         }
 #endif
 #if DRYIOC2
-        [Fact]
+        [Test]
         public void Test2()
         {
             Container? container = default;
@@ -36,9 +37,9 @@ namespace ReactiveUI.Avalonia.DryIoc1.Tests
                 .UseReactiveUIWithDryIoc(con => container = con)
                 .LogToTrace()
                 .SetupWithoutStarting();
-            Assert.IsType<AvaloniaScheduler>(RxApp.MainThreadScheduler);
-            Assert.NotNull(container);
-            Assert.IsType<DryIocDependencyResolver>(Locator.Current);
+            Assert.That(RxApp.MainThreadScheduler, Is.TypeOf<AvaloniaScheduler>());
+            Assert.That(container, Is.Not.Null);
+            Assert.That(Locator.Current, Is.TypeOf<DryIocDependencyResolver>());
         }
 #endif
     }

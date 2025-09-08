@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>$(BaseTargetFrameworks)</TargetFrameworks>
+    <TargetFrameworks>net8.0</TargetFrameworks>
     <PackageDescription>Contains the ReactiveUI platform specific extensions for Avalonia</PackageDescription>
     <PackageTags>mvvm;reactiveui;rx;reactive extensions;observable;LINQ;events;frp;avalonia;net;netcore</PackageTags>
   </PropertyGroup>
