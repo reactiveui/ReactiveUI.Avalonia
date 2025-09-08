@@ -12,6 +12,8 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Splat.Avalonia.Microsoft.Extensions.DependencyInjection\Splat.Avalonia.Microsoft.Extensions.DependencyInjection.csproj" />
+    <ProjectReference Include="..\Splat.Avalonia.DryIoc\Splat.Avalonia.DryIoc.csproj" />
+    <ProjectReference Include="..\Splat.Avalonia.Autofac\Splat.Avalonia.Autofac.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Avalonia.Desktop" />
