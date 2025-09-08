@@ -42,11 +42,6 @@
     <PackageReference Include="NUnit" />
     <PackageReference Include="NUnit3TestAdapter" />
     <PackageReference Include="NUnit.Analyzers" />
-
-    <PackageReference Include="FluentAssertions" />
-    <PackageReference Include="Microsoft.Reactive.Testing" />
-    <PackageReference Include="PublicApiGenerator" />
-    <PackageReference Include="coverlet.msbuild" PrivateAssets="All" />
   </ItemGroup>
   <ItemGroup Condition="'$(IsTestProject)' != 'true'">
     <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" />
