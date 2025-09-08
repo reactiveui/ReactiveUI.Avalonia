@@ -28,7 +28,7 @@ namespace Avalonia.ReactiveUI.Splat
                 null => throw new ArgumentNullException(nameof(builder)),
                 _ => builder.UseReactiveUI().AfterPlatformServicesSetup(_ =>
                 {
-                    if (Locator.CurrentMutable is null)
+                    if (AppLocator.CurrentMutable is null)
                     {
                         return;
                     }
@@ -43,8 +43,8 @@ namespace Avalonia.ReactiveUI.Splat
 #endif
 
                     var container = new Container();
-                    Locator.CurrentMutable.RegisterConstant(container);
-                    Locator.SetLocator(new DryIocDependencyResolver(container));
+                    AppLocator.CurrentMutable.RegisterConstant(container);
+                    AppLocator.SetLocator(new DryIocDependencyResolver(container));
                     RxApp.MainThreadScheduler = AvaloniaScheduler.Instance;
                     containerConfig(container);
                 })
@@ -72,7 +72,7 @@ namespace Avalonia.ReactiveUI.Splat
                     null => throw new ArgumentNullException(nameof(builder)),
                     _ => builder.UseReactiveUI().AfterPlatformServicesSetup(_ =>
                     {
-                        if (Locator.CurrentMutable is null)
+                        if (AppLocator.CurrentMutable is null)
                         {
                             return;
                         }
@@ -99,9 +99,9 @@ namespace Avalonia.ReactiveUI.Splat
 #endif
 
                         var container = containerFactory();
-                        Locator.CurrentMutable.RegisterConstant(container);
+                        AppLocator.CurrentMutable.RegisterConstant(container);
                         var dependencyResolver = dependencyResolverFactory(container);
-                        Locator.SetLocator(dependencyResolver);
+                        AppLocator.SetLocator(dependencyResolver);
                         RxApp.MainThreadScheduler = AvaloniaScheduler.Instance;
                         containerConfig(container);
                     })
