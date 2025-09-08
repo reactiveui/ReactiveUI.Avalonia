@@ -35,9 +35,6 @@
     <Compile Include="..\Splat.Avalonia.Tests\Mocks\Views\FooView.axaml.cs" Link="Mocks\Views\FooView.axaml.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\Splat.Avalonia.Microsoft1.Tests\AvaloniaUIThreadTestsMicrosoft.cs" Link="AvaloniaUIThreadTestsMicrosoft.cs" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\Splat.Avalonia.Microsoft.Extensions.DependencyInjection\Splat.Avalonia.Microsoft.Extensions.DependencyInjection.csproj" />
   </ItemGroup>
   <ItemGroup>

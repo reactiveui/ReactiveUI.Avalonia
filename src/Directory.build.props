@@ -32,7 +32,7 @@
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <IncludePackageReferencesDuringMarkupCompilation>true</IncludePackageReferencesDuringMarkupCompilation>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <BaseTargetFrameworks>net8.0</BaseTargetFrameworks>
+    <BaseTargetFrameworks>netstandard2.0;net8.0;net9.0</BaseTargetFrameworks>
   </PropertyGroup>
   <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
     <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>

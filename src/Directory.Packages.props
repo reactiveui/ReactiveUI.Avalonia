@@ -7,6 +7,10 @@
     <SplatVersion>16.2.1</SplatVersion>
   </PropertyGroup>
   <ItemGroup>
+    <PackageVersion Include="coverlet.collector" Version="6.0.4">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageVersion>
     <PackageVersion Include="coverlet.msbuild" Version="6.0.4" />
     <PackageVersion Include="Autofac" Version="8.4.0" />
     <PackageVersion Include="Avalonia" Version="11.3.5" />
@@ -37,6 +41,5 @@
     <PackageVersion Include="NUnit" Version="4.3.1" />
     <PackageVersion Include="NUnit3TestAdapter" Version="4.6.0" />
     <PackageVersion Include="NUnit.Analyzers" Version="5.0.0" />
-
   </ItemGroup>
 </Project>
