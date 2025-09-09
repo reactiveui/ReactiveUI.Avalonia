@@ -1,5 +1,4 @@
 #pragma warning disable SA1201
-using System;
 using System.Reactive.Disposables;
 using Avalonia;
 using NUnit.Framework;

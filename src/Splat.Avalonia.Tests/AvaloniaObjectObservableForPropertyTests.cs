@@ -1,29 +1,13 @@
-#pragma warning disable SA1201
-using System;
 using System.Linq.Expressions;
 using System.Reactive.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using NUnit.Framework;
-using ReactiveUI;
-using ReactiveUI.Avalonia;
 
 namespace ReactiveUI.Avalonia.Tests
 {
     public class AvaloniaObjectObservableForPropertyTests
     {
-        private class TestControl : Control
-        {
-            public static readonly StyledProperty<string?> TextProperty =
-                AvaloniaProperty.Register<TestControl, string?>(nameof(Text));
-
-            public string? Text
-            {
-                get => GetValue(TextProperty);
-                set => SetValue(TextProperty, value);
-            }
-        }
-
         [Test]
         public void GetAffinity_AvaloniaObjectWithProperty_ReturnsPositive()
         {
@@ -76,6 +60,18 @@ namespace ReactiveUI.Avalonia.Tests
             Expression<Func<object?>> expr = () => new object();
             Assert.Throws<InvalidOperationException>(() =>
                 ((ICreatesObservableForProperty)sut).GetNotificationForProperty(new object(), expr, "Foo"));
+        }
+
+        private class TestControl : Control
+        {
+            public static readonly StyledProperty<string?> TextProperty =
+                AvaloniaProperty.Register<TestControl, string?>(nameof(Text));
+
+            public string? Text
+            {
+                get => GetValue(TextProperty);
+                set => SetValue(TextProperty, value);
+            }
         }
     }
 }

@@ -1,8 +1,5 @@
-using System;
 using System.Reflection;
-using Avalonia;
 using NUnit.Framework;
-using ReactiveUI.Avalonia;
 
 namespace ReactiveUI.Avalonia.Tests
 {

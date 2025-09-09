@@ -1,22 +1,11 @@
-﻿using System;
-using System.Reactive.Concurrency;
+﻿using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
-using System.Threading;
-using System.Threading.Tasks;
 using NUnit.Framework;
-using ReactiveUI.Avalonia;
 
 namespace ReactiveUI.Avalonia.Tests
 {
     public class AvaloniaUIThreadTestsMain
     {
-        [Test]
-        public void SimpleTest()
-        {
-            // Simple test to verify NUnit is working
-            Assert.That(1 + 1, Is.EqualTo(2));
-        }
-
         [Test]
         public void AvaloniaScheduler_Instance_IsNotNull()
         {

@@ -1,8 +1,5 @@
 #pragma warning disable SA1201
-using System;
 using NUnit.Framework;
-using ReactiveUI;
-using ReactiveUI.Avalonia;
 using Splat;
 
 namespace ReactiveUI.Avalonia.Tests

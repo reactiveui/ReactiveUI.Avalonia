@@ -1,8 +1,6 @@
-using System;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using NUnit.Framework;
-using ReactiveUI.Avalonia;
 
 namespace ReactiveUI.Avalonia.Tests
 {

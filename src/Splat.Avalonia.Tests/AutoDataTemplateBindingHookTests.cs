@@ -1,10 +1,7 @@
-#pragma warning disable SA1202
-using System;
 using System.Linq.Expressions;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
 using NUnit.Framework;
-using ReactiveUI.Avalonia;
 
 namespace ReactiveUI.Avalonia.Tests
 {

@@ -3,9 +3,6 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
   </PropertyGroup>
-  <PropertyGroup>
-    <SplatVersion>16.2.1</SplatVersion>
-  </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="coverlet.collector" Version="6.0.4">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -28,11 +25,11 @@
     <PackageVersion Include="Ninject" Version="3.3.6" />
     <PackageVersion Include="ReactiveUI" Version="21.0.1" />
     <PackageVersion Include="Roslynator.Analyzers" Version="4.14.0" />
-    <PackageVersion Include="Splat" Version="$(SplatVersion)" />
-    <PackageVersion Include="Splat.Autofac" Version="$(SplatVersion)" />
-    <PackageVersion Include="Splat.Drawing" Version="$(SplatVersion)" />
-    <PackageVersion Include="Splat.DryIoc" Version="$(SplatVersion)" />
-    <PackageVersion Include="Splat.Ninject" Version="$(SplatVersion)" />
+    <PackageVersion Include="Splat" Version="16.2.1" />
+    <PackageVersion Include="Splat.Autofac" Version="16.2.1" />
+    <PackageVersion Include="Splat.Drawing" Version="16.2.1" />
+    <PackageVersion Include="Splat.DryIoc" Version="16.2.1" />
+    <PackageVersion Include="Splat.Ninject" Version="16.2.1" />
     <PackageVersion Include="stylecop.analyzers" Version="1.2.0-beta.556" />
     <PackageVersion Include="System.Collections.Immutable" Version="8.0.0" />
     <PackageVersion Include="System.IO.FileSystem.Primitives" Version="4.3.0" />

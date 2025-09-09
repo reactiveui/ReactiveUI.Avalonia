@@ -1,10 +1,8 @@
 #pragma warning disable SA1201
-using System;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Data;
 using NUnit.Framework;
-using ReactiveUI.Avalonia;
 
 namespace ReactiveUI.Avalonia.Tests
 {
