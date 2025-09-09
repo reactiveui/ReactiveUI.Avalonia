@@ -28,7 +28,7 @@ namespace ReactiveUI.Avalonia.Splat
                 null => throw new ArgumentNullException(nameof(builder)),
                 _ => builder.UseReactiveUI().AfterPlatformServicesSetup(_ =>
                 {
-                    if (Locator.CurrentMutable is null)
+                    if (AppLocator.CurrentMutable is null)
                     {
                         return;
                     }
@@ -43,18 +43,18 @@ namespace ReactiveUI.Avalonia.Splat
 #endif
 
                     IServiceCollection serviceCollection = new ServiceCollection();
-                    Locator.CurrentMutable.RegisterConstant(serviceCollection);
-                    Locator.SetLocator(new MicrosoftDependencyResolver(serviceCollection));
+                    AppLocator.CurrentMutable.RegisterConstant(serviceCollection);
+                    AppLocator.SetLocator(new MicrosoftDependencyResolver(serviceCollection));
                     RxApp.MainThreadScheduler = AvaloniaScheduler.Instance;
                     containerConfig(serviceCollection);
                     var serviceProvider = serviceCollection.BuildServiceProvider();
-                    if (Locator.Current is MicrosoftDependencyResolver resolver)
+                    if (AppLocator.Current is MicrosoftDependencyResolver resolver)
                     {
                         resolver.UpdateContainer(serviceProvider);
                     }
                     else
                     {
-                        Locator.SetLocator(new MicrosoftDependencyResolver(serviceProvider));
+                        AppLocator.SetLocator(new MicrosoftDependencyResolver(serviceProvider));
                     }
 
                     if (withResolver is not null)
@@ -86,7 +86,7 @@ namespace ReactiveUI.Avalonia.Splat
                     null => throw new ArgumentNullException(nameof(builder)),
                     _ => builder.UseReactiveUI().AfterPlatformServicesSetup(_ =>
                     {
-                        if (Locator.CurrentMutable is null)
+                        if (AppLocator.CurrentMutable is null)
                         {
                             return;
                         }
@@ -113,9 +113,9 @@ namespace ReactiveUI.Avalonia.Splat
 #endif
 
                         var container = containerFactory();
-                        Locator.CurrentMutable.RegisterConstant(container);
+                        AppLocator.CurrentMutable.RegisterConstant(container);
                         var dependencyResolver = dependencyResolverFactory(container);
-                        Locator.SetLocator(dependencyResolver);
+                        AppLocator.SetLocator(dependencyResolver);
                         RxApp.MainThreadScheduler = AvaloniaScheduler.Instance;
                         containerConfig(container);
                     })

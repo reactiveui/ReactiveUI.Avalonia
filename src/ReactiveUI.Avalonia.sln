@@ -11,13 +11,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Splat.Avalonia.DryIoc", "Sp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Splat.Avalonia.DryIoc1.Tests", "Splat.Avalonia.DryIoc1.Tests\Splat.Avalonia.DryIoc1.Tests.csproj", "{4C8CC2F8-2AE2-63E7-5AB3-C3E22C09D3D2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Splat.Avalonia.DryIoc2.Tests", "Splat.Avalonia.DryIoc2.Tests\Splat.Avalonia.DryIoc2.Tests.csproj", "{3796FDE5-9AF5-85B9-10C3-318763AE15B7}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Splat.Avalonia.Microsoft.Extensions.DependencyInjection", "Splat.Avalonia.Microsoft.Extensions.DependencyInjection\Splat.Avalonia.Microsoft.Extensions.DependencyInjection.csproj", "{93FC1FFA-3338-8B15-1825-FBD3C160EA5E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Splat.Avalonia.Microsoft1.Tests", "Splat.Avalonia.Microsoft1.Tests\Splat.Avalonia.Microsoft1.Tests.csproj", "{DBDA8127-BAD8-BEA2-5753-F1EF2CC0CEF2}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Splat.Avalonia.Microsoft2.Tests", "Splat.Avalonia.Microsoft2.Tests\Splat.Avalonia.Microsoft2.Tests.csproj", "{90EBC5E2-DC97-CBF4-0105-C1BDFD9FEE0C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Splat.Avalonia.Microsoft.Tests", "Splat.Avalonia.Microsoft1.Tests\Splat.Avalonia.Microsoft.Tests.csproj", "{DBDA8127-BAD8-BEA2-5753-F1EF2CC0CEF2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Splat.Avalonia.Ninject", "Splat.Avalonia.Ninject\Splat.Avalonia.Ninject.csproj", "{E6C4CDCE-C899-7D7A-6703-826E120B7732}"
 EndProject
@@ -31,8 +27,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionConfig", "SolutionC
 		..\.github\workflows\ci-build.yml = ..\.github\workflows\ci-build.yml
 		..\CODE_OF_CONDUCT.md = ..\CODE_OF_CONDUCT.md
 		..\CONTRIBUTING.md = ..\CONTRIBUTING.md
-		Directory.build.props = Directory.build.props
-		Directory.build.targets = Directory.build.targets
+		Directory.Build.props = Directory.Build.props
+		Directory.Build.targets = Directory.Build.targets
 		Directory.Packages.props = Directory.Packages.props
 		..\LICENSE = ..\LICENSE
 		..\nuget.config = ..\nuget.config
@@ -66,10 +62,6 @@ Global
 		{4C8CC2F8-2AE2-63E7-5AB3-C3E22C09D3D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4C8CC2F8-2AE2-63E7-5AB3-C3E22C09D3D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4C8CC2F8-2AE2-63E7-5AB3-C3E22C09D3D2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3796FDE5-9AF5-85B9-10C3-318763AE15B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3796FDE5-9AF5-85B9-10C3-318763AE15B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3796FDE5-9AF5-85B9-10C3-318763AE15B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3796FDE5-9AF5-85B9-10C3-318763AE15B7}.Release|Any CPU.Build.0 = Release|Any CPU
 		{93FC1FFA-3338-8B15-1825-FBD3C160EA5E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{93FC1FFA-3338-8B15-1825-FBD3C160EA5E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{93FC1FFA-3338-8B15-1825-FBD3C160EA5E}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -78,10 +70,6 @@ Global
 		{DBDA8127-BAD8-BEA2-5753-F1EF2CC0CEF2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DBDA8127-BAD8-BEA2-5753-F1EF2CC0CEF2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DBDA8127-BAD8-BEA2-5753-F1EF2CC0CEF2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{90EBC5E2-DC97-CBF4-0105-C1BDFD9FEE0C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{90EBC5E2-DC97-CBF4-0105-C1BDFD9FEE0C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{90EBC5E2-DC97-CBF4-0105-C1BDFD9FEE0C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{90EBC5E2-DC97-CBF4-0105-C1BDFD9FEE0C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E6C4CDCE-C899-7D7A-6703-826E120B7732}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E6C4CDCE-C899-7D7A-6703-826E120B7732}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E6C4CDCE-C899-7D7A-6703-826E120B7732}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -96,9 +84,7 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{4C8CC2F8-2AE2-63E7-5AB3-C3E22C09D3D2} = {5A781B8E-46B7-4226-9158-223531FE9E57}
-		{3796FDE5-9AF5-85B9-10C3-318763AE15B7} = {5A781B8E-46B7-4226-9158-223531FE9E57}
 		{DBDA8127-BAD8-BEA2-5753-F1EF2CC0CEF2} = {5A781B8E-46B7-4226-9158-223531FE9E57}
-		{90EBC5E2-DC97-CBF4-0105-C1BDFD9FEE0C} = {5A781B8E-46B7-4226-9158-223531FE9E57}
 		{58A3DEF1-6B1A-111E-660A-93AE84C80529} = {5A781B8E-46B7-4226-9158-223531FE9E57}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution

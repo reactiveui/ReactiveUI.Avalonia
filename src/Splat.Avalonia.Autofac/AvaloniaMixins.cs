@@ -32,7 +32,7 @@ namespace Avalonia.ReactiveUI.Splat
                 null => throw new ArgumentNullException(nameof(builder)),
                 _ => builder.UseReactiveUI().AfterPlatformServicesSetup(_ =>
                 {
-                    if (Locator.CurrentMutable is null)
+                    if (AppLocator.CurrentMutable is null)
                     {
                         return;
                     }
@@ -47,7 +47,7 @@ namespace Avalonia.ReactiveUI.Splat
 
                     var containerBuilder = new ContainerBuilder();
                     var autofacResolver = new AutofacDependencyResolver(containerBuilder);
-                    Locator.SetLocator(autofacResolver);
+                    AppLocator.SetLocator(autofacResolver);
                     containerBuilder.RegisterInstance(autofacResolver);
                     autofacResolver.InitializeReactiveUI();
                     RxApp.MainThreadScheduler = AvaloniaScheduler.Instance;
@@ -84,7 +84,7 @@ namespace Avalonia.ReactiveUI.Splat
                     null => throw new ArgumentNullException(nameof(builder)),
                     _ => builder.UseReactiveUI().AfterPlatformServicesSetup(_ =>
                     {
-                        if (Locator.CurrentMutable is null)
+                        if (AppLocator.CurrentMutable is null)
                         {
                             return;
                         }
@@ -111,9 +111,9 @@ namespace Avalonia.ReactiveUI.Splat
 #endif
 
                         var container = containerFactory();
-                        Locator.CurrentMutable.RegisterConstant(container);
+                        AppLocator.CurrentMutable.RegisterConstant(container);
                         var dependencyResolver = dependencyResolverFactory(container);
-                        Locator.SetLocator(dependencyResolver);
+                        AppLocator.SetLocator(dependencyResolver);
                         RxApp.MainThreadScheduler = AvaloniaScheduler.Instance;
                         containerConfig(container);
                     })

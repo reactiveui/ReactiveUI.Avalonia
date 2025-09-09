@@ -26,7 +26,8 @@
     <DefineConstants>$(DefineConstants);MONO;ANDROID</DefineConstants>
   </PropertyGroup>
 
-  <Target Name="ValidateNugetProperties" Condition="!$(IsTestProject) or $(IsTestProject) == ''" BeforeTargets="Compile">
+  <!-- Use a safe boolean condition so missing IsTestProject doesn't break build -->
+  <Target Name="ValidateNugetProperties" Condition="'$(IsTestProject)' != 'true'" BeforeTargets="Compile">
     <Error Condition="$(PackageDescription) == '' or $(PackageDescription) == $(DefaultPackageDescription)" Text="The Nuget PackageDescription property needs to be set for the project. Currently : '$(PackageDescription)'" />
   </Target>
 </Project>

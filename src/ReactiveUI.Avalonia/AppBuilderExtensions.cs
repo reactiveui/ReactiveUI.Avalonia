@@ -32,17 +32,17 @@ public static class AppBuilderExtensions
 
         return builder.AfterPlatformServicesSetup(_ => Locator.RegisterResolverCallbackChanged(() =>
         {
-            if (Locator.CurrentMutable is null)
+            if (AppLocator.CurrentMutable is null)
             {
                 return;
             }
 
             PlatformRegistrationManager.SetRegistrationNamespaces(RegistrationNamespace.Avalonia);
             RxApp.MainThreadScheduler = AvaloniaScheduler.Instance;
-            Locator.CurrentMutable.RegisterConstant<IActivationForViewFetcher>(new AvaloniaActivationForViewFetcher());
-            Locator.CurrentMutable.RegisterConstant<IPropertyBindingHook>(new AutoDataTemplateBindingHook());
-            Locator.CurrentMutable.RegisterConstant<ICreatesCommandBinding>(new AvaloniaCreatesCommandBinding());
-            Locator.CurrentMutable.RegisterConstant<ICreatesObservableForProperty>(new AvaloniaObjectObservableForProperty());
+            AppLocator.CurrentMutable.RegisterConstant<IActivationForViewFetcher>(new AvaloniaActivationForViewFetcher());
+            AppLocator.CurrentMutable.RegisterConstant<IPropertyBindingHook>(new AutoDataTemplateBindingHook());
+            AppLocator.CurrentMutable.RegisterConstant<ICreatesCommandBinding>(new AvaloniaCreatesCommandBinding());
+            AppLocator.CurrentMutable.RegisterConstant<ICreatesObservableForProperty>(new AvaloniaObjectObservableForProperty());
         }));
     }
 
@@ -64,7 +64,7 @@ public static class AppBuilderExtensions
 
         return builder.AfterPlatformServicesSetup(_ =>
         {
-            var resolver = Locator.CurrentMutable;
+            var resolver = AppLocator.CurrentMutable;
             if (resolver is null)
             {
                 return;
@@ -133,7 +133,7 @@ public static class AppBuilderExtensions
                     {
                         try
                         {
-                            var resolved = Locator.Current.GetService(viewType);
+                            var resolved = AppLocator.Current.GetService(viewType);
                             if (resolved is not null)
                             {
                                 return resolved;
