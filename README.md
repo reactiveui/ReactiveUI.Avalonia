@@ -295,7 +295,7 @@ Please do not open GitHub issues for support requests.
 
 ReactiveUI.Avalonia is developed under an OSI-approved open source license, making it freely usable and distributable, even for commercial use.
 
-If you want to submit pull requests please first open a [GitHub issue](https://github.com/reactiveui/ReactiveUI/issues/new/choose) to discuss. We are first time PR contributors friendly.
+If you want to submit pull requests please first open a [GitHub issue](https://github.com/reactiveui/ReactiveUI.Avalonia/issues/new/choose) to discuss. We are first time PR contributors friendly.
 
 See [Contribution Guidelines](https://www.reactiveui.net/contribute/) for further information how to contribute changes.
 
