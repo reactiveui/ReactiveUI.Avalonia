@@ -1,7 +1,8 @@
-![Build](https://github.com/reactiveui/ReactiveUI/workflows/Build/badge.svg) 
-[![Code Coverage](https://codecov.io/gh/reactiveui/ReactiveUI/branch/main/graph/badge.svg)](https://codecov.io/gh/reactiveui/ReactiveUI)
-[![#yourfirstpr](https://img.shields.io/badge/first--timers--only-friendly-blue.svg)](https://reactiveui.net/contribute) 
+[![Build](https://github.com/reactiveui/ReactiveUI.Avalonia/actions/workflows/ci-build.yml/badge.svg)](https://github.com/reactiveui/ReactiveUI.Avalonia/actions/workflows/ci-build.yml)
+[![Code Coverage](https://codecov.io/gh/reactiveui/ReactiveUI.Avalonia/branch/main/graph/badge.svg)](https://codecov.io/gh/reactiveui/ReactiveUI.Avalonia)
+[![#yourfirstpr](https://img.shields.io/badge/first--timers--only-friendly-blue.svg)](https://reactiveui.net/contribute)
 [![](https://img.shields.io/badge/chat-slack-blue.svg)](https://reactiveui.net/slack)
+[![NuGet](https://img.shields.io/nuget/v/ReactiveUI.Avalonia.svg)](https://www.nuget.org/packages/ReactiveUI.Avalonia/)
 
 <br>
 <a href="https://github.com/reactiveui/reactiveui">
@@ -9,108 +10,262 @@
 </a>
 <br>
 
-# What is ReactiveUI?
+# ReactiveUI for Avalonia UI
 
-[ReactiveUI](https://reactiveui.net/) is a composable, cross-platform model-view-viewmodel framework for all .NET platforms that is inspired by functional reactive programming, which is a paradigm that allows you to [abstract mutable state away from your user interfaces and express the idea around a feature in one readable place](https://www.youtube.com/watch?v=3HwEytvngXk) and improve the testability of your application.
+This package provides [ReactiveUI](https://reactiveui.net/) bindings for the [Avalonia UI](https://avaloniaui.net/) framework, enabling you to build composable, cross-platform model-view-viewmodel (MVVM) applications for Windows, macOS, and Linux.
 
-[🔨 Get Started](https://reactiveui.net/docs/getting-started/) [🛍 Install Packages](https://reactiveui.net/docs/getting-started/installation/) [🎞 Watch Videos](https://reactiveui.net/docs/resources/videos) [🎓 View Samples](https://reactiveui.net/docs/resources/samples/) [🎤 Discuss ReactiveUI](https://reactiveui.net/slack)
-
-## Book
-There has been an excellent [book](https://kent-boogaart.com/you-i-and-reactiveui/) written by our Alumni maintainer Kent Boogart.
-
+---
 ## NuGet Packages
 
-Install the following packages to start building your own ReactiveUI app. <b>Note:</b> some of the platform-specific packages are required. This means your app won't perform as expected until you install the packages properly. See the <a href="https://reactiveui.net/docs/getting-started/installation/">Installation</a> docs page for more info.
+To get started, install the following package into your Avalonia application project.
 
-| Platform          | ReactiveUI Package                  | NuGet                  |
-| ----------------- | ----------------------------------- | ---------------------- |
-| .NET Standard     | [ReactiveUI][CoreDoc]               | [![CoreBadge]][Core]   |
-|                   | [ReactiveUI.Fody][FodyDoc]          | [![FodyBadge]][Fody]   |
-| Unit Testing      | [ReactiveUI.Testing][TestDoc]       | [![TestBadge]][Test]   |
-| WPF               | [ReactiveUI.WPF][WpfDoc]            | [![WpfBadge]][Wpf]     |
-| UWP               | [ReactiveUI.Uwp][UwpDoc]            | [![UwpBadge]][Uwp]     |
-| WinUI             | [ReactiveUI.WinUI][WinUiDoc]        | [![WinUiBadge]][WinUi] |
-| MAUI              | [ReactiveUI.Maui][MauiDoc]          | [![MauiBadge]][Maui] |
-| Windows Forms     | [ReactiveUI.WinForms][WinDoc]       | [![WinBadge]][Win]     |
-| Xamarin.Forms     | [ReactiveUI.XamForms][XamDoc]       | [![XamBadge]][Xam]     |
-| Xamarin.Essentials| [ReactiveUI][XamDoc]                | [![CoreBadge]][Core]   |
-| AndroidX (Xamarin)| [ReactiveUI.AndroidX][DroDoc]       | [![DroXBadge]][DroX]   |
-| Xamarin.Android   | [ReactiveUI.AndroidSupport][DroDoc] | [![DroBadge]][Dro]     |
-| Xamarin.iOS       | [ReactiveUI][IosDoc]                | [![CoreBadge]][Core]   |
-| Xamarin.Mac       | [ReactiveUI][MacDoc]                | [![CoreBadge]][Core]   |
-| Tizen             | [ReactiveUI][CoreDoc]               | [![CoreBadge]][Core]   |
-| Blazor            | [ReactiveUI.Blazor][BlazDoc]        | [![BlazBadge]][Blaz]   |
-| Platform Uno      | [ReactiveUI.Uno][UnoDoc]            | [![UnoBadge]][Uno]     |
-| Platform Uno      | [ReactiveUI.Uno.WinUI][UnoWinUiDoc] | [![UnoWinUiBadge]][UnoWinUi] |
-| Avalonia          | [Avalonia.ReactiveUI][AvaDoc]       | [![AvaBadge]][Ava]     |
-| Any               | [ReactiveUI.Validation][ValDocs]    | [![ValBadge]][ValCore] |
+| Platform          | NuGet                  |
+| ----------------- | ---------------------- |
+| Avalonia          | [![NuGet](https://img.shields.io/nuget/v/ReactiveUI.Avalonia.svg)](https://www.nuget.org/packages/ReactiveUI.Avalonia/) |
 
-[Core]: https://www.nuget.org/packages/ReactiveUI/
-[CoreBadge]: https://img.shields.io/nuget/v/ReactiveUI.svg
-[CoreDoc]: https://reactiveui.net/docs/getting-started/installation/
+-----
 
-[Fody]: https://www.nuget.org/packages/ReactiveUI.Fody/
-[FodyDoc]: https://reactiveui.net/docs/handbook/view-models/boilerplate-code
-[FodyBadge]: https://img.shields.io/nuget/v/ReactiveUI.Fody.svg
+## Tutorial: Mastering ReactiveUI with Avalonia
 
-[Test]: https://www.nuget.org/packages/ReactiveUI.Testing/
-[TestBadge]: https://img.shields.io/nuget/v/ReactiveUI.Testing.svg
-[TestDoc]: https://reactiveui.net/docs/handbook/testing/
+Welcome to the `ReactiveUI.Avalonia` guide! This tutorial will walk you through setting up an Avalonia application with the power of ReactiveUI. We'll start from the basics and build up to a fully reactive application.
 
-[Wpf]: https://www.nuget.org/packages/ReactiveUI.WPF/
-[WpfBadge]: https://img.shields.io/nuget/v/ReactiveUI.WPF.svg
-[WpfDoc]: https://reactiveui.net/docs/getting-started/installation/windows-presentation-foundation
+`ReactiveUI.Avalonia` provides the necessary bindings and helpers to seamlessly integrate the ReactiveUI MVVM framework with your Avalonia projects, enabling you to write elegant, testable, and maintainable code.
 
-[Uwp]: https://www.nuget.org/packages/ReactiveUI.Uwp/
-[UwpBadge]: https://img.shields.io/nuget/v/ReactiveUI.Uwp.svg
-[UwpDoc]: https://reactiveui.net/docs/getting-started/installation/universal-windows-platform
+### Chapter 1: Getting Started - Your First Reactive View
 
-[WinUi]: https://www.nuget.org/packages/ReactiveUI.WinUI/
-[WinUiBadge]: https://img.shields.io/nuget/v/ReactiveUI.WinUI.svg
-[WinUiDoc]: https://reactiveui.net/docs/getting-started/installation/universal-windows-platform
+Let's begin by setting up your project and creating your first reactive view and view model.
 
-[Maui]: https://www.nuget.org/packages/ReactiveUI.Maui/
-[MauiBadge]: https://img.shields.io/nuget/v/ReactiveUI.Maui.svg
-[MauiDoc]: https://blog.jetbrains.com/dotnet/2020/09/18/xamarin-maui-and-the-reactive-mvvm-between-them-webinar-recording/
+#### 1. Installation
 
-[Win]: https://www.nuget.org/packages/ReactiveUI.WinForms/
-[WinEvents]: https://www.nuget.org/packages/ReactiveUI.Events.WinForms/
-[WinBadge]: https://img.shields.io/nuget/v/ReactiveUI.WinForms.svg
-[WinDoc]: https://reactiveui.net/docs/getting-started/installation/windows-forms
+Add the `ReactiveUI.Avalonia` package to your Avalonia application's project file.
 
-[Xam]: https://www.nuget.org/packages/ReactiveUI.XamForms/
-[XamEvents]: https://www.nuget.org/packages/ReactiveUI.Events.XamForms/
-[XamBadge]: https://img.shields.io/nuget/v/ReactiveUI.XamForms.svg
-[XamDoc]: https://reactiveui.net/docs/getting-started/installation/xamarin-forms
-[Dro]: https://www.nuget.org/packages/ReactiveUI.AndroidSupport/
-[DroBadge]: https://img.shields.io/nuget/v/ReactiveUI.AndroidSupport.svg
-[DroDoc]: https://reactiveui.net/docs/getting-started/installation/xamarin-android
+```xml
+<PackageReference Include="ReactiveUI.Avalonia" Version="21.0.1" />
+```
 
-[DroX]: https://www.nuget.org/packages/ReactiveUI.AndroidX/
-[DroXBadge]: https://img.shields.io/nuget/v/ReactiveUI.AndroidX.svg
+#### 2. Initialization
 
-[MacDoc]: https://reactiveui.net/docs/getting-started/installation/xamarin-mac
-[IosDoc]: https://reactiveui.net/docs/getting-started/installation/xamarin-ios
+Initialize ReactiveUI in your Avalonia app builder. Call `UseReactiveUI()` during app setup. You can also auto-register views for view models with the provided helpers.
 
-[Uno]: https://www.nuget.org/packages/ReactiveUI.Uno/
-[UnoBadge]: https://img.shields.io/nuget/v/ReactiveUI.Uno.svg
-[UnoDoc]: https://reactiveui.net/docs/getting-started/installation/uno-platform
-[UnoWinUi]: https://www.nuget.org/packages/ReactiveUI.Uno.WinUI/
-[UnoWinUiBadge]: https://img.shields.io/nuget/v/ReactiveUI.Uno.WinUI.svg
-[UnoWinUiDoc]: https://reactiveui.net/docs/getting-started/installation/uno-platform
+```csharp
+// Program.cs
+using Avalonia;
+using ReactiveUI.Avalonia;
 
-[Blaz]: https://www.nuget.org/packages/ReactiveUI.Blazor/
-[BlazBadge]: https://img.shields.io/nuget/v/ReactiveUI.Blazor.svg
-[BlazDoc]: https://www.reactiveui.net/docs/getting-started/installation/blazor
+public static class Program
+{
+    public static void Main(string[] args) => BuildAvaloniaApp()
+        .StartWithClassicDesktopLifetime(args);
 
-[Ava]: https://www.nuget.org/packages/Avalonia.ReactiveUI/
-[AvaBadge]: https://img.shields.io/nuget/v/Avalonia.ReactiveUI.svg
-[AvaDoc]: https://reactiveui.net/docs/getting-started/installation/avalonia
-[EventsDocs]: https://reactiveui.net/docs/handbook/events/
+    public static AppBuilder BuildAvaloniaApp() => AppBuilder.Configure<App>()
+        .UsePlatformDetect()
+        .LogToTrace()
+        .UseReactiveUI() // Initialize ReactiveUI for Avalonia
+        .RegisterReactiveUIViewsFromEntryAssembly(); // Optional: scan & register IViewFor<> views
+}
+```
 
-[ValCore]: https://www.nuget.org/packages/ReactiveUI.Validation/
-[ValBadge]: https://img.shields.io/nuget/v/ReactiveUI.Validation.svg
-[ValDocs]: https://reactiveui.net/docs/handbook/user-input-validation/
+#### 3. Create a ViewModel
+
+Create a simple view model. Notice how it inherits from `ReactiveObject` and uses `RaiseAndSetIfChanged` to notify the UI of property changes.
+
+```csharp
+// MyViewModel.cs
+using ReactiveUI;
+
+public class MyViewModel : ReactiveObject
+{
+    private string _greeting;
+
+    public string Greeting
+    {
+        get => _greeting;
+        set => this.RaiseAndSetIfChanged(ref _greeting, value);
+    }
+
+    public MyViewModel()
+    {
+        Greeting = "Hello, Reactive World!";
+    }
+}
+```
+
+#### 4. Create a Reactive View
+
+Create a view that binds to this view model. `ReactiveUserControl<TViewModel>` (or `ReactiveWindow<TViewModel>`) makes this easy.
+
+```xml
+<!-- MainView.axaml -->
+<UserControl x:Class="MyAvaloniaApp.Views.MainView"
+             xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:MyAvaloniaApp.Views"
+             xmlns:rxui="using:ReactiveUI.Avalonia">
+    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+        <TextBlock x:Name="GreetingTextBlock" FontSize="24"/>
+    </StackPanel>
+</UserControl>
+```
+
+In the code-behind, use `WhenActivated` to set up your bindings. This is the core of a reactive view.
+
+```csharp
+// MainView.axaml.cs
+using ReactiveUI;
+using ReactiveUI.Avalonia;
+using System.Reactive.Disposables;
+
+public partial class MainView : ReactiveUserControl<MyViewModel>
+{
+    public MainView()
+    {
+        InitializeComponent();
+        ViewModel = new MyViewModel();
+
+        this.WhenActivated(disposables =>
+        {
+            this.OneWayBind(ViewModel,
+                vm => vm.Greeting,
+                v => v.GreetingTextBlock.Text)
+                .DisposeWith(disposables);
+        });
+    }
+}
+```
+
+Congratulations! You've just created your first reactive UI with `ReactiveUI.Avalonia`. When you run the app, you'll see the greeting message displayed.
+
+### Chapter 2: Handling User Interaction with ReactiveCommands
+
+Static text is great, but apps need to respond to users. `ReactiveCommand` is the standard way to handle user actions like button clicks in a testable and composable way.
+
+#### 1. Add a Command to the ViewModel
+
+Let's add a command to our view model that generates a new greeting.
+
+```csharp
+// MyViewModel.cs
+using ReactiveUI;
+using System;
+using System.Reactive;
+
+public class MyViewModel : ReactiveObject
+{
+    // ... Greeting property from before ...
+
+    public ReactiveCommand<Unit, Unit> GenerateGreetingCommand { get; }
+
+    public MyViewModel()
+    {
+        Greeting = "Hello, Reactive World!";
+
+        GenerateGreetingCommand = ReactiveCommand.Create(() =>
+        {
+            Greeting = $"Hello from Avalonia! The time is {DateTime.Now.ToLongTimeString()}";
+        });
+    }
+}
+```
+
+#### 2. Bind the Command in the View
+
+Add a button to your XAML and bind its `Command` property to the new command.
+
+```xml
+<!-- MainView.axaml -->
+<StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+    <TextBlock x:Name="GreetingTextBlock" FontSize="24"/>
+    <Button x:Name="GenerateGreetingButton" Content="Generate" Margin="0,20,0,0"/>
+</StackPanel>
+```
+
+Update your `WhenActivated` block to bind the button to the command.
+
+```csharp
+// MainView.axaml.cs
+this.WhenActivated(disposables =>
+{
+    // ... existing binding ...
+
+    this.BindCommand(ViewModel,
+        vm => vm.GenerateGreetingCommand,
+        v => v.GenerateGreetingButton)
+        .DisposeWith(disposables);
+});
+```
+
+Now, when you click the button, the command will execute, the `Greeting` property will change, and the UI will automatically update.
+
+### Chapter 3: Navigating with `RoutedViewHost`
+
+For more complex applications, you'll need navigation. `RoutedViewHost` is a control that displays a view based on the current state of a `RoutingState` object.
+
+#### 1. Set up a Router
+
+In your main view model (or a dedicated routing service), create a `RoutingState`.
+
+```csharp
+// AppViewModel.cs
+using ReactiveUI;
+
+public class AppViewModel : ReactiveObject, IScreen
+{
+    public RoutingState Router { get; } = new RoutingState();
+
+    public AppViewModel()
+    {
+        // Navigate to the initial view model
+        Router.Navigate.Execute(new MyViewModel());
+    }
+}
+```
+
+#### 2. Use `RoutedViewHost` in your Main Window
+
+In your main window's XAML, replace the content with a `RoutedViewHost` and bind its `Router` property.
+
+```xml
+<!-- MainWindow.axaml -->
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:rxui="using:ReactiveUI.Avalonia"
+        x:Class="MyAvaloniaApp.MainWindow">
+    <Grid>
+        <rxui:RoutedViewHost Router="{Binding Router}" />
+    </Grid>
+</Window>
+```
+
+You'll also need a way to tell `RoutedViewHost` which view to create for a given view model. You can either register views manually or use the provided scan helpers.
+
+```csharp
+// App.axaml.cs (during app initialization)
+using ReactiveUI;
+using ReactiveUI.Avalonia;
+using Splat;
+
+Locator.CurrentMutable.Register(() => new MainView(), typeof(IViewFor<MyViewModel>));
+// or use: AppBuilder.Configure<App>().UseReactiveUI().RegisterReactiveUIViewsFromEntryAssembly();
+```
+
+Now, as you call `Router.Navigate.Execute(...)`, the `RoutedViewHost` will automatically switch to the correct view.
+
+This tutorial has covered the basics of getting started with `ReactiveUI.Avalonia`. You've learned how to set up your project, create reactive view models and views, handle user interaction with commands, and manage navigation. From here, you can explore more advanced ReactiveUI features like `WhenAnyValue`, `ObservableAsPropertyHelper`, and more complex command scenarios.
+
+-----
+
+## Thanks
+
+We want to thank the following contributors and libraries that help make ReactiveUI.Avalonia possible:
+
+### Core Libraries
+
+  - **Avalonia UI**: [Avalonia](https://avaloniaui.net/) - The cross-platform UI framework.
+  - **System.Reactive**: [Reactive Extensions for .NET](https://github.com/dotnet/reactive) - The foundation of ReactiveUI's asynchronous API.
+  - **Splat**: [Splat](https://github.com/reactiveui/splat) - Cross-platform utilities and service location.
+  - **ReactiveUI**: [ReactiveUI](https://github.com/reactiveui/reactiveui) - The core MVVM framework.
+
+-----
 
 ## Sponsorship
 
@@ -120,120 +275,32 @@ The core team members, ReactiveUI contributors and contributors in the ecosystem
 
 This is how we use the donations:
 
-* Allow the core team to work on ReactiveUI
-* Thank contributors if they invested a large amount of time in contributing
-* Support projects in the ecosystem
+  * Allow the core team to work on ReactiveUI
+  * Thank contributors if they invested a large amount of time in contributing
+  * Support projects in the ecosystem
+
+-----
 
 ## Support
 
-If you have a question, please see if any discussions in our [GitHub issues](https://github.com/reactiveui/ReactiveUI/issues) or [Stack Overflow](https://stackoverflow.com/questions/tagged/reactiveui) have already answered it.
+If you have a question, please see if any discussions in our [GitHub Discussions](https://github.com/reactiveui/ReactiveUI.Avalonia/discussions) or [GitHub issues](https://github.com/reactiveui/ReactiveUI.Avalonia/issues) have already answered it.
 
 If you want to discuss something or just need help, here is our [Slack room](https://reactiveui.net/slack), where there are always individuals looking to help out!
 
 Please do not open GitHub issues for support requests.
 
+-----
+
 ## Contribute
 
-ReactiveUI is developed under an OSI-approved open source license, making it freely usable and distributable, even for commercial use. 
+ReactiveUI.Avalonia is developed under an OSI-approved open source license, making it freely usable and distributable, even for commercial use.
 
-If you want to submit pull requests please first open a [GitHub issue](https://github.com/reactiveui/ReactiveUI/issues/new/choose) to discuss. We are first time PR contributors friendly.
+If you want to submit pull requests please first open a [GitHub issue](https://github.com/reactiveui/ReactiveUI.Avalonia/issues/new/choose) to discuss. We are first time PR contributors friendly.
 
 See [Contribution Guidelines](https://www.reactiveui.net/contribute/) for further information how to contribute changes.
 
-## Core Team
+-----
 
-<table>
-  <tbody>
-    <tr>
-      <td align="center" valign="top" width="105">
-        <img width="100" height="100" src="https://github.com/glennawatson.png?s=150">
-        <br>
-        <a href="https://github.com/glennawatson">Glenn Watson</a>
-        <p>Melbourne, Australia</p>
-      </td>
-      <td align="center" valign="top" width="105">
-        <img width="100" height="100" src="https://github.com/chrispulman.png?s=150">
-        <br>
-        <a href="https://github.com/chrispulman">Chris Pulman</a>
-        <p>United Kingdom</p>
-      </td>
-    </tr>
-    <tr>
-      <td align="center" valign="top" width="105">
-        <img width="100" height="100" src="https://github.com/rlittlesii.png?s=150">
-        <br>
-        <a href="https://github.com/rlittlesii">Rodney Littles II</a>
-        <p>Texas, USA</p>
-      </td>
-      <td align="center" valign="top" width="105">
-        <img width="100" height="100" src="https://github.com/cabauman.png?s=150">
-        <br>
-        <a href="https://github.com/cabauman">Colt Bauman</a>
-        <p>South Korea</p>
-      </td>
-    </tr>
-  </tbody>
-</table>
+## License
 
-
-## Alumni Core Team
-
-The following have been core team members in the past.
-
-<table>
-  <tbody>
-    <tr>
-      <td align="center" valign="top" width="105">
-        <img width="100" height="100" src="https://github.com/ghuntley.png?s=150">
-        <br>
-        <a href="https://github.com/ghuntley">Geoffrey Huntley</a>
-        <p>Sydney, Australia</p>
-      </td>
-      <td align="center" valign="top" width="105">
-        <img width="100" height="100" src="https://github.com/kentcb.png?s=150">
-        <br>
-        <a href="https://github.com/kentcb">Kent Boogaart</a>
-        <p>Brisbane, Australia</p>
-      </td>
-      <td align="center" valign="top" width="105">
-        <img width="100" height="100" src="https://github.com/olevett.png?s=150">
-        <br>
-        <a href="https://github.com/olevett">Olly Levett</a>
-        <p>London, United Kingdom</p>
-      </td>
-    </tr>
-    <tr>
-      <td align="center" valign="top" width="105">
-        <img width="100" height="100" src="https://github.com/anaisbetts.png?s=150">
-        <br>
-        <a href="https://github.com/anaisbetts">Anaïs Betts</a>
-        <p>San Francisco, USA</p>
-      </td>
-      <td align="center" valign="top" width="105">
-        <img width="100" height="100" src="https://github.com/shiftkey.png?s=150">
-        <br>
-        <a href="https://github.com/shiftkey">Brendan Forster</a>
-        <p>Melbourne, Australia</p>
-      </td>
-      <td align="center" valign="top" width="105">
-        <img width="100" height="100" src="https://github.com/clairernovotny.png?s=150">
-        <br>
-        <a href="https://github.com/clairernovotny">Claire Novotny</a>
-        <p>New York, USA</p>
-      </td>
-    </tr>
-    <tr>
-      <td align="center" valign="top" width="105">
-        <img width="100" height="100" src="https://github.com/worldbeater.png?s=150">
-        <br>
-        <a href="https://github.com/worldbeater">Artyom Gorchakov</a>
-        <p>Moscow, Russia</p>
-      </td>
-     </tr>
-  </tbody>
-</table>
-
-
-## .NET Foundation
-
-ReactiveUI is part of the [.NET Foundation](https://www.dotnetfoundation.org/). Other projects that are associated with the foundation include the Microsoft .NET Compiler Platform ("Roslyn") as well as the Microsoft ASP.NET family of projects, Microsoft .NET Core & Xamarin Forms.
+ReactiveUI.Avalonia is licensed under the [MIT License](https://github.com/reactiveui/ReactiveUI.Avalonia/blob/main/LICENSE).
