@@ -16,7 +16,8 @@ namespace ReactiveUI.Avalonia.Microsoft.Tests
             Assert.Throws<ArgumentNullException>(() =>
                 AvaloniaMixins.UseReactiveUIWithMicrosoftDependencyResolver(
                     builder!,
-                    _ => { }));
+                    _ => { },
+                    null));
         }
 
         [Test]

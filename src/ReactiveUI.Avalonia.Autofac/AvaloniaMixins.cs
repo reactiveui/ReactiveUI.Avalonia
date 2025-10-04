@@ -6,8 +6,10 @@
 using Autofac;
 using ReactiveUI;
 using ReactiveUI.Avalonia;
+using ReactiveUI.Builder;
 using Splat;
 using Splat.Autofac;
+using Splat.Builder;
 
 namespace Avalonia.ReactiveUI.Splat
 {
@@ -59,5 +61,48 @@ namespace Avalonia.ReactiveUI.Splat
                     }
                 })
             };
+
+        /// <summary>
+        /// Uses the reactive UI with autofac.
+        /// </summary>
+        /// <param name="builder">The builder.</param>
+        /// <param name="containerConfig">The container configuration.</param>
+        /// <param name="withResolver">The with resolver.</param>
+        /// <param name="withReactiveUIBuilder">The with reactive UI builder.</param>
+        /// <returns>
+        /// An App Builder.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">builder.</exception>
+        public static AppBuilder UseReactiveUIWithAutofac(this AppBuilder builder, Action<ContainerBuilder> containerConfig, Action<AutofacDependencyResolver>? withResolver = null, Action<ReactiveUIBuilder>? withReactiveUIBuilder = null)
+        {
+            if (builder is null)
+            {
+                throw new ArgumentNullException(nameof(builder));
+            }
+
+            if (containerConfig is null)
+            {
+                throw new ArgumentNullException(nameof(containerConfig));
+            }
+
+            return builder.UseReactiveUI(rxuiBuilder =>
+            {
+                var containerBuilder = new ContainerBuilder();
+                rxuiBuilder.UsingSplatModule(new AutofacSplatModule(containerBuilder));
+                containerConfig(containerBuilder);
+                var container = containerBuilder.Build();
+                var autofacResolver = container.Resolve<AutofacDependencyResolver>();
+                autofacResolver.SetLifetimeScope(container);
+                if (withResolver is not null)
+                {
+                    withResolver(autofacResolver);
+                }
+
+                if (withReactiveUIBuilder is not null)
+                {
+                    withReactiveUIBuilder(rxuiBuilder);
+                }
+            });
+        }
     }
 }

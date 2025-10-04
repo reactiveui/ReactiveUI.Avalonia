@@ -6,7 +6,9 @@
 using Ninject;
 using ReactiveUI;
 using ReactiveUI.Avalonia;
+using ReactiveUI.Builder;
 using Splat;
+using Splat.Builder;
 using Splat.Ninject;
 
 namespace Avalonia.ReactiveUI.Splat
@@ -47,6 +49,43 @@ namespace Avalonia.ReactiveUI.Splat
                     AppLocator.CurrentMutable.RegisterConstant(container);
                     RxApp.MainThreadScheduler = AvaloniaScheduler.Instance;
                     containerConfig(container);
+                })
+            };
+
+        /// <summary>
+        /// Uses the splat with dry ioc.
+        /// </summary>
+        /// <param name="builder">The builder.</param>
+        /// <param name="containerConfig">The configure.</param>
+        /// <param name="withReactiveUIBuilder">The with reactive UI builder.</param>
+        /// <returns>
+        /// An App Builder.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">builder.</exception>
+        public static AppBuilder UseReactiveUIWithNinject(this AppBuilder builder, Action<StandardKernel> containerConfig, Action<ReactiveUIBuilder>? withReactiveUIBuilder = null) =>
+            builder switch
+            {
+                null => throw new ArgumentNullException(nameof(builder)),
+                _ => builder.UseReactiveUI(rxuiBuilder =>
+                {
+#if NETSTANDARD
+                    if (containerConfig is null)
+                    {
+                        throw new ArgumentNullException(nameof(containerConfig));
+                    }
+#else
+                    ArgumentNullException.ThrowIfNull(containerConfig);
+#endif
+
+                    var container = new StandardKernel();
+                    rxuiBuilder.UsingSplatModule(new NinjectSplatModule(container));
+                    AppLocator.CurrentMutable.RegisterConstant(container);
+                    containerConfig(container);
+
+                    if (withReactiveUIBuilder is not null)
+                    {
+                        withReactiveUIBuilder(rxuiBuilder);
+                    }
                 })
             };
     }

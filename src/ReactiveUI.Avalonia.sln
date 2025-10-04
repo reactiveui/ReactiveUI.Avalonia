@@ -1,23 +1,23 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.14.36414.22
+# Visual Studio Version 18
+VisualStudioVersion = 18.0.11018.127
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReactiveUI.Avalonia", "ReactiveUI.Avalonia\ReactiveUI.Avalonia.csproj", "{2EE4814F-5B1E-F5AD-30DF-68B49C126774}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Splat.Avalonia.Autofac", "Splat.Avalonia.Autofac\Splat.Avalonia.Autofac.csproj", "{019834DF-7929-539D-6F73-AD90014746C5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReactiveUI.Avalonia.Autofac", "ReactiveUI.Avalonia.Autofac\ReactiveUI.Avalonia.Autofac.csproj", "{019834DF-7929-539D-6F73-AD90014746C5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Splat.Avalonia.DryIoc", "Splat.Avalonia.DryIoc\Splat.Avalonia.DryIoc.csproj", "{E9239D4F-CCFD-26EB-E87C-FF829B06CDEB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReactiveUI.Avalonia.DryIoc", "ReactiveUI.Avalonia.DryIoc\ReactiveUI.Avalonia.DryIoc.csproj", "{E9239D4F-CCFD-26EB-E87C-FF829B06CDEB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Splat.Avalonia.DryIoc1.Tests", "Splat.Avalonia.DryIoc1.Tests\Splat.Avalonia.DryIoc1.Tests.csproj", "{4C8CC2F8-2AE2-63E7-5AB3-C3E22C09D3D2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReactiveUI.Avalonia.DryIoc.Tests", "ReactiveUI.Avalonia.DryIoc1.Tests\ReactiveUI.Avalonia.DryIoc.Tests.csproj", "{4C8CC2F8-2AE2-63E7-5AB3-C3E22C09D3D2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Splat.Avalonia.Microsoft.Extensions.DependencyInjection", "Splat.Avalonia.Microsoft.Extensions.DependencyInjection\Splat.Avalonia.Microsoft.Extensions.DependencyInjection.csproj", "{93FC1FFA-3338-8B15-1825-FBD3C160EA5E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReactiveUI.Avalonia.Microsoft.Extensions.DependencyInjection", "ReactiveUI.Avalonia.Microsoft.Extensions.DependencyInjection\ReactiveUI.Avalonia.Microsoft.Extensions.DependencyInjection.csproj", "{93FC1FFA-3338-8B15-1825-FBD3C160EA5E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Splat.Avalonia.Microsoft.Tests", "Splat.Avalonia.Microsoft1.Tests\Splat.Avalonia.Microsoft.Tests.csproj", "{DBDA8127-BAD8-BEA2-5753-F1EF2CC0CEF2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReactiveUI.Avalonia.Microsoft.Tests", "ReactiveUI.Avalonia.Microsoft1.Tests\ReactiveUI.Avalonia.Microsoft.Tests.csproj", "{DBDA8127-BAD8-BEA2-5753-F1EF2CC0CEF2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Splat.Avalonia.Ninject", "Splat.Avalonia.Ninject\Splat.Avalonia.Ninject.csproj", "{E6C4CDCE-C899-7D7A-6703-826E120B7732}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReactiveUI.Avalonia.Ninject", "ReactiveUI.Avalonia.Ninject\ReactiveUI.Avalonia.Ninject.csproj", "{E6C4CDCE-C899-7D7A-6703-826E120B7732}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Splat.Avalonia.Tests", "Splat.Avalonia.Tests\Splat.Avalonia.Tests.csproj", "{58A3DEF1-6B1A-111E-660A-93AE84C80529}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReactiveUI.Avalonia.Tests", "ReactiveUI.Avalonia.Tests\ReactiveUI.Avalonia.Tests.csproj", "{58A3DEF1-6B1A-111E-660A-93AE84C80529}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionConfig", "SolutionConfig", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 	ProjectSection(SolutionItems) = preProject
