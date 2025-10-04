@@ -16,8 +16,8 @@ namespace ReactiveUI.Avalonia.Tests
             var result = hook.ExecuteHook(
                 source: null,
                 target: items,
-                getCurrentViewModelProperties: () => Array.Empty<IObservedChange<object, object>>(),
-                getCurrentViewProperties: () => new[] { ItemsObservedChange(items) },
+                getCurrentViewModelProperties: () => [],
+                getCurrentViewProperties: () => [ItemsObservedChange(items)],
                 direction: BindingDirection.TwoWay);
 
             Assert.That(result, Is.True);
@@ -34,8 +34,8 @@ namespace ReactiveUI.Avalonia.Tests
             var res = hook.ExecuteHook(
                 null,
                 items,
-                () => Array.Empty<IObservedChange<object, object>>(),
-                () => new[] { ItemsObservedChange(items) },
+                () => [],
+                () => [ItemsObservedChange(items)],
                 BindingDirection.OneWay);
 
             Assert.That(res, Is.True);
@@ -52,8 +52,8 @@ namespace ReactiveUI.Avalonia.Tests
             var res = hook.ExecuteHook(
                 null,
                 items,
-                () => Array.Empty<IObservedChange<object, object>>(),
-                () => new[] { ItemsObservedChange(items) },
+                () => [],
+                () => [ItemsObservedChange(items)],
                 BindingDirection.OneWay);
 
             Assert.That(res, Is.True);

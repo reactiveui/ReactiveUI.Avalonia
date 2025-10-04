@@ -44,12 +44,10 @@ namespace Avalonia.ReactiveUI.Splat
 #else
                     ArgumentNullException.ThrowIfNull(containerConfig);
 #endif
-
                     var containerBuilder = new ContainerBuilder();
-                    var autofacResolver = new AutofacDependencyResolver(containerBuilder);
-                    AppLocator.SetLocator(autofacResolver);
+                    var autofacResolver = containerBuilder.UseAutofacDependencyResolver();
                     containerBuilder.RegisterInstance(autofacResolver);
-                    autofacResolver.InitializeReactiveUI();
+                    autofacResolver.InitializeReactiveUI(RegistrationNamespace.Avalonia);
                     RxApp.MainThreadScheduler = AvaloniaScheduler.Instance;
                     containerConfig(containerBuilder);
                     var container = containerBuilder.Build();
@@ -61,62 +59,5 @@ namespace Avalonia.ReactiveUI.Splat
                     }
                 })
             };
-
-        /// <summary>
-        /// Uses the reactive UI with di container.
-        /// </summary>
-        /// <typeparam name="TContainer">The type of the container.</typeparam>
-        /// <param name="builder">The builder.</param>
-        /// <param name="containerFactory">The container factory.</param>
-        /// <param name="containerConfig">The container configuration.</param>
-        /// <param name="dependencyResolverFactory">The dependency resolver factory.</param>
-        /// <returns>
-        /// An AppBuilder.
-        /// </returns>
-        /// <exception cref="System.ArgumentNullException">builder.</exception>
-        public static AppBuilder UseReactiveUIWithDIContainer<TContainer>(
-            this AppBuilder builder,
-            Func<TContainer> containerFactory,
-            Action<TContainer> containerConfig,
-            Func<TContainer, IDependencyResolver> dependencyResolverFactory) =>
-                builder switch
-                {
-                    null => throw new ArgumentNullException(nameof(builder)),
-                    _ => builder.UseReactiveUI().AfterPlatformServicesSetup(_ =>
-                    {
-                        if (AppLocator.CurrentMutable is null)
-                        {
-                            return;
-                        }
-
-#if NETSTANDARD
-                        if (containerFactory is null)
-                        {
-                            throw new ArgumentNullException(nameof(containerFactory));
-                        }
-
-                        if (containerConfig is null)
-                        {
-                            throw new ArgumentNullException(nameof(containerConfig));
-                        }
-
-                        if (dependencyResolverFactory is null)
-                        {
-                            throw new ArgumentNullException(nameof(dependencyResolverFactory));
-                        }
-#else
-                        ArgumentNullException.ThrowIfNull(containerFactory);
-                        ArgumentNullException.ThrowIfNull(containerConfig);
-                        ArgumentNullException.ThrowIfNull(dependencyResolverFactory);
-#endif
-
-                        var container = containerFactory();
-                        AppLocator.CurrentMutable.RegisterConstant(container);
-                        var dependencyResolver = dependencyResolverFactory(container);
-                        AppLocator.SetLocator(dependencyResolver);
-                        RxApp.MainThreadScheduler = AvaloniaScheduler.Instance;
-                        containerConfig(container);
-                    })
-                };
     }
 }

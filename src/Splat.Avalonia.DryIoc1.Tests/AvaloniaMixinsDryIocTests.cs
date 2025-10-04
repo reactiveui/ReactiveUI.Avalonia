@@ -2,6 +2,7 @@ using Avalonia;
 using Avalonia.ReactiveUI.Splat;
 using DryIoc;
 using NUnit.Framework;
+using ReactiveUI.Avalonia;
 using Splat.DryIoc;
 
 namespace ReactiveUI.Avalonia.DryIoc1.Tests
@@ -20,7 +21,7 @@ namespace ReactiveUI.Avalonia.DryIoc1.Tests
         public void UseReactiveUIWithDryIoc_ReturnsBuilder_NoThrow()
         {
             var builder = AppBuilder.Configure<Application>();
-            var result = AvaloniaMixins.UseReactiveUIWithDryIoc(builder, _ => { });
+            var result = builder.UseReactiveUIWithDryIoc(_ => { });
             Assert.That(result, Is.SameAs(builder));
         }
 
@@ -29,7 +30,7 @@ namespace ReactiveUI.Avalonia.DryIoc1.Tests
         {
             AppBuilder? builder = null;
             Assert.Throws<ArgumentNullException>(() =>
-                AvaloniaMixins.UseReactiveUIWithDIContainer(
+                AppBuilderExtensions.UseReactiveUIWithDIContainer(
                     builder!,
                     () => new Container(),
                     _ => { },
@@ -42,8 +43,7 @@ namespace ReactiveUI.Avalonia.DryIoc1.Tests
             var builder = AppBuilder.Configure<Application>();
             var container = new Container();
 
-            var result = AvaloniaMixins.UseReactiveUIWithDIContainer(
-                builder,
+            var result = builder.UseReactiveUIWithDIContainer(
                 containerFactory: () => container,
                 containerConfig: _ => { },
                 dependencyResolverFactory: c => new DryIocDependencyResolver(c));

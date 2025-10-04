@@ -1,5 +1,3 @@
-using Avalonia;
-using Avalonia.Controls;
 using NUnit.Framework;
 
 namespace ReactiveUI.Avalonia.Tests

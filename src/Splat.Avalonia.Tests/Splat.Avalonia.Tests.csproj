@@ -16,9 +16,10 @@
     <ProjectReference Include="..\Splat.Avalonia.Autofac\Splat.Avalonia.Autofac.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Avalonia.Desktop" />
-    <PackageReference Include="Avalonia.Themes.Fluent" />
-    <PackageReference Include="Avalonia.Fonts.Inter" />
+    <PackageReference Include="Avalonia" VersionOverride="$(AvaloniaLatestVersion)" />
+    <PackageReference Include="Avalonia.Desktop" VersionOverride="$(AvaloniaLatestVersion)" />
+    <PackageReference Include="Avalonia.Themes.Fluent" VersionOverride="$(AvaloniaLatestVersion)" />
+    <PackageReference Include="Avalonia.Fonts.Inter" VersionOverride="$(AvaloniaLatestVersion)" />
 
     <!-- Add local test framework references so CI resolves NUnit on Linux -->
     <PackageReference Include="Microsoft.NET.Test.Sdk" />

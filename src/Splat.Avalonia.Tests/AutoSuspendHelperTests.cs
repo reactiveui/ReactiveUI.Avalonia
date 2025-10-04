@@ -3,7 +3,6 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Avalonia.Controls.ApplicationLifetimes;
 using NUnit.Framework;
-using ReactiveUI;
 
 namespace ReactiveUI.Avalonia.Tests
 {
@@ -19,10 +18,7 @@ namespace ReactiveUI.Avalonia.Tests
         }
 
         [Test]
-        public void Ctor_With_Null_Lifetime_Throws()
-        {
-            Assert.Throws<ArgumentNullException>(() => new AutoSuspendHelper(null!));
-        }
+        public void Ctor_With_Null_Lifetime_Throws() => Assert.Throws<ArgumentNullException>(() => new AutoSuspendHelper(null!));
 
         [Test]
         public void Ctor_With_DesktopLifetime_Sets_ShouldPersistState()

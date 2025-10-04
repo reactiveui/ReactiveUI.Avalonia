@@ -1,7 +1,6 @@
 using System.Reflection;
 using Avalonia.Controls;
 using NUnit.Framework;
-using ReactiveUI;
 using Splat;
 
 namespace ReactiveUI.Avalonia.Tests

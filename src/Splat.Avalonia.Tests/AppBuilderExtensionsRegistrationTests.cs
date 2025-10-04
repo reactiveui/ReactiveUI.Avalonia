@@ -2,7 +2,6 @@ using System.Reflection;
 using Avalonia;
 using Avalonia.Controls;
 using NUnit.Framework;
-using ReactiveUI;
 using Splat;
 
 namespace ReactiveUI.Avalonia.Tests
@@ -35,7 +34,7 @@ namespace ReactiveUI.Avalonia.Tests
                 .GetMethod("RegisterViewsInternal", BindingFlags.NonPublic | BindingFlags.Static);
             Assert.That(method, Is.Not.Null);
 
-            method!.Invoke(null, new object[] { resolver, new[] { typeof(AppBuilderExtensionsRegistrationTests).Assembly } });
+            method!.Invoke(null, [resolver, new[] { typeof(AppBuilderExtensionsRegistrationTests).Assembly }]);
 
             var serviceType = typeof(IViewFor<>).MakeGenericType(typeof(TestVm));
             var resolved = AppLocator.Current.GetService(serviceType);
@@ -51,7 +50,7 @@ namespace ReactiveUI.Avalonia.Tests
             var method = typeof(AppBuilderExtensions)
                 .GetMethod("RegisterViewsInternal", BindingFlags.NonPublic | BindingFlags.Static);
 
-            method!.Invoke(null, new object[] { resolver, new[] { typeof(AppBuilderExtensionsRegistrationTests).Assembly } });
+            method!.Invoke(null, [resolver, new[] { typeof(AppBuilderExtensionsRegistrationTests).Assembly }]);
 
             var serviceType = typeof(IViewFor<>).MakeGenericType(typeof(TestVm));
             var resolvedDefault = AppLocator.Current.GetService(serviceType);
@@ -68,12 +67,12 @@ namespace ReactiveUI.Avalonia.Tests
             var resolver = AppLocator.CurrentMutable!;
 
             var diInstance = new DiBackedView();
-            resolver.RegisterConstant(diInstance, typeof(DiBackedView));
+            resolver.RegisterConstant(diInstance);
 
             var method = typeof(AppBuilderExtensions)
                 .GetMethod("RegisterViewsInternal", BindingFlags.NonPublic | BindingFlags.Static);
 
-            method!.Invoke(null, new object[] { resolver, new[] { typeof(AppBuilderExtensionsRegistrationTests).Assembly } });
+            method!.Invoke(null, [resolver, new[] { typeof(AppBuilderExtensionsRegistrationTests).Assembly }]);
 
             var serviceType = typeof(IViewFor<>).MakeGenericType(typeof(TestVm));
             var resolved = AppLocator.Current.GetService(serviceType);
@@ -109,14 +108,9 @@ namespace ReactiveUI.Avalonia.Tests
         }
 
         [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
-        private sealed class ViewContractAttribute : Attribute
+        private sealed class ViewContractAttribute(string contract) : Attribute
         {
-            public ViewContractAttribute(string contract)
-            {
-                Contract = contract;
-            }
-
-            public string Contract { get; }
+            public string Contract { get; } = contract;
         }
 
         private sealed class TestView : UserControl, IViewFor<TestVm>

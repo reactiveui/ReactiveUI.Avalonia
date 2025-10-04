@@ -8,8 +8,7 @@
     <PackageTags>mvvm;reactiveui;rx;reactive extensions;observable;LINQ;events;frp;avalonia;net;netcore</PackageTags>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Autofac" />
-    <PackageReference Include="System.Text.Json" />    
+    <PackageReference Include="Splat.Autofac" />  
     <ProjectReference Include="..\ReactiveUI.Avalonia\ReactiveUI.Avalonia.csproj" />
   </ItemGroup>
 </Project>
