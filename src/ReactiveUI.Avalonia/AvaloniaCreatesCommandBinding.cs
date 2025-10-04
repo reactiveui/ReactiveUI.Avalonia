@@ -86,11 +86,16 @@ internal class AvaloniaCreatesCommandBinding : ICreatesCommandBinding
 
     private static RoutedEvent? FindRoutedEvent(object target, string eventName)
     {
-        foreach (var routedEvent in RoutedEventRegistry.Instance.GetRegistered(target.GetType()))
+        // Search the type hierarchy so events declared on base classes (e.g., Button.Click on Button
+        // when the target is a derived type) can be located.
+        for (var type = target.GetType(); type is not null && typeof(InputElement).IsAssignableFrom(type); type = type.BaseType)
         {
-            if (routedEvent.Name == eventName)
+            foreach (var routedEvent in RoutedEventRegistry.Instance.GetRegistered(type))
             {
-                return routedEvent;
+                if (string.Equals(routedEvent.Name, eventName, StringComparison.Ordinal))
+                {
+                    return routedEvent;
+                }
             }
         }
 
