@@ -12,8 +12,9 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\ReactiveUI.Avalonia.Microsoft.Extensions.DependencyInjection\ReactiveUI.Avalonia.Microsoft.Extensions.DependencyInjection.csproj" />
-    <ProjectReference Include="..\ReactiveUI.Avalonia.DryIoc\ReactiveUI.Avalonia.DryIoc.csproj" />
-    <ProjectReference Include="..\ReactiveUI.Avalonia.Autofac\ReactiveUI.Avalonia.Autofac.csproj" />
+    <ProjectReference Include="..\ReactiveUI.Avalonia.DryIoc\ReactiveUI.Avalonia.DryIoc.csproj" Aliases="dryioc" />
+    <ProjectReference Include="..\ReactiveUI.Avalonia.Autofac\ReactiveUI.Avalonia.Autofac.csproj" Aliases="autofac" />
+    <ProjectReference Include="..\ReactiveUI.Avalonia.Ninject\ReactiveUI.Avalonia.Ninject.csproj" Aliases="ninject" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Avalonia" VersionOverride="$(AvaloniaLatestVersion)" />
