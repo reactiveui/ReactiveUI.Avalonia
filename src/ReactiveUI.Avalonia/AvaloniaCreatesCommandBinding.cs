@@ -34,6 +34,8 @@ internal class AvaloniaCreatesCommandBinding : ICreatesCommandBinding
         return isCommandSource ? 10 : 0;
     }
 
+    public int GetAffinityForObject<T>(bool hasEventTarget) => GetAffinityForObject(typeof(T), hasEventTarget);
+
     public IDisposable? BindCommandToObject(ICommand? command, object? target, IObservable<object?> commandParameter)
     {
         if (command is null)
@@ -61,7 +63,7 @@ internal class AvaloniaCreatesCommandBinding : ICreatesCommandBinding
         });
     }
 
-    public IDisposable? BindCommandToObject<TEventArgs>(ICommand? command, object? target, IObservable<object?> commandParameter, string eventName)
+    public IDisposable BindCommandToObject<TEventArgs>(ICommand? command, object? target, IObservable<object?> commandParameter, string eventName)
     {
         if (command is null)
         {
