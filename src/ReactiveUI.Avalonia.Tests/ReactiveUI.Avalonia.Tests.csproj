@@ -11,9 +11,9 @@
     <PackageTags>mvvm;reactiveui;rx;reactive extensions;observable;LINQ;events;frp;avalonia;net;netcore</PackageTags>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Splat.Avalonia.Microsoft.Extensions.DependencyInjection\ReactiveUI.Avalonia.Microsoft.Extensions.DependencyInjection.csproj" />
-    <ProjectReference Include="..\Splat.Avalonia.DryIoc\ReactiveUI.Avalonia.DryIoc.csproj" />
-    <ProjectReference Include="..\Splat.Avalonia.Autofac\ReactiveUI.Avalonia.Autofac.csproj" />
+    <ProjectReference Include="..\ReactiveUI.Avalonia.Microsoft.Extensions.DependencyInjection\ReactiveUI.Avalonia.Microsoft.Extensions.DependencyInjection.csproj" />
+    <ProjectReference Include="..\ReactiveUI.Avalonia.DryIoc\ReactiveUI.Avalonia.DryIoc.csproj" />
+    <ProjectReference Include="..\ReactiveUI.Avalonia.Autofac\ReactiveUI.Avalonia.Autofac.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Avalonia" VersionOverride="$(AvaloniaLatestVersion)" />
