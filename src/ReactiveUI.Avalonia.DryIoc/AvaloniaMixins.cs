@@ -4,87 +4,85 @@
 // See the LICENSE file in the project root for full license information.
 
 using DryIoc;
-using ReactiveUI;
-using ReactiveUI.Avalonia;
 using ReactiveUI.Builder;
 using Splat;
 using Splat.Builder;
 using Splat.DryIoc;
+using AppBuilder = Avalonia.AppBuilder;
 
-namespace Avalonia.ReactiveUI.Splat
+namespace ReactiveUI.Avalonia.Splat;
+
+/// <summary>
+/// Avalonia Mixins.
+/// </summary>
+public static class AvaloniaMixins
 {
     /// <summary>
-    /// Avalonia Mixins.
+    /// Uses the splat with dry ioc.
     /// </summary>
-    public static class AvaloniaMixins
-    {
-        /// <summary>
-        /// Uses the splat with dry ioc.
-        /// </summary>
-        /// <param name="builder">The builder.</param>
-        /// <param name="containerConfig">The configure.</param>
-        /// <returns>An App Builder.</returns>
-        public static AppBuilder UseReactiveUIWithDryIoc(this AppBuilder builder, Action<Container> containerConfig) =>
-            builder switch
+    /// <param name="builder">The builder.</param>
+    /// <param name="containerConfig">The configure.</param>
+    /// <returns>An App Builder.</returns>
+    public static AppBuilder UseReactiveUIWithDryIoc(this AppBuilder builder, Action<Container> containerConfig) =>
+        builder switch
+        {
+            null => throw new ArgumentNullException(nameof(builder)),
+            _ => builder.UseReactiveUI().AfterPlatformServicesSetup(_ =>
             {
-                null => throw new ArgumentNullException(nameof(builder)),
-                _ => builder.UseReactiveUI().AfterPlatformServicesSetup(_ =>
+                if (AppLocator.CurrentMutable is null)
                 {
-                    if (AppLocator.CurrentMutable is null)
-                    {
-                        return;
-                    }
+                    return;
+                }
 
 #if NETSTANDARD
-                    if (containerConfig is null)
-                    {
-                        throw new ArgumentNullException(nameof(containerConfig));
-                    }
-#else
-                    ArgumentNullException.ThrowIfNull(containerConfig);
-#endif
-
-                    var container = new Container();
-                    container.UseDryIocDependencyResolver();
-                    AppLocator.CurrentMutable.RegisterConstant(container);
-                    RxApp.MainThreadScheduler = AvaloniaScheduler.Instance;
-                    containerConfig(container);
-                })
-            };
-
-        /// <summary>
-        /// Uses the reactive UI with dry ioc.
-        /// </summary>
-        /// <param name="builder">The builder.</param>
-        /// <param name="containerConfig">The container configuration.</param>
-        /// <param name="withReactiveUIBuilder">The with reactive UI builder.</param>
-        /// <returns>An App Builder.</returns>
-        /// <exception cref="ArgumentNullException">builder.</exception>
-        public static AppBuilder UseReactiveUIWithDryIoc(this AppBuilder builder, Action<Container> containerConfig, Action<ReactiveUIBuilder>? withReactiveUIBuilder = null) =>
-            builder switch
-            {
-                null => throw new ArgumentNullException(nameof(builder)),
-                _ => builder.UseReactiveUI(rxuiBuilder =>
+                if (containerConfig is null)
                 {
-#if NETSTANDARD
-                    if (containerConfig is null)
-                    {
-                        throw new ArgumentNullException(nameof(containerConfig));
-                    }
+                    throw new ArgumentNullException(nameof(containerConfig));
+                }
 #else
-                    ArgumentNullException.ThrowIfNull(containerConfig);
+                ArgumentNullException.ThrowIfNull(containerConfig);
 #endif
 
-                    var container = new Container();
-                    rxuiBuilder.UsingSplatModule(new DryIocSplatModule(container));
-                    AppLocator.CurrentMutable.RegisterConstant(container);
-                    containerConfig(container);
+                var container = new Container();
+                container.UseDryIocDependencyResolver();
+                AppLocator.CurrentMutable.RegisterConstant(container);
+                RxApp.MainThreadScheduler = AvaloniaScheduler.Instance;
+                containerConfig(container);
+            })
+        };
 
-                    if (withReactiveUIBuilder is not null)
-                    {
-                        withReactiveUIBuilder(rxuiBuilder);
-                    }
-                })
-            };
-    }
+    /// <summary>
+    /// Uses the reactive UI with dry ioc.
+    /// </summary>
+    /// <param name="builder">The builder.</param>
+    /// <param name="containerConfig">The container configuration.</param>
+    /// <param name="withReactiveUIBuilder">The with reactive UI builder.</param>
+    /// <returns>An App Builder.</returns>
+    /// <exception cref="ArgumentNullException">builder.</exception>
+    public static AppBuilder UseReactiveUIWithDryIoc(this AppBuilder builder, Action<Container> containerConfig, Action<ReactiveUIBuilder>? withReactiveUIBuilder = null) =>
+        builder switch
+        {
+            null => throw new ArgumentNullException(nameof(builder)),
+            _ => builder.UseReactiveUI(rxuiBuilder =>
+            {
+#if NETSTANDARD
+                if (containerConfig is null)
+                {
+                    throw new ArgumentNullException(nameof(containerConfig));
+                }
+#else
+                ArgumentNullException.ThrowIfNull(containerConfig);
+#endif
+
+                var container = new Container();
+                rxuiBuilder.UsingSplatModule(new DryIocSplatModule(container));
+                AppLocator.CurrentMutable.RegisterConstant(container);
+                containerConfig(container);
+
+                if (withReactiveUIBuilder is not null)
+                {
+                    withReactiveUIBuilder(rxuiBuilder);
+                }
+            })
+        };
 }

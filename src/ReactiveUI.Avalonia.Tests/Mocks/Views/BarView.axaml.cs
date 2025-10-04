@@ -3,20 +3,19 @@ using Avalonia.Markup.Xaml;
 using ReactiveUI;
 using ReactiveUIDemo.ViewModels;
 
-namespace ReactiveUIDemo.Views
+namespace ReactiveUIDemo.Views;
+
+internal sealed partial class BarView : UserControl, IViewFor<BarViewModel>
 {
-    internal sealed partial class BarView : UserControl, IViewFor<BarViewModel>
+    public BarView() => InitializeComponent();
+
+    public BarViewModel? ViewModel { get; set; }
+
+    object? IViewFor.ViewModel
     {
-        public BarView() => InitializeComponent();
-
-        public BarViewModel? ViewModel { get; set; }
-
-        object? IViewFor.ViewModel
-        {
-            get => ViewModel;
-            set => ViewModel = (BarViewModel?)value;
-        }
-
-        private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
+        get => ViewModel;
+        set => ViewModel = (BarViewModel?)value;
     }
+
+    private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 }

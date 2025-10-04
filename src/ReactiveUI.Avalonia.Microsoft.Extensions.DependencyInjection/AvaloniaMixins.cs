@@ -10,103 +10,102 @@ using Splat.Builder;
 using Splat.Microsoft.Extensions.DependencyInjection;
 using AppBuilder = Avalonia.AppBuilder;
 
-namespace ReactiveUI.Avalonia.Splat
+namespace ReactiveUI.Avalonia.Splat;
+
+/// <summary>
+/// Avalonia Mixins.
+/// </summary>
+public static class AvaloniaMixins
 {
     /// <summary>
-    /// Avalonia Mixins.
+    /// Uses the splat with microsoft dependency resolver.
     /// </summary>
-    public static class AvaloniaMixins
-    {
-        /// <summary>
-        /// Uses the splat with microsoft dependency resolver.
-        /// </summary>
-        /// <param name="builder">The builder.</param>
-        /// <param name="containerConfig">The configure.</param>
-        /// <param name="withResolver">The get service provider.</param>
-        /// <returns>An App Builder.</returns>
-        public static AppBuilder UseReactiveUIWithMicrosoftDependencyResolver(this AppBuilder builder, Action<IServiceCollection> containerConfig, Action<IServiceProvider?>? withResolver = null) =>
-            builder switch
+    /// <param name="builder">The builder.</param>
+    /// <param name="containerConfig">The configure.</param>
+    /// <param name="withResolver">The get service provider.</param>
+    /// <returns>An App Builder.</returns>
+    public static AppBuilder UseReactiveUIWithMicrosoftDependencyResolver(this AppBuilder builder, Action<IServiceCollection> containerConfig, Action<IServiceProvider?>? withResolver = null) =>
+        builder switch
+        {
+            null => throw new ArgumentNullException(nameof(builder)),
+            _ => builder.UseReactiveUI().AfterPlatformServicesSetup(_ =>
             {
-                null => throw new ArgumentNullException(nameof(builder)),
-                _ => builder.UseReactiveUI().AfterPlatformServicesSetup(_ =>
+                if (AppLocator.CurrentMutable is null)
                 {
-                    if (AppLocator.CurrentMutable is null)
-                    {
-                        return;
-                    }
+                    return;
+                }
 
 #if NETSTANDARD
-                    if (containerConfig is null)
-                    {
-                        throw new ArgumentNullException(nameof(containerConfig));
-                    }
+                if (containerConfig is null)
+                {
+                    throw new ArgumentNullException(nameof(containerConfig));
+                }
 #else
-                    ArgumentNullException.ThrowIfNull(containerConfig);
+                ArgumentNullException.ThrowIfNull(containerConfig);
 #endif
 
-                    IServiceCollection serviceCollection = new ServiceCollection();
-                    serviceCollection.UseMicrosoftDependencyResolver();
-                    AppLocator.CurrentMutable.RegisterConstant(serviceCollection);
-                    RxApp.MainThreadScheduler = AvaloniaScheduler.Instance;
-                    containerConfig(serviceCollection);
-                    var serviceProvider = serviceCollection.BuildServiceProvider();
-                    serviceProvider.UseMicrosoftDependencyResolver();
+                IServiceCollection serviceCollection = new ServiceCollection();
+                serviceCollection.UseMicrosoftDependencyResolver();
+                AppLocator.CurrentMutable.RegisterConstant(serviceCollection);
+                RxApp.MainThreadScheduler = AvaloniaScheduler.Instance;
+                containerConfig(serviceCollection);
+                var serviceProvider = serviceCollection.BuildServiceProvider();
+                serviceProvider.UseMicrosoftDependencyResolver();
 
-                    if (withResolver is not null)
-                    {
-                        withResolver(serviceProvider);
-                    }
-                })
-            };
-
-        /// <summary>
-        /// Uses the splat with microsoft dependency resolver.
-        /// </summary>
-        /// <param name="builder">The builder.</param>
-        /// <param name="containerConfig">The configure.</param>
-        /// <param name="withResolver">The get service provider.</param>
-        /// <param name="withReactiveUIBuilder">The with reactive UI builder.</param>
-        /// <returns>
-        /// An App Builder.
-        /// </returns>
-        /// <exception cref="ArgumentNullException">builder.</exception>
-        public static AppBuilder UseReactiveUIWithMicrosoftDependencyResolver(this AppBuilder builder, Action<IServiceCollection> containerConfig, Action<IServiceProvider?>? withResolver = null, Action<ReactiveUIBuilder>? withReactiveUIBuilder = null) =>
-            builder switch
-            {
-                null => throw new ArgumentNullException(nameof(builder)),
-                _ => builder.UseReactiveUI(rxuiBuilder =>
+                if (withResolver is not null)
                 {
-                    if (AppLocator.CurrentMutable is null)
-                    {
-                        return;
-                    }
+                    withResolver(serviceProvider);
+                }
+            })
+        };
+
+    /// <summary>
+    /// Uses the splat with microsoft dependency resolver.
+    /// </summary>
+    /// <param name="builder">The builder.</param>
+    /// <param name="containerConfig">The configure.</param>
+    /// <param name="withResolver">The get service provider.</param>
+    /// <param name="withReactiveUIBuilder">The with reactive UI builder.</param>
+    /// <returns>
+    /// An App Builder.
+    /// </returns>
+    /// <exception cref="ArgumentNullException">builder.</exception>
+    public static AppBuilder UseReactiveUIWithMicrosoftDependencyResolver(this AppBuilder builder, Action<IServiceCollection> containerConfig, Action<IServiceProvider?>? withResolver = null, Action<ReactiveUIBuilder>? withReactiveUIBuilder = null) =>
+        builder switch
+        {
+            null => throw new ArgumentNullException(nameof(builder)),
+            _ => builder.UseReactiveUI(rxuiBuilder =>
+            {
+                if (AppLocator.CurrentMutable is null)
+                {
+                    return;
+                }
 
 #if NETSTANDARD
-                    if (containerConfig is null)
-                    {
-                        throw new ArgumentNullException(nameof(containerConfig));
-                    }
+                if (containerConfig is null)
+                {
+                    throw new ArgumentNullException(nameof(containerConfig));
+                }
 #else
-                    ArgumentNullException.ThrowIfNull(containerConfig);
+                ArgumentNullException.ThrowIfNull(containerConfig);
 #endif
 
-                    IServiceCollection serviceCollection = new ServiceCollection();
-                    rxuiBuilder.UsingSplatModule(new MicrosoftDependencyResolverModule(serviceCollection));
-                    AppLocator.CurrentMutable.RegisterConstant(serviceCollection);
-                    containerConfig(serviceCollection);
-                    var serviceProvider = serviceCollection.BuildServiceProvider();
-                    serviceProvider.UseMicrosoftDependencyResolver();
+                IServiceCollection serviceCollection = new ServiceCollection();
+                rxuiBuilder.UsingSplatModule(new MicrosoftDependencyResolverModule(serviceCollection));
+                AppLocator.CurrentMutable.RegisterConstant(serviceCollection);
+                containerConfig(serviceCollection);
+                var serviceProvider = serviceCollection.BuildServiceProvider();
+                serviceProvider.UseMicrosoftDependencyResolver();
 
-                    if (withResolver is not null)
-                    {
-                        withResolver(serviceProvider);
-                    }
+                if (withResolver is not null)
+                {
+                    withResolver(serviceProvider);
+                }
 
-                    if (withReactiveUIBuilder is not null)
-                    {
-                        withReactiveUIBuilder(rxuiBuilder);
-                    }
-                })
-            };
-    }
+                if (withReactiveUIBuilder is not null)
+                {
+                    withReactiveUIBuilder(rxuiBuilder);
+                }
+            })
+        };
 }

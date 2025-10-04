@@ -6,25 +6,24 @@ using ReactiveUIDemo.ViewModels;
 using ReactiveUIDemo.Views;
 using Splat;
 
-namespace ReactiveUIDemo
+namespace ReactiveUIDemo;
+
+public class App : Application
 {
-    public class App : Application
+    public override void Initialize()
     {
-        public override void Initialize()
+        AvaloniaXamlLoader.Load(this);
+        AppLocator.CurrentMutable.Register(() => new FooView(), typeof(IViewFor<FooViewModel>));
+        AppLocator.CurrentMutable.Register(() => new BarView(), typeof(IViewFor<BarViewModel>));
+    }
+
+    public override void OnFrameworkInitializationCompleted()
+    {
+        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            AvaloniaXamlLoader.Load(this);
-            AppLocator.CurrentMutable.Register(() => new FooView(), typeof(IViewFor<FooViewModel>));
-            AppLocator.CurrentMutable.Register(() => new BarView(), typeof(IViewFor<BarViewModel>));
+            desktop.MainWindow = new MainWindow();
         }
 
-        public override void OnFrameworkInitializationCompleted()
-        {
-            if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
-            {
-                desktop.MainWindow = new MainWindow();
-            }
-
-            base.OnFrameworkInitializationCompleted();
-        }
+        base.OnFrameworkInitializationCompleted();
     }
 }

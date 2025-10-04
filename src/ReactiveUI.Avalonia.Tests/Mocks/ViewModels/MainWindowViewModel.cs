@@ -1,9 +1,8 @@
 ﻿using ReactiveUI;
 
-namespace ReactiveUIDemo.ViewModels
+namespace ReactiveUIDemo.ViewModels;
+
+internal sealed class MainWindowViewModel : ReactiveObject
 {
-    internal sealed class MainWindowViewModel : ReactiveObject
-    {
-        public RoutedViewHostPageViewModel RoutedViewHost { get; } = new();
-    }
+    public RoutedViewHostPageViewModel RoutedViewHost { get; } = new();
 }
