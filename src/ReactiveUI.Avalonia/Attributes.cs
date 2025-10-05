@@ -9,5 +9,6 @@ using Avalonia.Metadata;
 [assembly: XmlnsDefinition("http://reactiveui.net", "ReactiveUI.Avalonia")]
 
 // Allow test projects to access internal types for unit testing
-[assembly: InternalsVisibleTo("Splat.Avalonia.Tests")]
-[assembly: InternalsVisibleTo("Splat.Avalonia.Microsoft1.Tests")]
+[assembly: InternalsVisibleTo("ReactiveUI.Avalonia.Tests")]
+[assembly: InternalsVisibleTo("ReactiveUI.Avalonia.Microsoft.Tests")]
+[assembly: InternalsVisibleTo("ReactiveUI.Avalonia.DryIoc.Tests")]

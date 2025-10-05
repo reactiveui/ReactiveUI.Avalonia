@@ -1,0 +1,41 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>$(AvaloniaTestTargetFrameworks)</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <NoWarn>$(NoWarn);1591;CA1707;SA1600;SA1601;SA1633;CA2000;CA1515</NoWarn>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <DefineConstants>$(DefineConstants);MICROSOFT1</DefineConstants>
+    <PackageDescription>Contains the ReactiveUI platform specific extensions for Avalonia</PackageDescription>
+    <PackageTags>mvvm;reactiveui;rx;reactive extensions;observable;LINQ;events;frp;avalonia;net;netcore</PackageTags>
+  </PropertyGroup>
+  <ItemGroup>
+    <AvaloniaXaml Remove="Mocks\**" />
+    <Compile Remove="Mocks\**" />
+    <EmbeddedResource Remove="Mocks\**" />
+    <None Remove="Mocks\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ReactiveUI.Avalonia.Microsoft.Extensions.DependencyInjection\ReactiveUI.Avalonia.Microsoft.Extensions.DependencyInjection.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Avalonia" VersionOverride="$(AvaloniaLatestVersion)" />
+    <PackageReference Include="Avalonia.Desktop" VersionOverride="$(AvaloniaLatestVersion)" />
+    <PackageReference Include="Avalonia.Themes.Fluent" VersionOverride="$(AvaloniaLatestVersion)" />
+    <PackageReference Include="Avalonia.Fonts.Inter" VersionOverride="$(AvaloniaLatestVersion)" />
+
+    <!-- Add local test framework references so CI resolves NUnit on Linux -->
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="NUnit" />
+    <PackageReference Include="NUnit3TestAdapter" />
+    <PackageReference Include="coverlet.msbuild" />
+    <PackageReference Include="coverlet.collector">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="NUnit.Analyzers">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+</Project>

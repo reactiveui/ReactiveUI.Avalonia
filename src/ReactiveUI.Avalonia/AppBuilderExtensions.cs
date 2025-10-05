@@ -7,6 +7,7 @@ using System;
 using System.Linq;
 using System.Reflection;
 using Avalonia;
+using ReactiveUI.Builder;
 using Splat;
 
 namespace ReactiveUI.Avalonia;
@@ -30,7 +31,7 @@ public static class AppBuilderExtensions
             throw new ArgumentNullException(nameof(builder));
         }
 
-        return builder.AfterPlatformServicesSetup(_ => Locator.RegisterResolverCallbackChanged(() =>
+        return builder.AfterPlatformServicesSetup(_ => AppLocator.RegisterResolverCallbackChanged(() =>
         {
             if (AppLocator.CurrentMutable is null)
             {
@@ -44,6 +45,51 @@ public static class AppBuilderExtensions
             AppLocator.CurrentMutable.RegisterConstant<ICreatesCommandBinding>(new AvaloniaCreatesCommandBinding());
             AppLocator.CurrentMutable.RegisterConstant<ICreatesObservableForProperty>(new AvaloniaObjectObservableForProperty());
         }));
+    }
+
+    /// <summary>
+    /// Uses the reactive UI with ReactiveUI AppBuilder.
+    /// </summary>
+    /// <param name="builder">The builder.</param>
+    /// <param name="withReactiveUIBuilder">The with reactive UI builder.</param>
+    /// <returns>The Avalonia builder.</returns>
+    /// <exception cref="ArgumentNullException">
+    /// builder
+    /// or
+    /// withReactiveUIBuilder.
+    /// </exception>
+    public static AppBuilder UseReactiveUI(this AppBuilder builder, Action<ReactiveUIBuilder> withReactiveUIBuilder)
+    {
+        if (builder is null)
+        {
+            throw new ArgumentNullException(nameof(builder));
+        }
+
+        if (withReactiveUIBuilder is null)
+        {
+            throw new ArgumentNullException(nameof(withReactiveUIBuilder));
+        }
+
+        return builder.AfterPlatformServicesSetup(_ =>
+        {
+            var rxuiBuilder = AppLocator.CurrentMutable.CreateReactiveUIBuilder();
+            rxuiBuilder
+                .WithMainThreadScheduler(AvaloniaScheduler.Instance)
+                .WithRegistration(splat =>
+                {
+                    splat.RegisterConstant<IActivationForViewFetcher>(new AvaloniaActivationForViewFetcher());
+                    splat.RegisterConstant<IPropertyBindingHook>(new AutoDataTemplateBindingHook());
+                    splat.RegisterConstant<ICreatesCommandBinding>(new AvaloniaCreatesCommandBinding());
+                    splat.RegisterConstant<ICreatesObservableForProperty>(new AvaloniaObjectObservableForProperty());
+                });
+
+            withReactiveUIBuilder(rxuiBuilder);
+
+            if (!Splat.Builder.AppBuilder.HasBeenBuilt)
+            {
+                rxuiBuilder.BuildApp();
+            }
+        });
     }
 
     /// <summary>
@@ -98,6 +144,63 @@ public static class AppBuilderExtensions
         var entry = Assembly.GetEntryAssembly();
         return entry is null ? builder : RegisterReactiveUIViews(builder, entry);
     }
+
+    /// <summary>
+    /// Uses the reactive UI with di container.
+    /// </summary>
+    /// <typeparam name="TContainer">The type of the container.</typeparam>
+    /// <param name="builder">The builder.</param>
+    /// <param name="containerFactory">The container factory.</param>
+    /// <param name="containerConfig">The container configuration.</param>
+    /// <param name="dependencyResolverFactory">The dependency resolver factory.</param>
+    /// <returns>
+    /// An AppBuilder.
+    /// </returns>
+    /// <exception cref="System.ArgumentNullException">builder.</exception>
+    public static AppBuilder UseReactiveUIWithDIContainer<TContainer>(
+        this AppBuilder builder,
+        Func<TContainer> containerFactory,
+        Action<TContainer> containerConfig,
+        Func<TContainer, IDependencyResolver> dependencyResolverFactory) =>
+            builder switch
+            {
+                null => throw new ArgumentNullException(nameof(builder)),
+                _ => builder.UseReactiveUI().AfterPlatformServicesSetup(_ =>
+                {
+                    if (AppLocator.CurrentMutable is null)
+                    {
+                        return;
+                    }
+
+#if NETSTANDARD
+                    if (containerFactory is null)
+                    {
+                        throw new ArgumentNullException(nameof(containerFactory));
+                    }
+
+                    if (containerConfig is null)
+                    {
+                        throw new ArgumentNullException(nameof(containerConfig));
+                    }
+
+                    if (dependencyResolverFactory is null)
+                    {
+                        throw new ArgumentNullException(nameof(dependencyResolverFactory));
+                    }
+#else
+                    ArgumentNullException.ThrowIfNull(containerFactory);
+                    ArgumentNullException.ThrowIfNull(containerConfig);
+                    ArgumentNullException.ThrowIfNull(dependencyResolverFactory);
+#endif
+
+                    var container = containerFactory();
+                    AppLocator.CurrentMutable.RegisterConstant(container);
+                    var dependencyResolver = dependencyResolverFactory(container);
+                    AppLocator.SetLocator(dependencyResolver);
+                    RxApp.MainThreadScheduler = AvaloniaScheduler.Instance;
+                    containerConfig(container);
+                })
+            };
 
     private static void RegisterViewsInternal(IMutableDependencyResolver resolver, Assembly[] assemblies)
     {
