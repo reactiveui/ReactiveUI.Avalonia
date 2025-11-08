@@ -20,7 +20,7 @@
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.14.0" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.0.0" />
     <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="8.0.0" />
-    <PackageVersion Include="Nerdbank.GitVersioning" Version="3.8.118" />
+    <PackageVersion Include="Nerdbank.GitVersioning" Version="3.9.50" />
     <PackageVersion Include="ReactiveUI" Version="22.2.1" />
     <PackageVersion Include="Roslynator.Analyzers" Version="4.14.1" />
     <PackageVersion Include="Splat" Version="$(SplatVersion)" />
