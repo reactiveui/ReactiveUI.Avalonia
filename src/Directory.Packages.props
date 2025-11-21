@@ -2,7 +2,7 @@
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
-    <AvaloniaVersion>11.3.8</AvaloniaVersion>
+    <AvaloniaVersion>11.3.9</AvaloniaVersion>
     <AvaloniaLatestVersion>11.3.*</AvaloniaLatestVersion>
     <SplatVersion>17.1.1</SplatVersion>
   </PropertyGroup>
