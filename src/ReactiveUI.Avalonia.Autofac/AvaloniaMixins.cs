@@ -49,7 +49,7 @@ public static class AvaloniaMixins
                 var autofacResolver = containerBuilder.UseAutofacDependencyResolver();
                 containerBuilder.RegisterInstance(autofacResolver);
                 autofacResolver.InitializeReactiveUI(RegistrationNamespace.Avalonia);
-                RxApp.MainThreadScheduler = AvaloniaScheduler.Instance;
+                RxSchedulers.MainThreadScheduler = AvaloniaScheduler.Instance;
                 containerConfig(containerBuilder);
                 var container = containerBuilder.Build();
                 autofacResolver.SetLifetimeScope(container);

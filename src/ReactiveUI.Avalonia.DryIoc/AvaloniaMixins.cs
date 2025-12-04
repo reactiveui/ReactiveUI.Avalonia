@@ -46,7 +46,7 @@ public static class AvaloniaMixins
                 var container = new Container();
                 container.UseDryIocDependencyResolver();
                 AppLocator.CurrentMutable.RegisterConstant(container);
-                RxApp.MainThreadScheduler = AvaloniaScheduler.Instance;
+                RxSchedulers.MainThreadScheduler = AvaloniaScheduler.Instance;
                 containerConfig(container);
             })
         };

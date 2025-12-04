@@ -39,7 +39,7 @@ public static class AppBuilderExtensions
             }
 
             PlatformRegistrationManager.SetRegistrationNamespaces(RegistrationNamespace.Avalonia);
-            RxApp.MainThreadScheduler = AvaloniaScheduler.Instance;
+            RxSchedulers.MainThreadScheduler = AvaloniaScheduler.Instance;
             AppLocator.CurrentMutable.RegisterConstant<IActivationForViewFetcher>(new AvaloniaActivationForViewFetcher());
             AppLocator.CurrentMutable.RegisterConstant<IPropertyBindingHook>(new AutoDataTemplateBindingHook());
             AppLocator.CurrentMutable.RegisterConstant<ICreatesCommandBinding>(new AvaloniaCreatesCommandBinding());
@@ -197,7 +197,7 @@ public static class AppBuilderExtensions
                     AppLocator.CurrentMutable.RegisterConstant(container);
                     var dependencyResolver = dependencyResolverFactory(container);
                     AppLocator.SetLocator(dependencyResolver);
-                    RxApp.MainThreadScheduler = AvaloniaScheduler.Instance;
+                    RxSchedulers.MainThreadScheduler = AvaloniaScheduler.Instance;
                     containerConfig(container);
                 })
             };

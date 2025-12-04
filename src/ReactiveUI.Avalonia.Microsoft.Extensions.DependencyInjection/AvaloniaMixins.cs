@@ -47,7 +47,7 @@ public static class AvaloniaMixins
                 IServiceCollection serviceCollection = new ServiceCollection();
                 serviceCollection.UseMicrosoftDependencyResolver();
                 AppLocator.CurrentMutable.RegisterConstant(serviceCollection);
-                RxApp.MainThreadScheduler = AvaloniaScheduler.Instance;
+                RxSchedulers.MainThreadScheduler = AvaloniaScheduler.Instance;
                 containerConfig(serviceCollection);
                 var serviceProvider = serviceCollection.BuildServiceProvider();
                 serviceProvider.UseMicrosoftDependencyResolver();
