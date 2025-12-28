@@ -115,13 +115,11 @@ public static AppBuilder BuildAvaloniaApp() => AppBuilder
         withResolver: sp =>
         {
             // Optional: access ServiceProvider
-        },
-        withReactiveUIBuilder: rxui =>
-        {
-            // Optional ReactiveUI customizations
         })
-    .RegisterReactiveUIViewsFromEntryAssembly();
+    ;
 ```
+
+Note: `UseReactiveUIWithMicrosoftDependencyResolver(...)` builds the `ServiceProvider` during setup, so make sure you register all services (including any `IViewFor<T>` views) in the `services => { ... }` callback.
 
 With Ninject:
 
@@ -149,7 +147,7 @@ Notes
 ---
 ## Manual setup (without container mixins)
 
-You can configure a custom container using the generic `UseReactiveUIWithDIContainer` if you don’t use one of the provided integrations:
+You can configure a custom container using the generic `UseReactiveUIWithDIContainer` if you donâ€™t use one of the provided integrations:
 
 ```csharp
 AppBuilder
@@ -222,12 +220,12 @@ public partial class MainView : ReactiveUserControl<MyViewModel>
 ### ReactiveUI.Avalonia (core)
 
 Key extension methods on `AppBuilder`:
-- `UseReactiveUI()` — initialize ReactiveUI for Avalonia (scheduler, activation, bindings)
-- `UseReactiveUI(Action<ReactiveUIBuilder>)` — initialize with the `ReactiveUIBuilder` for additional configuration
-- `RegisterReactiveUIViews(params Assembly[])` — scan and register views implementing `IViewFor<T>`
-- `RegisterReactiveUIViewsFromEntryAssembly()` — convenience overload to scan the entry assembly
-- `RegisterReactiveUIViewsFromAssemblyOf<TMarker>()` — scan a specific assembly
-- `UseReactiveUIWithDIContainer<TContainer>(...)` — bring-your-own container integration via an `IDependencyResolver`
+- `UseReactiveUI()` â€” initialize ReactiveUI for Avalonia (scheduler, activation, bindings)
+- `UseReactiveUI(Action<ReactiveUIBuilder>)` â€” initialize with the `ReactiveUIBuilder` for additional configuration
+- `RegisterReactiveUIViews(params Assembly[])` â€” scan and register views implementing `IViewFor<T>`
+- `RegisterReactiveUIViewsFromEntryAssembly()` â€” convenience overload to scan the entry assembly
+- `RegisterReactiveUIViewsFromAssemblyOf<TMarker>()` â€” scan a specific assembly
+- `UseReactiveUIWithDIContainer<TContainer>(...)` â€” bring-your-own container integration via an `IDependencyResolver`
 
 Important types registered by default:
 - `IActivationForViewFetcher` ? `AvaloniaActivationForViewFetcher`
@@ -237,8 +235,8 @@ Important types registered by default:
 - `RxApp.MainThreadScheduler` set to `AvaloniaScheduler.Instance`
 
 Controls and helpers:
-- `RoutedViewHost` — view host that displays the view for the current `RoutingState`
-- `ReactiveUserControl<TViewModel>`, `ReactiveWindow<TViewModel>` — base classes for reactive views
+- `RoutedViewHost` â€” view host that displays the view for the current `RoutingState`
+- `ReactiveUserControl<TViewModel>`, `ReactiveWindow<TViewModel>` â€” base classes for reactive views
 
 ### ReactiveUI.Avalonia.Autofac
 
