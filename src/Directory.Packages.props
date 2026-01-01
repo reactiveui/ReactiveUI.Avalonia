@@ -4,7 +4,7 @@
     <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
     <AvaloniaVersion>11.3.10</AvaloniaVersion>
     <AvaloniaLatestVersion>11.3.*</AvaloniaLatestVersion>
-    <SplatVersion>17.2.1</SplatVersion>
+    <SplatVersion>18.1.1</SplatVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="coverlet.collector" Version="6.0.4">
