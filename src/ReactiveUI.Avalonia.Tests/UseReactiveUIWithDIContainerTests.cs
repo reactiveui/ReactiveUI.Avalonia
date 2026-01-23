@@ -13,7 +13,8 @@ public class UseReactiveUIWithDIContainerTests
         Assert.Throws<ArgumentNullException>(() => builder!.UseReactiveUIWithDIContainer(
             containerFactory: () => new object(),
             containerConfig: _ => { },
-            dependencyResolverFactory: _ => new DummyResolver()));
+            dependencyResolverFactory: _ => new DummyResolver(),
+            _ => { }));
     }
 
     [Test]
@@ -24,7 +25,8 @@ public class UseReactiveUIWithDIContainerTests
         var result = builder.UseReactiveUIWithDIContainer(
             containerFactory: () => new object(),
             containerConfig: _ => { },
-            dependencyResolverFactory: _ => new DummyResolver());
+            dependencyResolverFactory: _ => new DummyResolver(),
+            _ => { });
 
         Assert.That(result, Is.SameAs(builder));
     }
@@ -35,23 +37,117 @@ public class UseReactiveUIWithDIContainerTests
         {
         }
 
-        public object? GetService(Type? serviceType, string? contract = null)
+        public object? GetService(Type? serviceType)
         {
             return null;
         }
 
-        public IEnumerable<object> GetServices(Type? serviceType, string? contract = null)
+        public object? GetService(Type? serviceType, string? contract)
+        {
+            return null;
+        }
+
+        public T? GetService<T>()
+        {
+            return default;
+        }
+
+        public T? GetService<T>(string? contract)
+        {
+            return default;
+        }
+
+        public IEnumerable<object> GetServices(Type? serviceType)
         {
             return Array.Empty<object>();
         }
 
-        public bool HasRegistration(Type? serviceType, string? contract = null)
+        public IEnumerable<object> GetServices(Type? serviceType, string? contract)
+        {
+            return Array.Empty<object>();
+        }
+
+        public IEnumerable<T> GetServices<T>()
+        {
+            return Array.Empty<T>();
+        }
+
+        public IEnumerable<T> GetServices<T>(string? contract)
+        {
+            return Array.Empty<T>();
+        }
+
+        public bool HasRegistration(Type? serviceType)
         {
             return false;
         }
 
-        public void Register(Func<object?> factory, Type? serviceType, string? contract = null)
+        public bool HasRegistration(Type? serviceType, string? contract)
         {
+            return false;
+        }
+
+        public bool HasRegistration<T>()
+        {
+            return false;
+        }
+
+        public bool HasRegistration<T>(string? contract)
+        {
+            return false;
+        }
+
+        public void Register(Func<object?> factory, Type? serviceType)
+        {
+        }
+
+        public void Register(Func<object?> factory, Type? serviceType, string? contract)
+        {
+        }
+
+        public void Register<T>(Func<T?> factory)
+        {
+        }
+
+        public void Register<T>(Func<T?> factory, string? contract)
+        {
+        }
+
+        public void UnregisterCurrent(Type? serviceType)
+        {
+        }
+
+        public void UnregisterCurrent(Type? serviceType, string? contract)
+        {
+        }
+
+        public void UnregisterCurrent<T>()
+        {
+        }
+
+        public void UnregisterCurrent<T>(string? contract)
+        {
+        }
+
+        public void UnregisterAll(Type? serviceType)
+        {
+        }
+
+        public void UnregisterAll(Type? serviceType, string? contract)
+        {
+        }
+
+        public void UnregisterAll<T>()
+        {
+        }
+
+        public void UnregisterAll<T>(string? contract)
+        {
+        }
+
+        public IDisposable ServiceRegistrationCallback(Type serviceType, Action<IDisposable> callback)
+        {
+            return System.Reactive.Disposables.Disposable.Empty;
         }
 
         public IDisposable ServiceRegistrationCallback(Type serviceType, string? contract, Action<IDisposable> callback)
@@ -59,11 +155,45 @@ public class UseReactiveUIWithDIContainerTests
             return System.Reactive.Disposables.Disposable.Empty;
         }
 
-        public void UnregisterAll(Type? serviceType, string? contract = null)
+        public IDisposable ServiceRegistrationCallback<T>(Action<IDisposable> callback)
+        {
+            return System.Reactive.Disposables.Disposable.Empty;
+        }
+
+        public IDisposable ServiceRegistrationCallback<T>(string? contract, Action<IDisposable> callback)
+        {
+            return System.Reactive.Disposables.Disposable.Empty;
+        }
+
+        public void Register<TService, TImplementation>()
+            where TService : class
+            where TImplementation : class, TService, new()
         {
         }
 
-        public void UnregisterCurrent(Type? serviceType, string? contract = null)
+        public void Register<TService, TImplementation>(string? contract)
+            where TService : class
+            where TImplementation : class, TService, new()
+        {
+        }
+
+        public void RegisterConstant<T>(T? value)
+            where T : class
+        {
+        }
+
+        public void RegisterConstant<T>(T? value, string? contract)
+            where T : class
+        {
+        }
+
+        public void RegisterLazySingleton<T>(Func<T?> valueFactory)
+            where T : class
+        {
+        }
+
+        public void RegisterLazySingleton<T>(Func<T?> valueFactory, string? contract)
+            where T : class
         {
         }
     }

@@ -10,7 +10,7 @@ public class AppBuilderExtensionsTests
     {
         // Test that UseReactiveUI throws ArgumentNullException for null builder
         AppBuilder? nullBuilder = null;
-        Assert.Throws<ArgumentNullException>(() => nullBuilder!.UseReactiveUI());
+        Assert.Throws<ArgumentNullException>(() => nullBuilder!.UseReactiveUI(_ => { }));
     }
 
     [Test]

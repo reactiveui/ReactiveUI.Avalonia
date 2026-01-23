@@ -3,17 +3,16 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for full license information.
 
-using System;
-using System.Reactive.Linq;
-using System.Reflection;
-using Avalonia;
-using Splat;
-
 namespace ReactiveUI.Avalonia;
 
 /// <summary>
-/// Creates an observable for a property if available that is based on a DependencyProperty.
+/// Provides an implementation of ICreatesObservableForProperty that enables reactive observation of AvaloniaObject
+/// property changes using Avalonia's property system.
 /// </summary>
+/// <remarks>This class is intended for use within reactive UI frameworks to facilitate property change
+/// notifications for AvaloniaObject instances. It supports both standard and 'before changed' notifications, and
+/// integrates with Avalonia's property registry to identify observable properties. Thread safety and error handling are
+/// managed according to Avalonia and ReactiveUI conventions.</remarks>
 internal class AvaloniaObjectObservableForProperty : ICreatesObservableForProperty
 {
     /// <inheritdoc/>
@@ -63,6 +62,12 @@ internal class AvaloniaObjectObservableForProperty : ICreatesObservableForProper
             .Select(args => new ObservedChange<object, object?>(args.Sender, expression, args.NewValue));
     }
 
+    /// <summary>
+    /// Retrieves the registered Avalonia property with the specified name for the given type.
+    /// </summary>
+    /// <param name="type">The type for which to search for the Avalonia property. Must be a registered Avalonia type.</param>
+    /// <param name="propertyName">The name of the Avalonia property to retrieve. The comparison is case-sensitive.</param>
+    /// <returns>The Avalonia property matching the specified name for the given type, or null if no such property is registered.</returns>
     private static AvaloniaProperty? GetAvaloniaProperty(Type type, string propertyName)
     {
         foreach (var property in AvaloniaPropertyRegistry.Instance.GetRegistered(type))

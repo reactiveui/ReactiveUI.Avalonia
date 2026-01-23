@@ -13,52 +13,24 @@ using AppBuilder = Avalonia.AppBuilder;
 namespace ReactiveUI.Avalonia.Splat;
 
 /// <summary>
-/// Avalonia Mixins.
+/// Provides extension methods for configuring Avalonia applications to use ReactiveUI with DryIoc as the dependency
+/// injection container.
 /// </summary>
 public static class AvaloniaMixins
 {
     /// <summary>
-    /// Uses the splat with dry ioc.
+    /// Configures the application to use ReactiveUI with DryIoc as the dependency injection container.
     /// </summary>
-    /// <param name="builder">The builder.</param>
-    /// <param name="containerConfig">The configure.</param>
-    /// <returns>An App Builder.</returns>
-    public static AppBuilder UseReactiveUIWithDryIoc(this AppBuilder builder, Action<Container> containerConfig) =>
-        builder switch
-        {
-            null => throw new ArgumentNullException(nameof(builder)),
-            _ => builder.UseReactiveUI().AfterPlatformServicesSetup(_ =>
-            {
-                if (AppLocator.CurrentMutable is null)
-                {
-                    return;
-                }
-
-#if NETSTANDARD
-                if (containerConfig is null)
-                {
-                    throw new ArgumentNullException(nameof(containerConfig));
-                }
-#else
-                ArgumentNullException.ThrowIfNull(containerConfig);
-#endif
-
-                var container = new Container();
-                container.UseDryIocDependencyResolver();
-                AppLocator.CurrentMutable.RegisterConstant(container);
-                RxSchedulers.MainThreadScheduler = AvaloniaScheduler.Instance;
-                containerConfig(container);
-            })
-        };
-
-    /// <summary>
-    /// Uses the reactive UI with dry ioc.
-    /// </summary>
-    /// <param name="builder">The builder.</param>
-    /// <param name="containerConfig">The container configuration.</param>
-    /// <param name="withReactiveUIBuilder">The with reactive UI builder.</param>
-    /// <returns>An App Builder.</returns>
-    /// <exception cref="ArgumentNullException">builder.</exception>
+    /// <remarks>This method integrates DryIoc with ReactiveUI, allowing services and dependencies to be
+    /// registered using DryIoc. The provided <paramref name="containerConfig"/> delegate can be used to register
+    /// application-specific services. If additional ReactiveUI configuration is required, supply the <paramref
+    /// name="withReactiveUIBuilder"/> delegate.</remarks>
+    /// <param name="builder">The application builder used to configure the app pipeline. Cannot be null.</param>
+    /// <param name="containerConfig">A delegate that configures the DryIoc container. This is called after the container is created and registered.</param>
+    /// <param name="withReactiveUIBuilder">An optional delegate to further configure the ReactiveUI builder. If provided, it is invoked after DryIoc
+    /// integration.</param>
+    /// <returns>The application builder instance, configured to use ReactiveUI with DryIoc.</returns>
+    /// <exception cref="ArgumentNullException">Thrown if <paramref name="builder"/> or <paramref name="containerConfig"/> is null.</exception>
     public static AppBuilder UseReactiveUIWithDryIoc(this AppBuilder builder, Action<Container> containerConfig, Action<ReactiveUIBuilder>? withReactiveUIBuilder = null) =>
         builder switch
         {

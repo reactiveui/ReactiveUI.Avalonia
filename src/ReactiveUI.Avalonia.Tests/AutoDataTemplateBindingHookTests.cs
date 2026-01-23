@@ -2,6 +2,8 @@ using System.Linq.Expressions;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
 using NUnit.Framework;
+using ReactiveUI.Builder;
+using Splat;
 
 namespace ReactiveUI.Avalonia.Tests;
 
@@ -10,6 +12,8 @@ public class AutoDataTemplateBindingHookTests
     [Test]
     public void ExecuteHook_ItemsControlWithoutTemplate_SetsDefaultTemplate()
     {
+        ReactiveUIBuilder.ResetBuilderStateForTests();
+        AppLocator.CurrentMutable.CreateReactiveUIBuilder().WithCoreServices().BuildApp();
         var hook = new AutoDataTemplateBindingHook();
         var items = new ListBox();
 
@@ -27,6 +31,8 @@ public class AutoDataTemplateBindingHookTests
     [Test]
     public void ExecuteHook_WhenItemTemplateAlreadySet_DoesNotOverride()
     {
+        ReactiveUIBuilder.ResetBuilderStateForTests();
+        AppLocator.CurrentMutable.CreateReactiveUIBuilder().WithCoreServices().BuildApp();
         var hook = new AutoDataTemplateBindingHook();
         var items = new ListBox();
         items.ItemTemplate = new FuncDataTemplate<object>((_, _) => new TextBlock(), true);
@@ -45,6 +51,8 @@ public class AutoDataTemplateBindingHookTests
     [Test]
     public void ExecuteHook_WhenDataTemplatesPresent_DoesNotOverride()
     {
+        ReactiveUIBuilder.ResetBuilderStateForTests();
+        AppLocator.CurrentMutable.CreateReactiveUIBuilder().WithCoreServices().BuildApp();
         var hook = new AutoDataTemplateBindingHook();
         var items = new ListBox();
         items.DataTemplates.Add(new FuncDataTemplate<object>((_, _) => new TextBlock(), true));

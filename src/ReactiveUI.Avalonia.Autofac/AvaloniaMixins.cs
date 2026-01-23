@@ -5,7 +5,6 @@
 
 using Autofac;
 using ReactiveUI.Builder;
-using Splat;
 using Splat.Autofac;
 using Splat.Builder;
 using AppBuilder = Avalonia.AppBuilder;
@@ -13,65 +12,27 @@ using AppBuilder = Avalonia.AppBuilder;
 namespace ReactiveUI.Avalonia.Splat;
 
 /// <summary>
-/// Avalonia Mixins.
+/// Provides extension methods for configuring Avalonia applications to use ReactiveUI with Autofac as the dependency
+/// injection container.
 /// </summary>
+/// <remarks>This class contains extension methods that integrate Autofac with ReactiveUI in Avalonia
+/// applications. These methods are intended to be used during application startup to set up dependency resolution and
+/// enable further customization of the application's composition and ReactiveUI configuration.</remarks>
 public static class AvaloniaMixins
 {
     /// <summary>
-    /// Uses the splat with dry ioc.
+    /// Configures the application to use ReactiveUI with Autofac as the dependency injection container.
     /// </summary>
-    /// <param name="builder">The builder.</param>
-    /// <param name="containerConfig">The configure.</param>
-    /// <param name="withResolver">The get resolver.</param>
-    /// <returns>
-    /// An App Builder.
-    /// </returns>
-    /// <exception cref="System.ArgumentNullException">builder.</exception>
-    public static AppBuilder UseReactiveUIWithAutofac(this AppBuilder builder, Action<ContainerBuilder> containerConfig, Action<AutofacDependencyResolver>? withResolver = null) =>
-        builder switch
-        {
-            null => throw new ArgumentNullException(nameof(builder)),
-            _ => builder.UseReactiveUI().AfterPlatformServicesSetup(_ =>
-            {
-                if (AppLocator.CurrentMutable is null)
-                {
-                    return;
-                }
-#if NETSTANDARD
-                if (containerConfig is null)
-                {
-                    throw new ArgumentNullException(nameof(containerConfig));
-                }
-#else
-                ArgumentNullException.ThrowIfNull(containerConfig);
-#endif
-                var containerBuilder = new ContainerBuilder();
-                var autofacResolver = containerBuilder.UseAutofacDependencyResolver();
-                containerBuilder.RegisterInstance(autofacResolver);
-                autofacResolver.InitializeReactiveUI(RegistrationNamespace.Avalonia);
-                RxSchedulers.MainThreadScheduler = AvaloniaScheduler.Instance;
-                containerConfig(containerBuilder);
-                var container = containerBuilder.Build();
-                autofacResolver.SetLifetimeScope(container);
-
-                if (withResolver is not null)
-                {
-                    withResolver(autofacResolver);
-                }
-            })
-        };
-
-    /// <summary>
-    /// Uses the reactive UI with autofac.
-    /// </summary>
-    /// <param name="builder">The builder.</param>
-    /// <param name="containerConfig">The container configuration.</param>
-    /// <param name="withResolver">The with resolver.</param>
-    /// <param name="withReactiveUIBuilder">The with reactive UI builder.</param>
-    /// <returns>
-    /// An App Builder.
-    /// </returns>
-    /// <exception cref="ArgumentNullException">builder.</exception>
+    /// <remarks>This method integrates Autofac with ReactiveUI by registering the Autofac dependency resolver
+    /// and allowing custom container configuration. Additional customization of the resolver and ReactiveUI builder can
+    /// be performed using the optional delegates. This extension should be called during application startup before
+    /// registering views and view models.</remarks>
+    /// <param name="builder">The application builder used to configure the app. Cannot be null.</param>
+    /// <param name="containerConfig">A delegate that configures the Autofac container by registering services and components. Cannot be null.</param>
+    /// <param name="withResolver">An optional delegate that allows further customization of the Autofac dependency resolver after it is created.</param>
+    /// <param name="withReactiveUIBuilder">An optional delegate that allows additional configuration of the ReactiveUI builder.</param>
+    /// <returns>The application builder instance, enabling further configuration or chaining.</returns>
+    /// <exception cref="ArgumentNullException">Thrown if <paramref name="builder"/> or <paramref name="containerConfig"/> is null.</exception>
     public static AppBuilder UseReactiveUIWithAutofac(this AppBuilder builder, Action<ContainerBuilder> containerConfig, Action<AutofacDependencyResolver>? withResolver = null, Action<ReactiveUIBuilder>? withReactiveUIBuilder = null)
     {
         if (builder is null)

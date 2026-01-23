@@ -13,63 +13,32 @@ using AppBuilder = Avalonia.AppBuilder;
 namespace ReactiveUI.Avalonia.Splat;
 
 /// <summary>
-/// Avalonia Mixins.
+/// Provides extension methods for integrating ReactiveUI with Avalonia applications using the Microsoft dependency
+/// resolver.
 /// </summary>
+/// <remarks>This static class contains mixin methods that enable the use of ReactiveUI in Avalonia applications
+/// with dependency injection support via Microsoft's IServiceCollection and IServiceProvider. These methods facilitate
+/// the configuration of services and the setup of the dependency resolver, streamlining the integration process for
+/// applications that leverage both Avalonia and ReactiveUI.</remarks>
 public static class AvaloniaMixins
 {
     /// <summary>
-    /// Uses the splat with microsoft dependency resolver.
+    /// Configures the application to use ReactiveUI with the Microsoft dependency injection system, allowing services
+    /// to be registered and resolved via IServiceCollection and IServiceProvider.
     /// </summary>
-    /// <param name="builder">The builder.</param>
-    /// <param name="containerConfig">The configure.</param>
-    /// <param name="withResolver">The get service provider.</param>
-    /// <returns>An App Builder.</returns>
-    public static AppBuilder UseReactiveUIWithMicrosoftDependencyResolver(this AppBuilder builder, Action<IServiceCollection> containerConfig, Action<IServiceProvider?>? withResolver = null) =>
-        builder switch
-        {
-            null => throw new ArgumentNullException(nameof(builder)),
-            _ => builder.UseReactiveUI().AfterPlatformServicesSetup(_ =>
-            {
-                if (AppLocator.CurrentMutable is null)
-                {
-                    return;
-                }
-
-#if NETSTANDARD
-                if (containerConfig is null)
-                {
-                    throw new ArgumentNullException(nameof(containerConfig));
-                }
-#else
-                ArgumentNullException.ThrowIfNull(containerConfig);
-#endif
-
-                IServiceCollection serviceCollection = new ServiceCollection();
-                serviceCollection.UseMicrosoftDependencyResolver();
-                AppLocator.CurrentMutable.RegisterConstant(serviceCollection);
-                RxSchedulers.MainThreadScheduler = AvaloniaScheduler.Instance;
-                containerConfig(serviceCollection);
-                var serviceProvider = serviceCollection.BuildServiceProvider();
-                serviceProvider.UseMicrosoftDependencyResolver();
-
-                if (withResolver is not null)
-                {
-                    withResolver(serviceProvider);
-                }
-            })
-        };
-
-    /// <summary>
-    /// Uses the splat with microsoft dependency resolver.
-    /// </summary>
-    /// <param name="builder">The builder.</param>
-    /// <param name="containerConfig">The configure.</param>
-    /// <param name="withResolver">The get service provider.</param>
-    /// <param name="withReactiveUIBuilder">The with reactive UI builder.</param>
-    /// <returns>
-    /// An App Builder.
-    /// </returns>
-    /// <exception cref="ArgumentNullException">builder.</exception>
+    /// <remarks>This method integrates ReactiveUI with Microsoft's dependency injection by registering
+    /// services in an IServiceCollection and building an IServiceProvider. It is typically used during application
+    /// startup to enable service resolution throughout the app. The optional delegates allow for advanced customization
+    /// of both the dependency resolver and ReactiveUI configuration.</remarks>
+    /// <param name="builder">The application builder used to configure the app. Cannot be null.</param>
+    /// <param name="containerConfig">A delegate that configures the IServiceCollection for dependency injection. This is used to register services
+    /// required by the application. Cannot be null.</param>
+    /// <param name="withResolver">An optional delegate invoked with the IServiceProvider after it has been built, allowing additional
+    /// configuration or initialization using the resolved services.</param>
+    /// <param name="withReactiveUIBuilder">An optional delegate invoked with the ReactiveUIBuilder to allow further customization of ReactiveUI
+    /// configuration.</param>
+    /// <returns>The application builder instance, configured to use ReactiveUI with Microsoft dependency injection.</returns>
+    /// <exception cref="ArgumentNullException">Thrown if builder or containerConfig is null.</exception>
     public static AppBuilder UseReactiveUIWithMicrosoftDependencyResolver(this AppBuilder builder, Action<IServiceCollection> containerConfig, Action<IServiceProvider?>? withResolver = null, Action<ReactiveUIBuilder>? withReactiveUIBuilder = null) =>
         builder switch
         {

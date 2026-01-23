@@ -3,61 +3,29 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for full license information.
 
-using System;
-using System.Linq;
-using System.Reflection;
-using Avalonia;
-using ReactiveUI.Builder;
-using Splat;
-
 namespace ReactiveUI.Avalonia;
 
 /// <summary>
-/// Avalonia AppBuilder setup extensions.
+/// Provides extension methods for configuring Avalonia applications to use ReactiveUI, including integration with
+/// custom dependency injection containers and automatic view registration.
 /// </summary>
+/// <remarks>These extension methods simplify the setup of ReactiveUI in Avalonia applications by enabling
+/// automatic registration of views, integration with dependency injection containers, and configuration of ReactiveUI
+/// services. Methods in this class should be called during application startup, typically in the AppBuilder
+/// configuration pipeline, to ensure proper initialization before platform services are set up.</remarks>
 public static class AppBuilderExtensions
 {
     /// <summary>
-    /// Initializes ReactiveUI framework to use with Avalonia. Registers Avalonia scheduler,
-    /// an activation for view fetcher, a template binding hook.
-    /// Remember to call this method if you are using ReactiveUI in your application.
+    /// Configures the application to use ReactiveUI with Avalonia by registering required services and allowing
+    /// additional customization via a builder callback.
     /// </summary>
-    /// <param name="builder">This builder.</param>
-    /// <returns>The builder.</returns>
-    public static AppBuilder UseReactiveUI(this AppBuilder builder)
-    {
-        if (builder is null)
-        {
-            throw new ArgumentNullException(nameof(builder));
-        }
-
-        return builder.AfterPlatformServicesSetup(_ => AppLocator.RegisterResolverCallbackChanged(() =>
-        {
-            if (AppLocator.CurrentMutable is null)
-            {
-                return;
-            }
-
-            PlatformRegistrationManager.SetRegistrationNamespaces(RegistrationNamespace.Avalonia);
-            RxSchedulers.MainThreadScheduler = AvaloniaScheduler.Instance;
-            AppLocator.CurrentMutable.RegisterConstant<IActivationForViewFetcher>(new AvaloniaActivationForViewFetcher());
-            AppLocator.CurrentMutable.RegisterConstant<IPropertyBindingHook>(new AutoDataTemplateBindingHook());
-            AppLocator.CurrentMutable.RegisterConstant<ICreatesCommandBinding>(new AvaloniaCreatesCommandBinding());
-            AppLocator.CurrentMutable.RegisterConstant<ICreatesObservableForProperty>(new AvaloniaObjectObservableForProperty());
-        }));
-    }
-
-    /// <summary>
-    /// Uses the reactive UI with ReactiveUI AppBuilder.
-    /// </summary>
-    /// <param name="builder">The builder.</param>
-    /// <param name="withReactiveUIBuilder">The with reactive UI builder.</param>
-    /// <returns>The Avalonia builder.</returns>
-    /// <exception cref="ArgumentNullException">
-    /// builder
-    /// or
-    /// withReactiveUIBuilder.
-    /// </exception>
+    /// <remarks>This method sets up core ReactiveUI services for Avalonia, including activation, property
+    /// binding, and command binding. The provided callback allows registering additional services or modifying the
+    /// ReactiveUI configuration before the application is built.</remarks>
+    /// <param name="builder">The application builder to configure. Cannot be null.</param>
+    /// <param name="withReactiveUIBuilder">A callback that receives a ReactiveUI builder for further customization. Cannot be null.</param>
+    /// <returns>The application builder instance, enabling further configuration.</returns>
+    /// <exception cref="ArgumentNullException">Thrown if <paramref name="builder"/> or <paramref name="withReactiveUIBuilder"/> is null.</exception>
     public static AppBuilder UseReactiveUI(this AppBuilder builder, Action<ReactiveUIBuilder> withReactiveUIBuilder)
     {
         if (builder is null)
@@ -93,14 +61,16 @@ public static class AppBuilderExtensions
     }
 
     /// <summary>
-    /// Scan and register IViewFor&lt;TViewModel&gt; view types into the current resolver for the provided assemblies.
-    /// Useful to avoid manual view registrations in App.Initialize.
-    /// Registration prefers resolving the concrete view from the current resolver (to allow DI),
-    /// and falls back to Activator.CreateInstance.
+    /// Registers ReactiveUI view types from the specified assemblies with the application's dependency resolver during
+    /// platform services setup.
     /// </summary>
-    /// <param name="builder">This builder.</param>
-    /// <param name="assemblies">Assemblies to scan for view registrations.</param>
-    /// <returns>The builder.</returns>
+    /// <remarks>This method should be called before the application is started to ensure that ReactiveUI
+    /// views are available for dependency resolution. Views are registered after platform services have been set up,
+    /// allowing for proper integration with the application's lifecycle.</remarks>
+    /// <param name="builder">The application builder to configure. Cannot be null.</param>
+    /// <param name="assemblies">An array of assemblies containing ReactiveUI view types to register. If null or empty, no views are registered.</param>
+    /// <returns>The application builder instance, enabling further configuration.</returns>
+    /// <exception cref="ArgumentNullException">Thrown if <paramref name="builder"/> is null.</exception>
     public static AppBuilder RegisterReactiveUIViews(this AppBuilder builder, params Assembly[] assemblies)
     {
         if (builder is null)
@@ -126,19 +96,28 @@ public static class AppBuilderExtensions
     }
 
     /// <summary>
-    /// Convenience overload to scan and register views from the assembly containing the specified marker type.
+    /// Registers all ReactiveUI view types found in the assembly containing the specified marker type with the
+    /// application builder.
     /// </summary>
-    /// <typeparam name="TMarker">A type from the assembly to scan.</typeparam>
-    /// <param name="builder">This builder.</param>
-    /// <returns>The builder.</returns>
+    /// <remarks>This method scans the assembly of <typeparamref name="TMarker"/> for ReactiveUI view types
+    /// and registers them for use within the application. Use this method to simplify view registration when working
+    /// with assemblies that contain ReactiveUI views.</remarks>
+    /// <typeparam name="TMarker">The type used to identify the assembly from which ReactiveUI views will be registered.</typeparam>
+    /// <param name="builder">The application builder to configure with ReactiveUI view registrations.</param>
+    /// <returns>The same <see cref="AppBuilder"/> instance, enabling fluent configuration.</returns>
     public static AppBuilder RegisterReactiveUIViewsFromAssemblyOf<TMarker>(this AppBuilder builder)
         => RegisterReactiveUIViews(builder, typeof(TMarker).Assembly);
 
     /// <summary>
-    /// Convenience overload to scan and register views from the entry assembly when available.
+    /// Registers all ReactiveUI view types found in the application's entry assembly with the specified application
+    /// builder.
     /// </summary>
-    /// <param name="builder">This builder.</param>
-    /// <returns>The builder.</returns>
+    /// <remarks>This method is typically used during application startup to automatically discover and
+    /// register ReactiveUI views from the entry assembly. If the entry assembly cannot be determined, no views are
+    /// registered and the builder is returned unchanged.</remarks>
+    /// <param name="builder">The application builder to configure with ReactiveUI view registrations.</param>
+    /// <returns>The same application builder instance, with ReactiveUI views registered if the entry assembly is available;
+    /// otherwise, the original builder.</returns>
     public static AppBuilder RegisterReactiveUIViewsFromEntryAssembly(this AppBuilder builder)
     {
         var entry = Assembly.GetEntryAssembly();
@@ -146,26 +125,33 @@ public static class AppBuilderExtensions
     }
 
     /// <summary>
-    /// Uses the reactive UI with di container.
+    /// Configures the application to use ReactiveUI with a custom dependency injection container and dependency
+    /// resolver.
     /// </summary>
-    /// <typeparam name="TContainer">The type of the container.</typeparam>
-    /// <param name="builder">The builder.</param>
-    /// <param name="containerFactory">The container factory.</param>
-    /// <param name="containerConfig">The container configuration.</param>
-    /// <param name="dependencyResolverFactory">The dependency resolver factory.</param>
-    /// <returns>
-    /// An AppBuilder.
-    /// </returns>
-    /// <exception cref="System.ArgumentNullException">builder.</exception>
+    /// <remarks>This method integrates ReactiveUI into the Avalonia application and sets up a custom
+    /// dependency injection container for service registration and resolution. It should be called during application
+    /// startup before platform services are initialized. The provided container and dependency resolver will be
+    /// registered with the application's service locator.</remarks>
+    /// <typeparam name="TContainer">The type of the dependency injection container to be used for service registration and resolution.</typeparam>
+    /// <param name="builder">The application builder used to configure the Avalonia application.</param>
+    /// <param name="containerFactory">A factory function that creates an instance of the dependency injection container.</param>
+    /// <param name="containerConfig">An action that configures the dependency injection container after it has been created.</param>
+    /// <param name="dependencyResolverFactory">A function that creates an IDependencyResolver from the dependency injection container.</param>
+    /// <param name="configureReactiveUI">An action that configures ReactiveUI options and services.</param>
+    /// <returns>The application builder instance, configured to use ReactiveUI with the specified dependency injection container
+    /// and resolver.</returns>
+    /// <exception cref="ArgumentNullException">Thrown if builder, containerFactory, containerConfig, or dependencyResolverFactory is null.</exception>
     public static AppBuilder UseReactiveUIWithDIContainer<TContainer>(
         this AppBuilder builder,
         Func<TContainer> containerFactory,
         Action<TContainer> containerConfig,
-        Func<TContainer, IDependencyResolver> dependencyResolverFactory) =>
+        Func<TContainer, IDependencyResolver> dependencyResolverFactory,
+        Action<ReactiveUIBuilder> configureReactiveUI)
+        where TContainer : class =>
             builder switch
             {
                 null => throw new ArgumentNullException(nameof(builder)),
-                _ => builder.UseReactiveUI().AfterPlatformServicesSetup(_ =>
+                _ => builder.UseReactiveUI(configureReactiveUI).AfterPlatformServicesSetup(_ =>
                 {
                     if (AppLocator.CurrentMutable is null)
                     {
@@ -202,6 +188,15 @@ public static class AppBuilderExtensions
                 })
             };
 
+    /// <summary>
+    /// Registers all non-abstract, non-interface view types implementing IViewFor{T} from the specified assemblies with
+    /// the provided dependency resolver.
+    /// </summary>
+    /// <remarks>If a view type is decorated with a ViewContract attribute, its contract value is used during
+    /// registration. Each view type is registered with the resolver using either an existing service instance or a new
+    /// instance created via Activator. Duplicate assemblies are ignored.</remarks>
+    /// <param name="resolver">The dependency resolver in which the discovered view types will be registered.</param>
+    /// <param name="assemblies">An array of assemblies to scan for view types implementing IViewFor{T}.</param>
     private static void RegisterViewsInternal(IMutableDependencyResolver resolver, Assembly[] assemblies)
     {
         foreach (var asm in assemblies.Distinct())

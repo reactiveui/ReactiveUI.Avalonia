@@ -3,11 +3,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for full license information.
 
-using System;
 using System.Reactive.Disposables.Fluent;
-using Avalonia;
-using Avalonia.Controls;
-using Splat;
 
 namespace ReactiveUI.Avalonia;
 
@@ -19,34 +15,50 @@ namespace ReactiveUI.Avalonia;
 public class ViewModelViewHost : TransitioningContentControl, IViewFor, IEnableLogger
 {
     /// <summary>
-    /// <see cref="AvaloniaProperty"/> for the <see cref="ViewModel"/> property.
+    /// Identifies the ViewModel dependency property for the ViewModelViewHost control.
     /// </summary>
+    /// <remarks>This field is used to reference the ViewModel property in property system operations, such as
+    /// data binding or property change notifications. It is typically used when interacting with Avalonia's property
+    /// system APIs.</remarks>
     public static readonly AvaloniaProperty<object?> ViewModelProperty =
         AvaloniaProperty.Register<ViewModelViewHost, object?>(nameof(ViewModel));
 
     /// <summary>
-    /// <see cref="AvaloniaProperty"/> for the <see cref="ViewContract"/> property.
+    /// Identifies the ViewContract dependency property for the ViewModelViewHost control.
     /// </summary>
+    /// <remarks>This field is used to register and reference the ViewContract property within Avalonia's
+    /// property system. It enables styling, binding, and change notification for the ViewContract property in XAML and
+    /// code.</remarks>
     public static readonly StyledProperty<string?> ViewContractProperty =
         AvaloniaProperty.Register<ViewModelViewHost, string?>(nameof(ViewContract));
 
     /// <summary>
-    /// <see cref="AvaloniaProperty"/> for the <see cref="DefaultContent"/> property.
+    /// Identifies the default content property for the ViewModelViewHost control.
     /// </summary>
+    /// <remarks>This property can be used to set or retrieve the default content displayed by the
+    /// ViewModelViewHost when no view model is present. It is typically used in XAML bindings or when customizing the
+    /// control's appearance.</remarks>
     public static readonly StyledProperty<object?> DefaultContentProperty =
         AvaloniaProperty.Register<ViewModelViewHost, object?>(nameof(DefaultContent));
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="ViewModelViewHost"/> class.
+    /// Initializes a new instance of the <see cref="ViewModelViewHost"/> class and sets up activation logic to automatically navigate.
+    /// to the appropriate view when the ViewModel or ViewContract changes.
     /// </summary>
+    /// <remarks>This constructor subscribes to changes in the ViewModel and ViewContract properties, ensuring
+    /// that the view is updated in response to these changes. The activation logic is disposed of when the host is
+    /// deactivated, following the ReactiveUI activation pattern.</remarks>
     public ViewModelViewHost() =>
         this.WhenActivated(disposables => this.WhenAnyValue(x => x.ViewModel, x => x.ViewContract)
                                                .Subscribe(tuple => NavigateToViewModel(tuple.Item1, tuple.Item2))
                                                .DisposeWith(disposables));
 
     /// <summary>
-    /// Gets or sets the ViewModel to display.
+    /// Gets or sets the data context for the control, typically used for data binding in MVVM scenarios.
     /// </summary>
+    /// <remarks>Assigning a view model to this property enables the control to bind its UI elements to
+    /// properties and commands exposed by the view model. Changing the value will update data bindings accordingly.
+    /// This property is commonly used in frameworks that support the Model-View-ViewModel (MVVM) pattern.</remarks>
     public object? ViewModel
     {
         get => GetValue(ViewModelProperty);
@@ -54,7 +66,7 @@ public class ViewModelViewHost : TransitioningContentControl, IViewFor, IEnableL
     }
 
     /// <summary>
-    /// Gets or sets the view contract.
+    /// Gets or sets the name of the view contract associated with this element.
     /// </summary>
     public string? ViewContract
     {
@@ -63,8 +75,11 @@ public class ViewModelViewHost : TransitioningContentControl, IViewFor, IEnableL
     }
 
     /// <summary>
-    /// Gets or sets the content displayed whenever there is no page currently routed.
+    /// Gets or sets the default content to display when no explicit content is provided.
     /// </summary>
+    /// <remarks>The value can be any object, such as a string, UI element, or data model, depending on the
+    /// context in which the property is used. If set to <see langword="null"/>, no default content will be
+    /// shown.</remarks>
     public object? DefaultContent
     {
         get => GetValue(DefaultContentProperty);
@@ -72,18 +87,26 @@ public class ViewModelViewHost : TransitioningContentControl, IViewFor, IEnableL
     }
 
     /// <summary>
-    /// Gets or sets the view locator.
+    /// Gets or sets the view locator used to resolve views for view models.
     /// </summary>
+    /// <remarks>Assign an implementation of <see cref="IViewLocator"/> to customize how views are located and
+    /// instantiated. If <see langword="null"/>, the default view resolution strategy will be used.</remarks>
     public IViewLocator? ViewLocator { get; set; }
 
     /// <inheritdoc/>
     protected override Type StyleKeyOverride => typeof(TransitioningContentControl);
 
     /// <summary>
-    /// Invoked when ReactiveUI router navigates to a view model.
+    /// Navigates to the view associated with the specified view model and contract, updating the content to display the
+    /// resolved view.
     /// </summary>
-    /// <param name="viewModel">ViewModel to which the user navigates.</param>
-    /// <param name="contract">The contract for view resolution.</param>
+    /// <remarks>If no view can be resolved for the provided view model and contract, the content falls back
+    /// to the default. The resolved view's data context and view model are set to the provided instance, ensuring
+    /// proper binding. Logging is performed to indicate navigation actions and fallback scenarios.</remarks>
+    /// <param name="viewModel">The view model instance for which to resolve and display the corresponding view. If <paramref name="viewModel"/>
+    /// is <see langword="null"/>, the default content is shown.</param>
+    /// <param name="contract">An optional contract string used to distinguish between multiple views for the same view model type. If
+    /// <paramref name="contract"/> is <see langword="null"/>, the default view is used.</param>
     private void NavigateToViewModel(object? viewModel, string? contract)
     {
         if (viewModel == null)

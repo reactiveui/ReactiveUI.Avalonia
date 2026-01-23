@@ -11,4 +11,26 @@
     <PackageReference Include="Avalonia" />
     <PackageReference Include="ReactiveUI" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="System"/>
+    <Using Include="System.Linq"/>
+    <Using Include="System.Reflection"/>
+    <Using Include="Avalonia"/>
+    <Using Include="ReactiveUI.Builder"/>
+    <Using Include="Splat"/>
+    <Using Include="Avalonia.Controls"/>
+    <Using Include="Avalonia.Controls.Templates"/>
+    <Using Include="Avalonia.Data"/>
+    <Using Include="Avalonia.Input"/>
+    <Using Include="Avalonia.Layout"/>
+    <Using Include="Avalonia.Threading"/>
+    <Using Include="System.Reactive"/>
+    <Using Include="System.Reactive.Disposables"/>
+    <Using Include="System.Reactive.Linq"/>
+    <Using Include="System.Reactive.Subjects"/>
+    <Using Include="System.Threading"/>
+    <Using Include="Avalonia.Controls.ApplicationLifetimes"/>
+    <Using Include="Avalonia.Interactivity"/>
+  </ItemGroup>
 </Project>

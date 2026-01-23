@@ -3,9 +3,6 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for full license information.
 
-using Avalonia;
-using Avalonia.Controls;
-
 namespace ReactiveUI.Avalonia;
 
 /// <summary>
@@ -19,15 +16,23 @@ public class ReactiveWindow<TViewModel> : Window, IViewFor<TViewModel>
     where TViewModel : class
 {
     /// <summary>
-    /// The <see cref="ViewModel"/> dependency property.
+    /// Identifies the ViewModel dependency property for a ReactiveWindow.
     /// </summary>
+    /// <remarks>This field is used to register and reference the ViewModel property within Avalonia's
+    /// property system. It enables data binding and change notification for the ViewModel associated with the
+    /// window.</remarks>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("AvaloniaProperty", "AVP1002", Justification = "Generic avalonia property is expected here.")]
     public static readonly StyledProperty<TViewModel?> ViewModelProperty = AvaloniaProperty
         .Register<ReactiveWindow<TViewModel>, TViewModel?>(nameof(ViewModel));
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="ReactiveWindow{TViewModel}"/> class.
+    /// Initializes a new instance of the <see cref="ReactiveWindow{TViewModel}"/> class and sets up activation handling for the window and its.
+    /// view model.
     /// </summary>
+    /// <remarks>This constructor configures the window to participate in activation lifecycle management. If
+    /// the associated view model implements IActivatableViewModel, its activation logic will be invoked when the window
+    /// is activated. This enables coordinated resource management and event handling between the view and its view
+    /// model.</remarks>
     public ReactiveWindow()
     {
         // This WhenActivated block calls ViewModel's WhenActivated

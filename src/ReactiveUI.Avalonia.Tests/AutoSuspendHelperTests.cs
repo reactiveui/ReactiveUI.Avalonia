@@ -11,10 +11,10 @@ public class AutoSuspendHelperTests
     [SetUp]
     public void Setup()
     {
-        RxApp.SuspensionHost.IsResuming = Observable.Never<Unit>();
-        RxApp.SuspensionHost.IsLaunchingNew = new Subject<Unit>();
-        RxApp.SuspensionHost.ShouldPersistState = Observable.Never<IDisposable>();
-        RxApp.SuspensionHost.ShouldInvalidateState = Observable.Never<Unit>();
+        RxSuspension.SuspensionHost.IsResuming = Observable.Never<Unit>();
+        RxSuspension.SuspensionHost.IsLaunchingNew = new Subject<Unit>();
+        RxSuspension.SuspensionHost.ShouldPersistState = Observable.Never<IDisposable>();
+        RxSuspension.SuspensionHost.ShouldInvalidateState = Observable.Never<Unit>();
     }
 
     [Test]
@@ -27,7 +27,7 @@ public class AutoSuspendHelperTests
         using var helper = new AutoSuspendHelper(lifetime);
 
         var notified = false;
-        var sub = RxApp.SuspensionHost.ShouldPersistState.Subscribe(d =>
+        var sub = RxSuspension.SuspensionHost.ShouldPersistState.Subscribe(d =>
         {
             notified = true;
             d.Dispose();
@@ -46,7 +46,7 @@ public class AutoSuspendHelperTests
         using var helper = new AutoSuspendHelper(lifetime);
 
         var count = 0;
-        var sub = RxApp.SuspensionHost.IsLaunchingNew.Subscribe(_ => count++);
+        var sub = RxSuspension.SuspensionHost.IsLaunchingNew.Subscribe(_ => count++);
 
         helper.OnFrameworkInitializationCompleted();
 
