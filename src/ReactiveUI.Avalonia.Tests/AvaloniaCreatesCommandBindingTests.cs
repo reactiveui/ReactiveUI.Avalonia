@@ -13,10 +13,10 @@ public class AvaloniaCreatesCommandBindingTests
     {
         var sut = new AvaloniaCreatesCommandBinding();
 
-        Assert.That(sut.GetAffinityForObject(typeof(object), hasEventTarget: false), Is.EqualTo(0));
-        Assert.That(sut.GetAffinityForObject(typeof(InputElement), hasEventTarget: false), Is.EqualTo(0));
-        Assert.That(sut.GetAffinityForObject(typeof(InputElement), hasEventTarget: true), Is.GreaterThan(0));
-        Assert.That(sut.GetAffinityForObject(typeof(Button), hasEventTarget: false), Is.EqualTo(10));
+        Assert.That(sut.GetAffinityForObject<object>(hasEventTarget: false), Is.EqualTo(0));
+        Assert.That(sut.GetAffinityForObject<InputElement>(hasEventTarget: false), Is.EqualTo(0));
+        Assert.That(sut.GetAffinityForObject<InputElement>(hasEventTarget: true), Is.GreaterThan(0));
+        Assert.That(sut.GetAffinityForObject<Button>(hasEventTarget: false), Is.EqualTo(10));
     }
 
     [Test]
@@ -49,7 +49,7 @@ public class AvaloniaCreatesCommandBindingTests
         var btn = new Button();
         var param = new BehaviorSubject<object?>("evt");
 
-        using var disp = sut.BindCommandToObject<RoutedEventArgs>(cmd, btn, param, nameof(InputElement.GotFocus));
+        using var disp = sut.BindCommandToObject<Button, RoutedEventArgs>(cmd, btn, param, nameof(InputElement.GotFocus));
 
         Assert.That(btn.IsEnabled, Is.True);
 
@@ -65,7 +65,7 @@ public class AvaloniaCreatesCommandBindingTests
         Assert.That(cmd.ExecutedCount, Is.EqualTo(1));
         Assert.That(cmd.LastParameter, Is.EqualTo("evt3"));
 
-        disp.Dispose();
+        disp?.Dispose();
         Assert.That(btn.IsSet(InputElement.IsEnabledProperty), Is.False);
     }
 
@@ -77,13 +77,13 @@ public class AvaloniaCreatesCommandBindingTests
         var param = new BehaviorSubject<object?>(null);
 
         Assert.Throws<ArgumentNullException>(() => sut.BindCommandToObject(null!, new object(), param));
-        Assert.Throws<ArgumentNullException>(() => sut.BindCommandToObject(cmd, null!, param));
+        Assert.Throws<ArgumentNullException>(() => sut.BindCommandToObject<object>(cmd, null!, param));
         Assert.Throws<InvalidOperationException>(() => sut.BindCommandToObject(cmd, new object(), param));
 
-        Assert.Throws<ArgumentNullException>(() => sut.BindCommandToObject<RoutedEventArgs>(null!, new object(), param, "Click"));
-        Assert.Throws<ArgumentNullException>(() => sut.BindCommandToObject<RoutedEventArgs>(cmd, null!, param, "Click"));
-        Assert.Throws<InvalidOperationException>(() => sut.BindCommandToObject<RoutedEventArgs>(cmd, new object(), param, "Click"));
-        Assert.Throws<InvalidOperationException>(() => sut.BindCommandToObject<RoutedEventArgs>(cmd, new Button(), param, "MissingEvent"));
+        Assert.Throws<ArgumentNullException>(() => sut.BindCommandToObject<object, RoutedEventArgs>(null!, new object(), param, "Click"));
+        Assert.Throws<ArgumentNullException>(() => sut.BindCommandToObject<object, RoutedEventArgs>(cmd, null!, param, "Click"));
+        Assert.Throws<InvalidOperationException>(() => sut.BindCommandToObject<object, RoutedEventArgs>(cmd, new object(), param, "Click"));
+        Assert.Throws<InvalidOperationException>(() => sut.BindCommandToObject<object, RoutedEventArgs>(cmd, new Button(), param, "MissingEvent"));
     }
 
     private sealed class TestCommand : System.Windows.Input.ICommand

@@ -33,7 +33,8 @@ public class AvaloniaMixinsDryIocTests
                 builder!,
                 () => new Container(),
                 _ => { },
-                c => new DryIocDependencyResolver(c)));
+                c => new DryIocDependencyResolver(c),
+                _ => { }));
     }
 
     [Test]
@@ -45,7 +46,8 @@ public class AvaloniaMixinsDryIocTests
         var result = builder.UseReactiveUIWithDIContainer(
             containerFactory: () => container,
             containerConfig: _ => { },
-            dependencyResolverFactory: c => new DryIocDependencyResolver(c));
+            dependencyResolverFactory: c => new DryIocDependencyResolver(c),
+            _ => { });
 
         Assert.That(result, Is.SameAs(builder));
     }
@@ -56,11 +58,15 @@ public class AvaloniaMixinsDryIocTests
         var container = new Container();
         var resolver = new DryIocDependencyResolver(container);
 
-        resolver.Register(() => "a", typeof(string));
-        resolver.Register(() => "b", typeof(string), "x");
+        resolver.Register<string>(() => "a");
+        resolver.Register<string>(() => "b");
+        resolver.Register<string>(() => "c", "x");
 
-        var last = resolver.GetService(typeof(string));
-        Assert.That(last, Is.EqualTo("b"));
+        var noContract = resolver.GetService(typeof(string));
+        Assert.That(noContract, Is.EqualTo("b"));
+
+        var withContract = resolver.GetService(typeof(string), "x");
+        Assert.That(withContract, Is.EqualTo("c"));
 
         var all = resolver.GetServices(typeof(string)).ToArray();
         Assert.That(all, Does.Contain("a"));

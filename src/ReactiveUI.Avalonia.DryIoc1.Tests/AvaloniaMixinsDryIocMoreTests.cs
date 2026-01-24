@@ -31,7 +31,8 @@ public class AvaloniaMixinsDryIocMoreTests
             builder,
             containerFactory: () => new Container(),
             containerConfig: _ => { },
-            dependencyResolverFactory: c => new DryIocDependencyResolver(c));
+            dependencyResolverFactory: c => new DryIocDependencyResolver(c),
+            _ => { });
 
         Assert.That(result, Is.SameAs(builder));
     }

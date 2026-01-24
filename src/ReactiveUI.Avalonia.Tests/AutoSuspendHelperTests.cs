@@ -3,6 +3,8 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Avalonia.Controls.ApplicationLifetimes;
 using NUnit.Framework;
+using ReactiveUI.Builder;
+using Splat;
 
 namespace ReactiveUI.Avalonia.Tests;
 
@@ -11,10 +13,17 @@ public class AutoSuspendHelperTests
     [SetUp]
     public void Setup()
     {
-        RxApp.SuspensionHost.IsResuming = Observable.Never<Unit>();
-        RxApp.SuspensionHost.IsLaunchingNew = new Subject<Unit>();
-        RxApp.SuspensionHost.ShouldPersistState = Observable.Never<IDisposable>();
-        RxApp.SuspensionHost.ShouldInvalidateState = Observable.Never<Unit>();
+        ReactiveUIBuilder.ResetBuilderStateForTests();
+        AppLocator.CurrentMutable.CreateReactiveUIBuilder()
+            .WithRegistration(splat =>
+            {
+                splat.RegisterConstant<IActivationForViewFetcher>(new AvaloniaActivationForViewFetcher());
+                splat.RegisterConstant<IPropertyBindingHook>(new AutoDataTemplateBindingHook());
+                splat.RegisterConstant<ICreatesCommandBinding>(new AvaloniaCreatesCommandBinding());
+                splat.RegisterConstant<ICreatesObservableForProperty>(new AvaloniaObjectObservableForProperty());
+            })
+            .WithSuspensionHost<Unit>()
+            .Build();
     }
 
     [Test]
@@ -27,7 +36,7 @@ public class AutoSuspendHelperTests
         using var helper = new AutoSuspendHelper(lifetime);
 
         var notified = false;
-        var sub = RxApp.SuspensionHost.ShouldPersistState.Subscribe(d =>
+        var sub = RxSuspension.SuspensionHost.ShouldPersistState.Subscribe(d =>
         {
             notified = true;
             d.Dispose();
@@ -46,7 +55,7 @@ public class AutoSuspendHelperTests
         using var helper = new AutoSuspendHelper(lifetime);
 
         var count = 0;
-        var sub = RxApp.SuspensionHost.IsLaunchingNew.Subscribe(_ => count++);
+        var sub = RxSuspension.SuspensionHost.IsLaunchingNew.Subscribe(_ => count++);
 
         helper.OnFrameworkInitializationCompleted();
 

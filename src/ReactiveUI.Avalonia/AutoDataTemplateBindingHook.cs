@@ -3,20 +3,16 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for full license information.
 
-using System;
-using System.Linq;
-using Avalonia;
-using Avalonia.Controls;
-using Avalonia.Controls.Templates;
-using Avalonia.Layout;
-
 namespace ReactiveUI.Avalonia;
 
 /// <summary>
-/// AutoDataTemplateBindingHook is a binding hook that checks ItemsControls
-/// that don't have DataTemplates, and assigns a default DataTemplate that
-/// loads the View associated with each ViewModel.
+/// Provides a binding hook that automatically assigns a default data template to an ItemsControl when no item template
+/// or data templates are defined.
 /// </summary>
+/// <remarks>This class is typically used in scenarios where view models are bound to item controls and a data
+/// template is required for proper rendering. If the ItemsControl does not have an ItemTemplate or any DataTemplates, a
+/// default template is applied to ensure that items are displayed using a ViewModelViewHost. This behavior helps
+/// prevent issues where items may not be rendered due to missing templates.</remarks>
 public class AutoDataTemplateBindingHook : IPropertyBindingHook
 {
     private static readonly FuncDataTemplate DefaultItemTemplate = new FuncDataTemplate<object>(

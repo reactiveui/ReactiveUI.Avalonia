@@ -3,9 +3,6 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for full license information.
 
-using Avalonia;
-using Avalonia.Controls;
-
 namespace ReactiveUI.Avalonia;
 
 /// <summary>
@@ -19,15 +16,22 @@ public class ReactiveUserControl<TViewModel> : UserControl, IViewFor<TViewModel>
     where TViewModel : class
 {
     /// <summary>
-    /// The <see cref="ViewModel"/> dependency property.
+    /// Identifies the ViewModel dependency property for a ReactiveUserControl.
     /// </summary>
+    /// <remarks>This property enables data binding of a view model to a ReactiveUserControl instance in
+    /// Avalonia applications. It is typically used to associate a view model with the control for reactive UI
+    /// scenarios.</remarks>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("AvaloniaProperty", "AVP1002", Justification = "Generic avalonia property is expected here.")]
     public static readonly StyledProperty<TViewModel?> ViewModelProperty = AvaloniaProperty
         .Register<ReactiveUserControl<TViewModel>, TViewModel?>(nameof(ViewModel));
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="ReactiveUserControl{TViewModel}"/> class.
+    /// Initializes a new instance of the <see cref="ReactiveUserControl{TViewModel}"/> class and sets up activation handling for the control.
     /// </summary>
+    /// <remarks>When the control is activated, this constructor ensures that any activation logic defined in
+    /// the associated ViewModel is also executed, provided the ViewModel implements IActivatableViewModel. This enables
+    /// coordinated activation and deactivation between the view and its ViewModel, which is useful for managing
+    /// resources and subscriptions in reactive UI scenarios.</remarks>
     public ReactiveUserControl()
     {
         // This WhenActivated block calls ViewModel's WhenActivated

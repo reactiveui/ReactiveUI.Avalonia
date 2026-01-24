@@ -13,54 +13,27 @@ using AppBuilder = Avalonia.AppBuilder;
 namespace ReactiveUI.Avalonia.Splat;
 
 /// <summary>
-/// Avalonia Mixins.
+/// Provides extension methods for integrating ReactiveUI with Ninject in Avalonia applications.
 /// </summary>
+/// <remarks>This static class contains mixin methods that enable the configuration of dependency injection using
+/// Ninject alongside ReactiveUI in Avalonia app builders. These methods are intended to simplify setup and promote
+/// modular application architecture.</remarks>
 public static class AvaloniaMixins
 {
     /// <summary>
-    /// Uses the splat with dry ioc.
+    /// Configures the application to use ReactiveUI with a Ninject dependency injection container, allowing custom
+    /// container setup and optional ReactiveUI builder configuration.
     /// </summary>
-    /// <param name="builder">The builder.</param>
-    /// <param name="containerConfig">The configure.</param>
-    /// <returns>An App Builder.</returns>
-    public static AppBuilder UseReactiveUIWithNinject(this AppBuilder builder, Action<StandardKernel> containerConfig) =>
-        builder switch
-        {
-            null => throw new ArgumentNullException(nameof(builder)),
-            _ => builder.UseReactiveUI().AfterPlatformServicesSetup(_ =>
-            {
-                if (AppLocator.CurrentMutable is null)
-                {
-                    return;
-                }
-
-#if NETSTANDARD
-                if (containerConfig is null)
-                {
-                    throw new ArgumentNullException(nameof(containerConfig));
-                }
-#else
-                ArgumentNullException.ThrowIfNull(containerConfig);
-#endif
-
-                var container = new StandardKernel();
-                container.UseNinjectDependencyResolver();
-                AppLocator.CurrentMutable.RegisterConstant(container);
-                RxSchedulers.MainThreadScheduler = AvaloniaScheduler.Instance;
-                containerConfig(container);
-            })
-        };
-
-    /// <summary>
-    /// Uses the splat with dry ioc.
-    /// </summary>
-    /// <param name="builder">The builder.</param>
-    /// <param name="containerConfig">The configure.</param>
-    /// <param name="withReactiveUIBuilder">The with reactive UI builder.</param>
-    /// <returns>
-    /// An App Builder.
-    /// </returns>
-    /// <exception cref="ArgumentNullException">builder.</exception>
+    /// <remarks>This method integrates Ninject as the dependency injection container for ReactiveUI
+    /// applications. The Ninject container is registered with the application's service locator, and the provided
+    /// configuration delegate allows customization of container bindings. Additional ReactiveUI builder configuration
+    /// can be performed via the optional delegate.</remarks>
+    /// <param name="builder">The application builder used to configure the app pipeline. Cannot be null.</param>
+    /// <param name="containerConfig">A delegate that configures the Ninject container. This is called after the container is created and registered.</param>
+    /// <param name="withReactiveUIBuilder">An optional delegate to further configure the ReactiveUI builder. If provided, it is invoked after the Ninject
+    /// container is set up.</param>
+    /// <returns>The application builder instance with ReactiveUI and Ninject configured.</returns>
+    /// <exception cref="ArgumentNullException">Thrown if <paramref name="builder"/> is null, or if <paramref name="containerConfig"/> is null.</exception>
     public static AppBuilder UseReactiveUIWithNinject(this AppBuilder builder, Action<StandardKernel> containerConfig, Action<ReactiveUIBuilder>? withReactiveUIBuilder = null) =>
         builder switch
         {
