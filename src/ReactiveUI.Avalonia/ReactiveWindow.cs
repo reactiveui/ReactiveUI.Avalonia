@@ -26,8 +26,7 @@ public class ReactiveWindow<TViewModel> : Window, IViewFor<TViewModel>
         .Register<ReactiveWindow<TViewModel>, TViewModel?>(nameof(ViewModel));
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="ReactiveWindow{TViewModel}"/> class and sets up activation handling for the window and its.
-    /// view model.
+    /// Initializes a new instance of the <see cref="ReactiveWindow{TViewModel}"/> class and sets up activation handling for the window and its view model.
     /// </summary>
     /// <remarks>This constructor configures the window to participate in activation lifecycle management. If
     /// the associated view model implements IActivatableViewModel, its activation logic will be invoked when the window
