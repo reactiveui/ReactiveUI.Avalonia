@@ -42,7 +42,7 @@ public class ViewModelViewHost : TransitioningContentControl, IViewFor, IEnableL
         AvaloniaProperty.Register<ViewModelViewHost, object?>(nameof(DefaultContent));
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="ViewModelViewHost"/> class and sets up activation logic to automatically navigate.
+    /// Initializes a new instance of the <see cref="ViewModelViewHost"/> class and sets up activation logic to automatically navigate
     /// to the appropriate view when the ViewModel or ViewContract changes.
     /// </summary>
     /// <remarks>This constructor subscribes to changes in the ViewModel and ViewContract properties, ensuring
