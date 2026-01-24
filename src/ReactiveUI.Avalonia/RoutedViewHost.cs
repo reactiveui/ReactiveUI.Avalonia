@@ -79,8 +79,7 @@ public class RoutedViewHost : TransitioningContentControl, IActivatableView, IEn
         ViewModelViewHost.DefaultContentProperty.AddOwner<RoutedViewHost>();
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="RoutedViewHost"/> class and sets up reactive navigation between view models and.
-    /// views.
+    /// Initializes a new instance of the <see cref="RoutedViewHost"/> class and sets up reactive navigation between view models and views.
     /// </summary>
     /// <remarks>This constructor activates the view host and subscribes to changes in the router and view
     /// contract properties. When the router changes or is removed, the view host automatically navigates to the
