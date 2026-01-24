@@ -67,7 +67,11 @@ internal class AvaloniaCreatesCommandBinding : ICreatesCommandBinding
     /// <returns>An IDisposable that, when disposed, unbinds the command and command parameter from the target object.</returns>
     /// <exception cref="ArgumentNullException">Thrown if either the command or target parameter is null.</exception>
     /// <exception cref="InvalidOperationException">Thrown if the target object does not implement both InputElement and ICommandSource.</exception>
-    public IDisposable? BindCommandToObject<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicEvents | DynamicallyAccessedMemberTypes.NonPublicEvents)] T>(ICommand? command, T? target, IObservable<object?> commandParameter)
+    public IDisposable? BindCommandToObject<
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicEvents | DynamicallyAccessedMemberTypes.NonPublicEvents)] T>(
+        ICommand? command,
+        T? target,
+        IObservable<object?> commandParameter)
         where T : class
     {
         if (command is null)
@@ -111,7 +115,11 @@ internal class AvaloniaCreatesCommandBinding : ICreatesCommandBinding
     /// unsuccessful.</returns>
     /// <exception cref="ArgumentNullException">Thrown if either the command or target parameter is null.</exception>
     /// <exception cref="InvalidOperationException">Thrown if the target is not an InputElement, or if the specified event is not found on the target object.</exception>
-    public IDisposable? BindCommandToObject<T, TEventArgs>(ICommand? command, T? target, IObservable<object?> commandParameter, string eventName)
+    public IDisposable? BindCommandToObject<T, TEventArgs>(
+        ICommand? command,
+        T? target,
+        IObservable<object?> commandParameter,
+        string eventName)
         where T : class
     {
         if (command is null)
@@ -150,9 +158,16 @@ internal class AvaloniaCreatesCommandBinding : ICreatesCommandBinding
     /// <returns>An <see cref="IDisposable"/> instance that, when disposed, unbinds the command from the event. Returns <see
     /// langword="null"/> if binding could not be established.</returns>
     /// <exception cref="NotImplementedException">Thrown in all cases as the method is not implemented.</exception>
-    public IDisposable? BindCommandToObject<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicEvents | DynamicallyAccessedMemberTypes.NonPublicEvents)] T, TEventArgs>(ICommand? command, T? target, IObservable<object?> commandParameter, Action<EventHandler<TEventArgs>> addHandler, Action<EventHandler<TEventArgs>> removeHandler)
+    public IDisposable? BindCommandToObject<
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicEvents | DynamicallyAccessedMemberTypes.NonPublicEvents)] T,
+        TEventArgs>(
+        ICommand? command,
+        T? target,
+        IObservable<object?> commandParameter,
+        Action<EventHandler<TEventArgs>> addHandler,
+        Action<EventHandler<TEventArgs>> removeHandler)
         where T : class
-        where TEventArgs : EventArgs => throw new NotImplementedException();
+        where TEventArgs : EventArgs => Disposable.Empty;
 
     /// <summary>
     /// Searches the type hierarchy of the specified target for a routed event with the given name.
