@@ -49,7 +49,7 @@ public static class AppBuilderExtensions
                     splat.RegisterConstant<IPropertyBindingHook>(new AutoDataTemplateBindingHook());
                     splat.RegisterConstant<ICreatesCommandBinding>(new AvaloniaCreatesCommandBinding());
                     splat.RegisterConstant<ICreatesObservableForProperty>(new AvaloniaObjectObservableForProperty());
-                });
+                }).WithSuspensionHost<Unit>();
 
             withReactiveUIBuilder(rxuiBuilder);
 

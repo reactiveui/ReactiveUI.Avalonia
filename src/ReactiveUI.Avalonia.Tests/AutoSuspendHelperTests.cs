@@ -3,6 +3,8 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Avalonia.Controls.ApplicationLifetimes;
 using NUnit.Framework;
+using ReactiveUI.Builder;
+using Splat;
 
 namespace ReactiveUI.Avalonia.Tests;
 
@@ -11,10 +13,17 @@ public class AutoSuspendHelperTests
     [SetUp]
     public void Setup()
     {
-        RxSuspension.SuspensionHost.IsResuming = Observable.Never<Unit>();
-        RxSuspension.SuspensionHost.IsLaunchingNew = new Subject<Unit>();
-        RxSuspension.SuspensionHost.ShouldPersistState = Observable.Never<IDisposable>();
-        RxSuspension.SuspensionHost.ShouldInvalidateState = Observable.Never<Unit>();
+        ReactiveUIBuilder.ResetBuilderStateForTests();
+        AppLocator.CurrentMutable.CreateReactiveUIBuilder()
+            .WithRegistration(splat =>
+            {
+                splat.RegisterConstant<IActivationForViewFetcher>(new AvaloniaActivationForViewFetcher());
+                splat.RegisterConstant<IPropertyBindingHook>(new AutoDataTemplateBindingHook());
+                splat.RegisterConstant<ICreatesCommandBinding>(new AvaloniaCreatesCommandBinding());
+                splat.RegisterConstant<ICreatesObservableForProperty>(new AvaloniaObjectObservableForProperty());
+            })
+            .WithSuspensionHost<Unit>()
+            .Build();
     }
 
     [Test]
