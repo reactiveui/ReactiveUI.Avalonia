@@ -11,7 +11,7 @@ jobs:
   release:
     uses: reactiveui/actions-common/.github/workflows/workflow-common-release.yml@main
     with:
-      solutionFile: src/ReactiveUI.Avalonia.sln
+      solutionFile: ReactiveUI.Avalonia.sln
       installWorkloads: true
     secrets:
       ES_USERNAME: ${{ secrets.ES_USERNAME }}
