@@ -4,6 +4,7 @@
 
 using Autofac;
 using ReactiveUI.Builder;
+using Splat;
 using Splat.Autofac;
 using Splat.Builder;
 using AppBuilder = Avalonia.AppBuilder;
@@ -47,7 +48,13 @@ public static class AvaloniaMixins
         return builder.UseReactiveUI(rxuiBuilder =>
         {
             var containerBuilder = new ContainerBuilder();
-            rxuiBuilder.UsingSplatModule(new AutofacSplatModule(containerBuilder));
+
+            // Configure the Autofac Splat module eagerly rather than deferring via UsingSplatModule,
+            // because the Autofac container must be built after AutofacDependencyResolver is registered
+            // with the ContainerBuilder. UsingSplatModule defers Configure() until BuildApp(), which
+            // runs after this callback returns - too late for container.Resolve<AutofacDependencyResolver>().
+            var module = new AutofacSplatModule(containerBuilder);
+            module.Configure(AppLocator.CurrentMutable);
             containerConfig(containerBuilder);
             var container = containerBuilder.Build();
             var autofacResolver = container.Resolve<AutofacDependencyResolver>();
