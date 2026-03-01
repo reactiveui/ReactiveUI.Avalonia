@@ -1,6 +1,5 @@
-// Copyright (c) 2025 .NET Foundation and Contributors. All rights reserved.
-// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
+// Copyright (c) 2019-2026 ReactiveUI and Avalonia Teams, and Contributors. All rights reserved.
+// Licensed under the MIT license.
 // See the LICENSE file in the project root for full license information.
 
 using System.Reactive.Concurrency;
@@ -32,6 +31,9 @@ public sealed class AvaloniaScheduler : LocalScheduler
     /// </summary>
     private const int MaxReentrantSchedules = 32;
 
+    /// <summary>
+    /// Tracks the current depth of reentrant schedule calls.
+    /// </summary>
     private int _reentrancyGuard;
 
     /// <summary>

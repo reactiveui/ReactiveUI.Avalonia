@@ -1,6 +1,5 @@
-﻿// Copyright (c) 2025 .NET Foundation and Contributors. All rights reserved.
-// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
+// Copyright (c) 2019-2026 ReactiveUI and Avalonia Teams, and Contributors. All rights reserved.
+// Licensed under the MIT license.
 // See the LICENSE file in the project root for full license information.
 
 using System.Diagnostics.CodeAnalysis;
@@ -206,10 +205,29 @@ internal class AvaloniaCreatesCommandBinding : ICreatesCommandBinding
     /// subscription is no longer needed to release event handlers and resources.</remarks>
     private sealed class RoutedEventSubscriptionClosure : IDisposable
     {
+        /// <summary>
+        /// The input element associated with this subscription.
+        /// </summary>
         private readonly InputElement _element;
+
+        /// <summary>
+        /// The routed event being subscribed to.
+        /// </summary>
         private readonly RoutedEvent _routedEvent;
+
+        /// <summary>
+        /// The command to execute when the event fires.
+        /// </summary>
         private readonly ICommand _command;
+
+        /// <summary>
+        /// The subscription to command parameter changes.
+        /// </summary>
         private readonly IDisposable _commandSubscription;
+
+        /// <summary>
+        /// The most recent command parameter value.
+        /// </summary>
         private object? _lastCommandParameter;
 
         /// <summary>
