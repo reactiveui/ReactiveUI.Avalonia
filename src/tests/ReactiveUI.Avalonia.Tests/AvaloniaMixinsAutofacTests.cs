@@ -8,6 +8,7 @@ using Autofac;
 using Avalonia;
 using Splat;
 using Splat.Autofac;
+using TUnit.Core.Executors;
 using AutofacSplatModule = Splat.Builder.AutofacSplatModule;
 using AvaloniaMixins = autofac::ReactiveUI.Avalonia.Splat.AvaloniaMixins;
 using SplatAppBuilder = Splat.Builder.AppBuilder;
@@ -79,6 +80,7 @@ public class AvaloniaMixinsAutofacTests
     /// </summary>
     /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
+    [TestExecutor<AutofacIsolatedTestExecutor>]
     public async Task AutofacSplatModule_Configure_Registers_Resolver_Before_ContainerBuild()
     {
         var containerBuilder = new ContainerBuilder();
@@ -101,6 +103,7 @@ public class AvaloniaMixinsAutofacTests
     /// </summary>
     /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
+    [TestExecutor<AutofacIsolatedTestExecutor>]
     public async Task AutofacSplatModule_Deferred_Via_UsingModule_Fails_To_Resolve()
     {
         var containerBuilder = new ContainerBuilder();
