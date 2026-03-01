@@ -11,3 +11,7 @@ using Avalonia.Metadata;
 [assembly: InternalsVisibleTo("ReactiveUI.Avalonia.Tests")]
 [assembly: InternalsVisibleTo("ReactiveUI.Avalonia.Microsoft.Tests")]
 [assembly: InternalsVisibleTo("ReactiveUI.Avalonia.DryIoc.Tests")]
+[assembly: InternalsVisibleTo("ReactiveUI.Avalonia.Autofac")]
+[assembly: InternalsVisibleTo("ReactiveUI.Avalonia.DryIoc")]
+[assembly: InternalsVisibleTo("ReactiveUI.Avalonia.Microsoft.Extensions.DependencyInjection")]
+[assembly: InternalsVisibleTo("ReactiveUI.Avalonia.Ninject")]

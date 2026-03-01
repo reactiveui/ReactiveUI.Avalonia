@@ -2,12 +2,15 @@
 // Licensed under the MIT license.
 // See the LICENSE file in the project root for full license information.
 
+using System.Reactive;
+using System.Reactive.Concurrency;
 using Autofac;
 using ReactiveUI.Builder;
 using Splat;
 using Splat.Autofac;
 using Splat.Builder;
 using AppBuilder = Avalonia.AppBuilder;
+using SplatBuilder = Splat.Builder.AppBuilder;
 
 namespace ReactiveUI.Avalonia.Splat;
 
@@ -45,28 +48,52 @@ public static class AvaloniaMixins
             throw new ArgumentNullException(nameof(containerConfig));
         }
 
-        return builder.UseReactiveUI(rxuiBuilder =>
+        return builder.AfterPlatformServicesSetup(_ =>
         {
-            var containerBuilder = new ContainerBuilder();
-
             // Configure the Autofac Splat module eagerly rather than deferring via UsingSplatModule,
             // because the Autofac container must be built after AutofacDependencyResolver is registered
             // with the ContainerBuilder. UsingSplatModule defers Configure() until BuildApp(), which
             // runs after this callback returns - too late for container.Resolve<AutofacDependencyResolver>().
+            var containerBuilder = new ContainerBuilder();
             var module = new AutofacSplatModule(containerBuilder);
-            module.Configure(AppLocator.CurrentMutable);
+            module.Configure(default!);
             containerConfig(containerBuilder);
-            var container = containerBuilder.Build();
-            var autofacResolver = container.Resolve<AutofacDependencyResolver>();
-            autofacResolver.SetLifetimeScope(container);
-            if (withResolver is not null)
-            {
-                withResolver(autofacResolver);
-            }
 
+            // Create the ReactiveUI builder and register Avalonia-specific services for view activation, property binding, command binding, and observable properties using AutoFac.
+            // This ensures that ReactiveUI can properly interact with Avalonia's view lifecycle and data binding mechanisms.
+            var rxuiBuilder = AppLocator.CurrentMutable.CreateReactiveUIBuilder();
+
+            // Configure the default schedulers for ReactiveUI and register Avalonia-specific implementations for view activation, property binding hooks, command binding, and observable properties.
+            // This setup allows ReactiveUI to work seamlessly with Avalonia's UI framework and ensures that ReactiveUI's features are properly integrated into the Avalonia application.
+            rxuiBuilder
+                .WithMainThreadScheduler(AvaloniaScheduler.Instance)
+                .WithTaskPoolScheduler(TaskPoolScheduler.Default)
+                .WithRegistration(splat =>
+                {
+                    splat.RegisterConstant<IActivationForViewFetcher>(new AvaloniaActivationForViewFetcher());
+                    splat.RegisterConstant<IPropertyBindingHook>(new AutoDataTemplateBindingHook());
+                    splat.RegisterConstant<ICreatesCommandBinding>(new AvaloniaCreatesCommandBinding());
+                    splat.RegisterConstant<ICreatesObservableForProperty>(new AvaloniaObjectObservableForProperty());
+                }).WithSuspensionHost<Unit>();
+
+            // Allow additional configuration of the ReactiveUI builder through the optional delegate, enabling further customization of ReactiveUI's behavior and integration with Avalonia.
             if (withReactiveUIBuilder is not null)
             {
                 withReactiveUIBuilder(rxuiBuilder);
+            }
+
+            if (!SplatBuilder.HasBeenBuilt)
+            {
+                rxuiBuilder.BuildApp();
+            }
+
+            var container = containerBuilder.Build();
+            var autofacResolver = container.Resolve<AutofacDependencyResolver>();
+            autofacResolver.SetLifetimeScope(container);
+
+            if (withResolver is not null)
+            {
+                withResolver(autofacResolver);
             }
         });
     }

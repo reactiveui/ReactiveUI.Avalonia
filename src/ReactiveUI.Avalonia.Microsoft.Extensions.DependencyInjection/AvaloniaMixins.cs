@@ -2,12 +2,15 @@
 // Licensed under the MIT license.
 // See the LICENSE file in the project root for full license information.
 
+using System.Reactive;
+using System.Reactive.Concurrency;
 using Microsoft.Extensions.DependencyInjection;
 using ReactiveUI.Builder;
 using Splat;
 using Splat.Builder;
 using Splat.Microsoft.Extensions.DependencyInjection;
 using AppBuilder = Avalonia.AppBuilder;
+using SplatBuilder = Splat.Builder.AppBuilder;
 
 namespace ReactiveUI.Avalonia.Splat;
 
@@ -42,37 +45,50 @@ public static class AvaloniaMixins
         builder switch
         {
             null => throw new ArgumentNullException(nameof(builder)),
-            _ => builder.UseReactiveUI(rxuiBuilder =>
+            _ => builder.AfterPlatformServicesSetup(_ =>
             {
-                if (AppLocator.CurrentMutable is null)
-                {
-                    return;
-                }
-
-#if NETSTANDARD
-                if (containerConfig is null)
-                {
-                    throw new ArgumentNullException(nameof(containerConfig));
-                }
-#else
                 ArgumentNullException.ThrowIfNull(containerConfig);
-#endif
 
                 IServiceCollection serviceCollection = new ServiceCollection();
-                rxuiBuilder.UsingSplatModule(new MicrosoftDependencyResolverModule(serviceCollection));
+                var module = new MicrosoftDependencyResolverModule(serviceCollection);
+                module.Configure(default!);
                 AppLocator.CurrentMutable.RegisterConstant(serviceCollection);
                 containerConfig(serviceCollection);
+
+                // Create the ReactiveUI builder and register Avalonia-specific services for view activation, property binding, command binding, and observable properties using AutoFac.
+                // This ensures that ReactiveUI can properly interact with Avalonia's view lifecycle and data binding mechanisms.
+                var rxuiBuilder = AppLocator.CurrentMutable.CreateReactiveUIBuilder();
+
+                // Configure the default schedulers for ReactiveUI and register Avalonia-specific implementations for view activation, property binding hooks, command binding, and observable properties.
+                // This setup allows ReactiveUI to work seamlessly with Avalonia's UI framework and ensures that ReactiveUI's features are properly integrated into the Avalonia application.
+                rxuiBuilder
+                    .WithMainThreadScheduler(AvaloniaScheduler.Instance)
+                    .WithTaskPoolScheduler(TaskPoolScheduler.Default)
+                    .WithRegistration(splat =>
+                    {
+                        splat.RegisterConstant<IActivationForViewFetcher>(new AvaloniaActivationForViewFetcher());
+                        splat.RegisterConstant<IPropertyBindingHook>(new AutoDataTemplateBindingHook());
+                        splat.RegisterConstant<ICreatesCommandBinding>(new AvaloniaCreatesCommandBinding());
+                        splat.RegisterConstant<ICreatesObservableForProperty>(new AvaloniaObjectObservableForProperty());
+                    }).WithSuspensionHost<Unit>();
+
+                // Allow additional configuration of the ReactiveUI builder through the optional delegate, enabling further customization of ReactiveUI's behavior and integration with Avalonia.
+                if (withReactiveUIBuilder is not null)
+                {
+                    withReactiveUIBuilder(rxuiBuilder);
+                }
+
+                if (!SplatBuilder.HasBeenBuilt)
+                {
+                    rxuiBuilder.BuildApp();
+                }
+
                 var serviceProvider = serviceCollection.BuildServiceProvider();
                 serviceProvider.UseMicrosoftDependencyResolver();
 
                 if (withResolver is not null)
                 {
                     withResolver(serviceProvider);
-                }
-
-                if (withReactiveUIBuilder is not null)
-                {
-                    withReactiveUIBuilder(rxuiBuilder);
                 }
             })
         };
