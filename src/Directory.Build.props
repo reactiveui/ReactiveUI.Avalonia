@@ -4,8 +4,8 @@
     <Platform>AnyCPU</Platform>
     <IsTestProject>$(MSBuildProjectName.Contains('Tests'))</IsTestProject>
     <DebugType>embedded</DebugType>
-    <Authors>.NET Foundation and Contributors</Authors>
-    <Copyright>Copyright (c) .NET Foundation and Contributors</Copyright>
+    <Authors>ReactiveUI and Avalonia Teams, and Contributors</Authors>
+    <Copyright>Copyright (c) 2019-$([System.DateTime]::Now.ToString(`yyyy`)) ReactiveUI and Avalonia Teams, and Contributors</Copyright>
     <PackageIcon>logo.png</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -38,6 +38,25 @@
   <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
     <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(IsTestProject)' == 'true'">
+    <TestingPlatformDotnetTestSupport>true</TestingPlatformDotnetTestSupport>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <!-- MTP Native JSON Configuration -->
+  <ItemGroup Condition="'$(IsTestProject)' == 'true'">
+    <None Include="$(MSBuildThisFileDirectory)testconfig.json">
+      <Link>$(AssemblyName).testconfig.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup Condition="'$(IsTestProject)' == 'true'">
+    <PackageReference Include="TUnit" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="Microsoft.Testing.Extensions.CodeCoverage" />
+    <PackageReference Include="Verify.TUnit" />
+  </ItemGroup>
+
   <ItemGroup Condition="'$(IsTestProject)' != 'true'">
     <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" />
   </ItemGroup>

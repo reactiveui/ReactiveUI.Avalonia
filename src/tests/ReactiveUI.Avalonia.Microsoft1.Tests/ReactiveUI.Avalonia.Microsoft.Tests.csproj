@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>$(AvaloniaTestTargetFrameworks)</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <OutputType>Exe</OutputType>
+    <IsTestProject>true</IsTestProject>
+    <DefineConstants>$(DefineConstants);MICROSOFT1</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup>
+    <AvaloniaXaml Remove="Mocks\**" />
+    <Compile Remove="Mocks\**" />
+    <EmbeddedResource Remove="Mocks\**" />
+    <None Remove="Mocks\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\ReactiveUI.Avalonia.Microsoft.Extensions.DependencyInjection\ReactiveUI.Avalonia.Microsoft.Extensions.DependencyInjection.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Avalonia" />
+    <PackageReference Include="Avalonia.Desktop" />
+    <PackageReference Include="Avalonia.Themes.Fluent" />
+    <PackageReference Include="Avalonia.Fonts.Inter" />
+  </ItemGroup>
+</Project>

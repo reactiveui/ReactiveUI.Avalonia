@@ -17,6 +17,6 @@ jobs:
     with:
       configuration: Release
       productNamespacePrefix: "ReactiveUI"
-      solutionFile: "ReactiveUI.Avalonia.sln"
+      solutionFile: "ReactiveUI.Avalonia.slnx"
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
