@@ -2,6 +2,8 @@
 // Licensed under the MIT license.
 // See the LICENSE file in the project root for full license information.
 
+using System.Reactive.Concurrency;
+
 namespace ReactiveUI.Avalonia;
 
 /// <summary>
@@ -39,9 +41,10 @@ public static class AppBuilderExtensions
 
         return builder.AfterPlatformServicesSetup(_ =>
         {
-            var rxuiBuilder = AppLocator.CurrentMutable.CreateReactiveUIBuilder();
+            var rxuiBuilder = RxAppBuilder.CreateReactiveUIBuilder();
             rxuiBuilder
                 .WithMainThreadScheduler(AvaloniaScheduler.Instance)
+                .WithTaskPoolScheduler(TaskPoolScheduler.Default)
                 .WithRegistration(splat =>
                 {
                     splat.RegisterConstant<IActivationForViewFetcher>(new AvaloniaActivationForViewFetcher());
