@@ -3,6 +3,8 @@
 // See the LICENSE file in the project root for full license information.
 
 using Avalonia;
+using ReactiveUI.Builder;
+using Splat;
 
 namespace ReactiveUI.Avalonia.Tests;
 
@@ -33,5 +35,32 @@ public class AppBuilderExtensionsTests
         await Assert.That(type.IsClass).IsTrue();
         await Assert.That(type.IsAbstract).IsTrue();
         await Assert.That(type.IsSealed).IsTrue();
+    }
+
+    /// <summary>
+    /// Verifies that WithAvalonia throws ArgumentNullException for a null builder.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
+    [Test]
+    public async Task WithAvalonia_ThrowsOnNullBuilder()
+    {
+        IReactiveUIBuilder? builder = null;
+        await Assert.That(() => builder!.WithAvalonia()).ThrowsExactly<ArgumentNullException>();
+    }
+
+    /// <summary>
+    /// Verifies that WithAvalonia registers Avalonia-specific ReactiveUI services.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
+    [Test]
+    public async Task WithAvalonia_Registers_Avalonia_Services()
+    {
+        var builder = AppLocator.CurrentMutable.CreateReactiveUIBuilder();
+        builder.WithAvalonia().BuildApp();
+
+        await Assert.That(AppLocator.Current.GetService<IActivationForViewFetcher>()).IsTypeOf<AvaloniaActivationForViewFetcher>();
+        await Assert.That(AppLocator.Current.GetService<IPropertyBindingHook>()).IsTypeOf<AutoDataTemplateBindingHook>();
+        await Assert.That(AppLocator.Current.GetService<ICreatesCommandBinding>()).IsTypeOf<AvaloniaCreatesCommandBinding>();
+        await Assert.That(AppLocator.Current.GetService<ICreatesObservableForProperty>()).IsTypeOf<AvaloniaObjectObservableForProperty>();
     }
 }

@@ -123,6 +123,30 @@ public class AppBuilderExtensionsRegistrationTests
     }
 
     /// <summary>
+    /// Verifies that RegisterViewsInternal ignores duplicate assemblies.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
+    [Test]
+    public async Task RegisterViewsInternal_Ignores_Duplicate_Assemblies()
+    {
+        var resolver = AppLocator.CurrentMutable!;
+        var method = typeof(AppBuilderExtensions)
+            .GetMethod("RegisterViewsInternal", BindingFlags.NonPublic | BindingFlags.Static);
+
+        var assembly = typeof(DistinctRegistrationVm).Assembly;
+        var serviceType = typeof(IViewFor<>).MakeGenericType(typeof(DistinctRegistrationVm));
+        var before = AppLocator.Current.GetServices(serviceType).Count();
+
+        method!.Invoke(null, [resolver, new[] { assembly, assembly }]);
+
+        var after = AppLocator.Current.GetServices(serviceType).Count();
+        var resolved = AppLocator.Current.GetService(serviceType);
+
+        await Assert.That(after).IsEqualTo(before + 1);
+        await Assert.That(resolved).IsTypeOf<DistinctRegistrationView>();
+    }
+
+    /// <summary>
     /// A test view model implementing ITestVm.
     /// </summary>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1812:Avoid uninstantiated internal classes", Justification = "Instantiated via reflection by RegisterViewsInternal.")]
@@ -197,6 +221,33 @@ public class AppBuilderExtensionsRegistrationTests
         {
             get => ViewModel;
             set => ViewModel = (TestVm?)value;
+        }
+    }
+
+    /// <summary>
+    /// A distinct view model used to validate duplicate assembly handling.
+    /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1812:Avoid uninstantiated internal classes", Justification = "Instantiated via reflection by RegisterViewsInternal.")]
+    private sealed class DistinctRegistrationVm : ReactiveObject
+    {
+    }
+
+    /// <summary>
+    /// A distinct view used to validate duplicate assembly handling.
+    /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1812:Avoid uninstantiated internal classes", Justification = "Instantiated via reflection by RegisterViewsInternal.")]
+    private sealed class DistinctRegistrationView : UserControl, IViewFor<DistinctRegistrationVm>
+    {
+        /// <summary>
+        /// Gets or sets the view model.
+        /// </summary>
+        public DistinctRegistrationVm? ViewModel { get; set; }
+
+        /// <inheritdoc/>
+        object? IViewFor.ViewModel
+        {
+            get => ViewModel;
+            set => ViewModel = (DistinctRegistrationVm?)value;
         }
     }
 }

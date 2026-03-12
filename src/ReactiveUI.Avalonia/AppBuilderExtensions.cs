@@ -42,16 +42,7 @@ public static class AppBuilderExtensions
         return builder.AfterPlatformServicesSetup(_ =>
         {
             var rxuiBuilder = RxAppBuilder.CreateReactiveUIBuilder();
-            rxuiBuilder
-                .WithMainThreadScheduler(AvaloniaScheduler.Instance)
-                .WithTaskPoolScheduler(TaskPoolScheduler.Default)
-                .WithRegistration(splat =>
-                {
-                    splat.RegisterConstant<IActivationForViewFetcher>(new AvaloniaActivationForViewFetcher());
-                    splat.RegisterConstant<IPropertyBindingHook>(new AutoDataTemplateBindingHook());
-                    splat.RegisterConstant<ICreatesCommandBinding>(new AvaloniaCreatesCommandBinding());
-                    splat.RegisterConstant<ICreatesObservableForProperty>(new AvaloniaObjectObservableForProperty());
-                }).WithSuspensionHost<Unit>();
+            rxuiBuilder.WithAvalonia();
 
             withReactiveUIBuilder(rxuiBuilder);
 
@@ -189,6 +180,33 @@ public static class AppBuilderExtensions
                     containerConfig(container);
                 })
             };
+
+    /// <summary>
+    /// Configures the specified ReactiveUI builder to use Avalonia-specific implementations for various services.
+    /// </summary>
+    /// <remarks>This method sets up the main thread scheduler, task pool scheduler, and registers
+    /// Avalonia-specific services for command binding and property observation.</remarks>
+    /// <param name="builder">The builder instance to configure for Avalonia support. Must not be null.</param>
+    /// <returns>The configured IReactiveUIBuilder instance with Avalonia support enabled.</returns>
+    /// <exception cref="ArgumentNullException">Thrown if the builder parameter is null.</exception>
+    public static IReactiveUIBuilder WithAvalonia(this IReactiveUIBuilder builder)
+    {
+        if (builder is null)
+        {
+            throw new ArgumentNullException(nameof(builder));
+        }
+
+        return builder
+        .WithMainThreadScheduler(AvaloniaScheduler.Instance)
+        .WithTaskPoolScheduler(TaskPoolScheduler.Default)
+        .WithRegistration(splat =>
+        {
+            splat.RegisterConstant<IActivationForViewFetcher>(new AvaloniaActivationForViewFetcher());
+            splat.RegisterConstant<IPropertyBindingHook>(new AutoDataTemplateBindingHook());
+            splat.RegisterConstant<ICreatesCommandBinding>(new AvaloniaCreatesCommandBinding());
+            splat.RegisterConstant<ICreatesObservableForProperty>(new AvaloniaObjectObservableForProperty());
+        }).WithSuspensionHost<Unit>();
+    }
 
     /// <summary>
     /// Registers all non-abstract, non-interface view types implementing IViewFor{T} from the specified assemblies with
