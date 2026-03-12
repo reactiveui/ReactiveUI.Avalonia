@@ -55,16 +55,7 @@ public static class AvaloniaMixins
 
                 // Configure the default schedulers for ReactiveUI and register Avalonia-specific implementations for view activation, property binding hooks, command binding, and observable properties.
                 // This setup allows ReactiveUI to work seamlessly with Avalonia's UI framework and ensures that ReactiveUI's features are properly integrated into the Avalonia application.
-                rxuiBuilder
-                    .WithMainThreadScheduler(AvaloniaScheduler.Instance)
-                    .WithTaskPoolScheduler(TaskPoolScheduler.Default)
-                    .WithRegistration(splat =>
-                    {
-                        splat.RegisterConstant<IActivationForViewFetcher>(new AvaloniaActivationForViewFetcher());
-                        splat.RegisterConstant<IPropertyBindingHook>(new AutoDataTemplateBindingHook());
-                        splat.RegisterConstant<ICreatesCommandBinding>(new AvaloniaCreatesCommandBinding());
-                        splat.RegisterConstant<ICreatesObservableForProperty>(new AvaloniaObjectObservableForProperty());
-                    }).WithSuspensionHost<Unit>();
+                rxuiBuilder.WithAvalonia();
 
                 // Allow additional configuration of the ReactiveUI builder through the optional delegate, enabling further customization of ReactiveUI's behavior and integration with Avalonia.
                 if (withReactiveUIBuilder is not null)
