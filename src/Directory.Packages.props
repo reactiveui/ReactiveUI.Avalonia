@@ -11,7 +11,7 @@
     <PackageVersion Include="Avalonia.Desktop" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Fonts.Inter" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Themes.Fluent" Version="$(AvaloniaVersion)" />
-    <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="10.0.202" />
+    <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="10.0.203" />
     <PackageVersion Include="Nerdbank.GitVersioning" Version="3.9.50" />
     <PackageVersion Include="ReactiveUI" Version="23.2.1" />
     <PackageVersion Include="Roslynator.Analyzers" Version="4.15.0" />
@@ -22,7 +22,7 @@
     <PackageVersion Include="Splat.Microsoft.Extensions.DependencyInjection" Version="$(SplatVersion)" />
     <PackageVersion Include="Splat.Ninject" Version="$(SplatVersion)" />
     <PackageVersion Include="stylecop.analyzers" Version="1.2.0-beta.556" />
-    <PackageVersion Include="System.Collections.Immutable" Version="10.0.6" />
+    <PackageVersion Include="System.Collections.Immutable" Version="10.0.7" />
     <PackageVersion Include="System.IO.FileSystem.Primitives" Version="4.3.0" />
     <PackageVersion Include="System.Runtime.Serialization.Primitives" Version="4.3.0" />
   </ItemGroup>
