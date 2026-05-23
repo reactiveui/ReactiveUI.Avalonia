@@ -23,7 +23,6 @@ jobs:
     with:
       solutionFile: ReactiveUI.Avalonia.slnx
       installWorkloads: true
-      versioningTool: minver
       minverMinimumMajorMinor: '12.1'
       bump: ${{ inputs.bump }}
     secrets:
