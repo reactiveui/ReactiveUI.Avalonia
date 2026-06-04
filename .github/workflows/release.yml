@@ -4,13 +4,21 @@ on:
   workflow_dispatch:
     inputs:
       bump:
-        description: 'Release level'
-        required: true
+        description: 'Release level (ignored when versionOverride is set; leave blank to use versionOverride)'
+        required: false
         type: choice
+        default: ''
         options:
+          - ''
           - patch
           - minor
           - major
+
+      versionOverride:
+        description: 'Exact version to stamp (e.g. 11.4.13) for an out-of-sequence / backport release (e.g. an 11.4.x patch while main is on 12.x). Overrides bump. Pair with sourceRef to build the matching maintenance branch.'
+        required: false
+        type: string
+        default: ''
 
       sourceRef:
         description: 'Optional git ref (tag/branch/SHA) to release from. Leave blank to release from this branch (normally main).'
@@ -30,7 +38,10 @@ jobs:
       solutionFile: ReactiveUI.Avalonia.slnx
       installWorkloads: true
       minverMinimumMajorMinor: '12.1'
-      bump: ${{ inputs.bump }}
+      # versionOverride wins: when it's set, force bump empty so the two version
+      # selectors can't collide (the reusable workflow rejects both at once).
+      bump: ${{ inputs.versionOverride != '' && '' || inputs.bump }}
+      versionOverride: ${{ inputs.versionOverride }}
       ref: ${{ inputs.sourceRef }}
     secrets:
       CERTUM_USER_ID: ${{ secrets.CERTUM_USER_ID }}
