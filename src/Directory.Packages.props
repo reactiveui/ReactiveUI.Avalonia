@@ -2,8 +2,8 @@
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
-    <AvaloniaVersion>12.0.3</AvaloniaVersion>
-    <SplatVersion>19.3.1</SplatVersion>
+    <AvaloniaVersion>11.3.17</AvaloniaVersion>
+    <SplatVersion>19.4.1</SplatVersion>
   </PropertyGroup>
 
   <ItemGroup Label="Core packages">
@@ -13,7 +13,7 @@
     <PackageVersion Include="Avalonia.Themes.Fluent" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="10.0.300" />
     <PackageVersion Include="MinVer" Version="7.0.0" />
-    <PackageVersion Include="ReactiveUI" Version="23.2.27" />
+    <PackageVersion Include="ReactiveUI" Version="23.2.28" />
     <PackageVersion Include="Roslynator.Analyzers" Version="4.15.0" />
     <PackageVersion Include="Splat" Version="$(SplatVersion)" />
     <PackageVersion Include="Splat.Autofac" Version="$(SplatVersion)" />
