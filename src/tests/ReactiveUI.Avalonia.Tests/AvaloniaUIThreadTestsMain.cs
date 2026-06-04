@@ -81,17 +81,19 @@ public class AvaloniaUIThreadTestsMain
     public async Task AvaloniaScheduler_Schedule_WithZeroDelay_ExecutesAction()
     {
         var scheduler = AvaloniaScheduler.Instance;
-        var actionExecuted = false;
+        var tcs = new TaskCompletionSource();
 
         var disposable = scheduler.Schedule("test", TimeSpan.Zero, (s, state) =>
         {
-            actionExecuted = true;
+            tcs.TrySetResult();
             return Disposable.Empty;
         });
 
-        Thread.Sleep(50);
-
-        await Assert.That(actionExecuted).IsTrue();
+        // When invoked on the UI thread the action runs synchronously; otherwise it is posted to the
+        // dispatcher. Await its completion with a timeout rather than a fixed sleep so the test is not
+        // sensitive to dispatcher scheduling latency on busy CI machines (the previous fixed 50ms sleep
+        // was occasionally too short on loaded macOS runners, causing intermittent failures).
+        await tcs.Task.WaitAsync(TimeSpan.FromSeconds(10));
         await Assert.That(disposable).IsNotNull();
     }
 
