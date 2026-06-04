@@ -20,21 +20,27 @@ public class AutofacIsolatedTestExecutor : ITestExecutor
     {
         ArgumentNullException.ThrowIfNull(testAction);
 
-        var originalLocator = Locator.GetLocator();
+        // Run on the shared headless UI thread for consistency with AvaloniaTestExecutor.
+        await AvaloniaTestSession.Instance.Dispatch(
+            async () =>
+            {
+                var originalLocator = Locator.GetLocator();
 
-        try
-        {
-            await testAction();
-        }
-        finally
-        {
-            Locator.SetLocator(originalLocator);
+                try
+                {
+                    await testAction();
+                }
+                finally
+                {
+                    Locator.SetLocator(originalLocator);
 
-            ReactiveUIBuilder.ResetBuilderStateForTests();
+                    ReactiveUIBuilder.ResetBuilderStateForTests();
 
-            AppLocator.CurrentMutable.CreateReactiveUIBuilder()
-                .WithCoreServices()
-                .BuildApp();
-        }
+                    AppLocator.CurrentMutable.CreateReactiveUIBuilder()
+                        .WithCoreServices()
+                        .BuildApp();
+                }
+            },
+            CancellationToken.None);
     }
 }

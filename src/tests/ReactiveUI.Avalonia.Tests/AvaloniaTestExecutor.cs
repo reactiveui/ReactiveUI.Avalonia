@@ -19,31 +19,38 @@ public class AvaloniaTestExecutor : ITestExecutor
     {
         ArgumentNullException.ThrowIfNull(testAction);
 
-        ReactiveUIBuilder.ResetBuilderStateForTests();
-
-        AppLocator.CurrentMutable.CreateReactiveUIBuilder()
-            .WithRegistration(splat =>
+        // Run the test body on the shared headless UI thread so dispatcher-dependent code
+        // (e.g. AvaloniaScheduler) behaves deterministically. See AvaloniaTestSession.
+        await AvaloniaTestSession.Instance.Dispatch(
+            async () =>
             {
-                splat.RegisterConstant<IActivationForViewFetcher>(new AvaloniaActivationForViewFetcher());
-                splat.RegisterConstant<IPropertyBindingHook>(new AutoDataTemplateBindingHook());
-                splat.RegisterConstant<ICreatesCommandBinding>(new AvaloniaCreatesCommandBinding());
-                splat.RegisterConstant<ICreatesObservableForProperty>(new AvaloniaObjectObservableForProperty());
-            })
-            .WithSuspensionHost()
-            .WithCoreServices()
-            .BuildApp();
+                ReactiveUIBuilder.ResetBuilderStateForTests();
 
-        try
-        {
-            await testAction();
-        }
-        finally
-        {
-            ReactiveUIBuilder.ResetBuilderStateForTests();
+                AppLocator.CurrentMutable.CreateReactiveUIBuilder()
+                    .WithRegistration(splat =>
+                    {
+                        splat.RegisterConstant<IActivationForViewFetcher>(new AvaloniaActivationForViewFetcher());
+                        splat.RegisterConstant<IPropertyBindingHook>(new AutoDataTemplateBindingHook());
+                        splat.RegisterConstant<ICreatesCommandBinding>(new AvaloniaCreatesCommandBinding());
+                        splat.RegisterConstant<ICreatesObservableForProperty>(new AvaloniaObjectObservableForProperty());
+                    })
+                    .WithSuspensionHost()
+                    .WithCoreServices()
+                    .BuildApp();
 
-            AppLocator.CurrentMutable.CreateReactiveUIBuilder()
-                .WithCoreServices()
-                .BuildApp();
-        }
+                try
+                {
+                    await testAction();
+                }
+                finally
+                {
+                    ReactiveUIBuilder.ResetBuilderStateForTests();
+
+                    AppLocator.CurrentMutable.CreateReactiveUIBuilder()
+                        .WithCoreServices()
+                        .BuildApp();
+                }
+            },
+            CancellationToken.None);
     }
 }
