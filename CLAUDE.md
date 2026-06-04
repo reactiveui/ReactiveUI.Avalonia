@@ -145,8 +145,6 @@ cat /tmp/coverage-report/Summary.txt
 reportgenerator -reports:"tests/ReactiveUI.Avalonia.Tests/bin/Release/net10.0/TestResults/*.cobertura.xml" -targetdir:/tmp/coverage-report -reporttypes:Html
 ```
 
-**Note:** `Microsoft.Testing.Extensions.CodeCoverage` is pinned at 18.4.1 due to a regression in newer versions that produces incorrect coverage data. Do not upgrade without verifying coverage output.
-
 ### Key Configuration Files
 
 - `global.json` - Specifies `"Microsoft.Testing.Platform"` as the test runner
