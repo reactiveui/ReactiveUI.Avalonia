@@ -1,39 +1,36 @@
-// Copyright (c) 2019-2026 ReactiveUI and Avalonia Teams, and Contributors. All rights reserved.
-// Licensed under the MIT license.
+// Copyright (c) 2019-2026 ReactiveUI Association Incorporated. All rights reserved.
+// ReactiveUI Association Incorporated licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for full license information.
-
 using System.Reflection;
+using System.Runtime.ExceptionServices;
 using Avalonia;
 using Avalonia.Controls;
 using Splat;
 
 namespace ReactiveUI.Avalonia.Tests;
 
-/// <summary>
-/// Tests for view registration via AppBuilderExtensions internal methods.
-/// </summary>
+/// <summary>Tests for view registration via AppBuilderExtensions internal methods.</summary>
 public class AppBuilderExtensionsRegistrationTests
 {
-    /// <summary>
-    /// Contract interface for the test view model.
-    /// </summary>
-    private interface ITestVm
+    /// <summary>Contract interface for the test view model.</summary>
+    public interface ITestVm
     {
+        /// <summary>Gets a marker value for the test contract.</summary>
+        object? TestContract { get; }
     }
 
-    /// <summary>
-    /// Verifies that RegisterViewsInternal registers a view for a view model using the activator.
-    /// </summary>
+    /// <summary>Verifies that RegisterViewsInternal registers a view for a view model using the activator.</summary>
     /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task RegisterViewsInternal_Registers_View_For_ViewModel_Using_Activator()
     {
         var resolver = AppLocator.CurrentMutable!;
+        Assembly[] assemblies = [typeof(AppBuilderExtensionsRegistrationTests).Assembly];
         var method = typeof(AppBuilderExtensions)
             .GetMethod("RegisterViewsInternal", BindingFlags.NonPublic | BindingFlags.Static);
         await Assert.That(method).IsNotNull();
 
-        method!.Invoke(null, [resolver, new[] { typeof(AppBuilderExtensionsRegistrationTests).Assembly }]);
+        _ = method!.Invoke(null, [resolver, assemblies]);
 
         var serviceType = typeof(IViewFor<>).MakeGenericType(typeof(TestVm));
         var resolved = AppLocator.Current.GetService(serviceType);
@@ -42,18 +39,17 @@ public class AppBuilderExtensionsRegistrationTests
         await Assert.That(serviceType.IsInstanceOfType(resolved)).IsTrue();
     }
 
-    /// <summary>
-    /// Verifies that RegisterViewsInternal honors the ViewContract attribute for contract-based resolution.
-    /// </summary>
+    /// <summary>Verifies that RegisterViewsInternal honors the ViewContract attribute for contract-based resolution.</summary>
     /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task RegisterViewsInternal_Honors_ViewContractAttribute()
     {
         var resolver = AppLocator.CurrentMutable!;
+        Assembly[] assemblies = [typeof(AppBuilderExtensionsRegistrationTests).Assembly];
         var method = typeof(AppBuilderExtensions)
             .GetMethod("RegisterViewsInternal", BindingFlags.NonPublic | BindingFlags.Static);
 
-        method!.Invoke(null, [resolver, new[] { typeof(AppBuilderExtensionsRegistrationTests).Assembly }]);
+        _ = method!.Invoke(null, [resolver, assemblies]);
 
         var serviceType = typeof(IViewFor<>).MakeGenericType(typeof(TestVm));
         var resolvedDefault = AppLocator.Current.GetService(serviceType);
@@ -64,32 +60,72 @@ public class AppBuilderExtensionsRegistrationTests
         await Assert.That(resolvedC1).IsTypeOf<ContractedTestView>();
     }
 
-    /// <summary>
-    /// Verifies that RegisterViewsInternal prefers DI-resolved instances over activator-created ones.
-    /// </summary>
+    /// <summary>Verifies that a ViewContractAttribute without a Contract property is treated as the default contract.</summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
+    [Test]
+    public async Task RegisterViewsInternal_ViewContractAttributeWithoutContract_UsesDefaultContract()
+    {
+        var resolver = AppLocator.CurrentMutable!;
+        Assembly[] assemblies = [typeof(AppBuilderExtensionsRegistrationTests).Assembly];
+        var method = typeof(AppBuilderExtensions)
+            .GetMethod("RegisterViewsInternal", BindingFlags.NonPublic | BindingFlags.Static);
+
+        _ = method!.Invoke(null, [resolver, assemblies]);
+
+        var serviceType = typeof(IViewFor<>).MakeGenericType(typeof(NoContractVm));
+        var resolved = AppLocator.Current.GetService(serviceType);
+
+        await Assert.That(resolved).IsTypeOf<NoContractView>();
+    }
+
+    /// <summary>Verifies that RegisterViewsInternal prefers DI-resolved instances over activator-created ones.</summary>
     /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task RegisterViewsInternal_Prefers_DI_Resolution_Over_Activator()
     {
         var resolver = AppLocator.CurrentMutable!;
 
-        var diInstance = new DiBackedView();
-        resolver.RegisterConstant(diInstance);
+        var resolverBackedView = new DiBackedView();
+        resolver.RegisterConstant(resolverBackedView);
 
+        Assembly[] assemblies = [typeof(AppBuilderExtensionsRegistrationTests).Assembly];
         var method = typeof(AppBuilderExtensions)
             .GetMethod("RegisterViewsInternal", BindingFlags.NonPublic | BindingFlags.Static);
 
-        method!.Invoke(null, [resolver, new[] { typeof(AppBuilderExtensionsRegistrationTests).Assembly }]);
+        _ = method!.Invoke(null, [resolver, assemblies]);
 
         var serviceType = typeof(IViewFor<>).MakeGenericType(typeof(TestVm));
         var resolved = AppLocator.Current.GetService(serviceType);
 
-        await Assert.That(resolved).IsSameReferenceAs(diInstance);
+        await Assert.That(resolved).IsSameReferenceAs(resolverBackedView);
     }
 
-    /// <summary>
-    /// Verifies that RegisterReactiveUIViews throws on a null builder.
-    /// </summary>
+    /// <summary>Verifies that CreateView falls back to Activator when service resolution throws.</summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
+    [Test]
+    public async Task CreateView_WhenResolverThrows_FallsBackToActivator()
+    {
+        AppLocator.CurrentMutable!.Register(
+            static () => throw new InvalidOperationException("expected"),
+            typeof(FallbackView));
+
+        var method = typeof(AppBuilderExtensions)
+            .GetMethod("CreateView", BindingFlags.NonPublic | BindingFlags.Static);
+
+        var resolved = method!.Invoke(null, [typeof(FallbackView)]);
+
+        await Assert.That(resolved).IsTypeOf<FallbackView>();
+    }
+
+    /// <summary>Verifies that CreateView throws when Activator returns null.</summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
+    [Test]
+    public async Task CreateView_WhenActivatorReturnsNull_ThrowsInvalidOperationException()
+    {
+        await Assert.That(() => InvokeCreateView(typeof(int?))).ThrowsExactly<InvalidOperationException>();
+    }
+
+    /// <summary>Verifies that RegisterReactiveUIViews throws on a null builder.</summary>
     /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task RegisterReactiveUIViews_Throws_On_Null_Builder()
@@ -98,9 +134,7 @@ public class AppBuilderExtensionsRegistrationTests
         await Assert.That(() => builder!.RegisterReactiveUIViews()).ThrowsExactly<ArgumentNullException>();
     }
 
-    /// <summary>
-    /// Verifies that RegisterReactiveUIViewsFromAssemblyOf returns the same builder instance.
-    /// </summary>
+    /// <summary>Verifies that RegisterReactiveUIViewsFromAssemblyOf returns the same builder instance.</summary>
     /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task RegisterReactiveUIViewsFromAssemblyOf_Returns_Same_Builder()
@@ -110,9 +144,7 @@ public class AppBuilderExtensionsRegistrationTests
         await Assert.That(result).IsSameReferenceAs(builder);
     }
 
-    /// <summary>
-    /// Verifies that RegisterReactiveUIViewsFromEntryAssembly does not throw and returns the same builder.
-    /// </summary>
+    /// <summary>Verifies that RegisterReactiveUIViewsFromEntryAssembly does not throw and returns the same builder.</summary>
     /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task RegisterReactiveUIViewsFromEntryAssembly_Does_Not_Throw()
@@ -122,9 +154,79 @@ public class AppBuilderExtensionsRegistrationTests
         await Assert.That(result).IsSameReferenceAs(builder);
     }
 
-    /// <summary>
-    /// Verifies that RegisterViewsInternal ignores duplicate assemblies.
-    /// </summary>
+    /// <summary>Verifies that the entry-assembly helper returns the original builder when no entry assembly is available.</summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
+    [Test]
+    public async Task RegisterReactiveUIViewsFromEntryAssembly_WithNullEntry_ReturnsSameBuilder()
+    {
+        var builder = AppBuilder.Configure<Application>();
+
+        var result = InvokeRegisterReactiveUIViewsFromEntryAssembly(builder, null);
+
+        await Assert.That(result).IsSameReferenceAs(builder);
+    }
+
+    /// <summary>Verifies that the entry-assembly helper registers views when an entry assembly is supplied.</summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
+    [Test]
+    public async Task RegisterReactiveUIViewsFromEntryAssembly_WithEntryAssembly_RegistersViews()
+    {
+        var builder = AppBuilder.Configure<Application>();
+
+        var result = InvokeRegisterReactiveUIViewsFromEntryAssembly(builder, typeof(AppBuilderExtensionsRegistrationTests).Assembly);
+        InvokeAfterPlatformServicesSetup(result);
+
+        var serviceType = typeof(IViewFor<>).MakeGenericType(typeof(DistinctRegistrationVm));
+        var resolved = AppLocator.Current.GetService(serviceType);
+
+        await Assert.That(result).IsSameReferenceAs(builder);
+        await Assert.That(resolved).IsTypeOf<DistinctRegistrationView>();
+    }
+
+    /// <summary>Verifies that RegisterReactiveUIViews executes its platform setup callback for empty assemblies.</summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
+    [Test]
+    public async Task RegisterReactiveUIViews_AfterPlatformCallback_WithEmptyAssemblies_Returns()
+    {
+        var builder = AppBuilder.Configure<Application>().RegisterReactiveUIViews();
+
+        InvokeAfterPlatformServicesSetup(builder);
+
+        await Assert.That(builder).IsNotNull();
+    }
+
+    /// <summary>Verifies that the private view registration guard returns for unavailable inputs.</summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
+    [Test]
+    public async Task RegisterReactiveUIViews_WithUnavailableInputs_Returns()
+    {
+        var resolver = AppLocator.CurrentMutable!;
+        var assembly = typeof(AppBuilderExtensionsRegistrationTests).Assembly;
+
+        InvokeRegisterReactiveUIViews(null, [assembly]);
+        InvokeRegisterReactiveUIViews(resolver, null);
+        InvokeRegisterReactiveUIViews(resolver, []);
+
+        await Assert.That(AppLocator.CurrentMutable).IsSameReferenceAs(resolver);
+    }
+
+    /// <summary>Verifies that RegisterReactiveUIViews executes its platform setup callback and registers views.</summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
+    [Test]
+    public async Task RegisterReactiveUIViews_AfterPlatformCallback_RegistersViews()
+    {
+        var builder = AppBuilder.Configure<Application>()
+            .RegisterReactiveUIViews(typeof(AppBuilderExtensionsRegistrationTests).Assembly);
+
+        InvokeAfterPlatformServicesSetup(builder);
+
+        var serviceType = typeof(IViewFor<>).MakeGenericType(typeof(DistinctRegistrationVm));
+        var resolved = AppLocator.Current.GetService(serviceType);
+
+        await Assert.That(resolved).IsTypeOf<DistinctRegistrationView>();
+    }
+
+    /// <summary>Verifies that RegisterViewsInternal ignores duplicate assemblies.</summary>
     /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task RegisterViewsInternal_Ignores_Duplicate_Assemblies()
@@ -134,10 +236,11 @@ public class AppBuilderExtensionsRegistrationTests
             .GetMethod("RegisterViewsInternal", BindingFlags.NonPublic | BindingFlags.Static);
 
         var assembly = typeof(DistinctRegistrationVm).Assembly;
+        Assembly[] assemblies = [assembly, assembly];
         var serviceType = typeof(IViewFor<>).MakeGenericType(typeof(DistinctRegistrationVm));
         var before = AppLocator.Current.GetServices(serviceType).Count();
 
-        method!.Invoke(null, [resolver, new[] { assembly, assembly }]);
+        _ = method!.Invoke(null, [resolver, assemblies]);
 
         var after = AppLocator.Current.GetServices(serviceType).Count();
         var resolved = AppLocator.Current.GetService(serviceType);
@@ -146,36 +249,90 @@ public class AppBuilderExtensionsRegistrationTests
         await Assert.That(resolved).IsTypeOf<DistinctRegistrationView>();
     }
 
-    /// <summary>
-    /// A test view model implementing ITestVm.
-    /// </summary>
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1812:Avoid uninstantiated internal classes", Justification = "Instantiated via reflection by RegisterViewsInternal.")]
-    private sealed class TestVm : ReactiveObject, ITestVm
+    /// <summary>Invokes the AppBuilder platform setup callback registered by extension methods.</summary>
+    /// <param name="builder">The application builder.</param>
+    private static void InvokeAfterPlatformServicesSetup(AppBuilder builder)
     {
+        var property = typeof(AppBuilder).GetProperty(
+            "AfterPlatformServicesSetupCallback",
+            BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+
+        var callback = (Action<AppBuilder>?)property?.GetValue(builder);
+        callback?.Invoke(builder);
     }
 
-    /// <summary>
-    /// Attribute to specify a view contract name.
-    /// </summary>
+    /// <summary>Invokes the private CreateView method and preserves the thrown exception type.</summary>
+    /// <param name="viewType">The type to create.</param>
+    /// <returns>The created view instance.</returns>
+    private static object InvokeCreateView(Type viewType)
+    {
+        var method = typeof(AppBuilderExtensions)
+            .GetMethod("CreateView", BindingFlags.NonPublic | BindingFlags.Static);
+
+        try
+        {
+            return method!.Invoke(null, [viewType])!;
+        }
+        catch (TargetInvocationException error) when (error.InnerException is not null)
+        {
+            ExceptionDispatchInfo.Capture(error.InnerException).Throw();
+            throw;
+        }
+    }
+
+    /// <summary>Invokes the private entry-assembly registration helper.</summary>
+    /// <param name="builder">The application builder.</param>
+    /// <param name="entryAssembly">The entry assembly to pass.</param>
+    /// <returns>The returned application builder.</returns>
+    private static AppBuilder InvokeRegisterReactiveUIViewsFromEntryAssembly(AppBuilder builder, Assembly? entryAssembly)
+    {
+        var method = typeof(AppBuilderExtensions)
+            .GetMethods(BindingFlags.NonPublic | BindingFlags.Static)
+            .Single(candidate =>
+                candidate.Name == "RegisterReactiveUIViewsFromEntryAssembly" &&
+                candidate.GetParameters() is [{ ParameterType: var builderType }, { ParameterType: var assemblyType }] &&
+                builderType == typeof(AppBuilder) &&
+                assemblyType == typeof(Assembly));
+
+        return (AppBuilder)method.Invoke(null, [builder, entryAssembly])!;
+    }
+
+    /// <summary>Invokes the private guarded view registration helper.</summary>
+    /// <param name="resolver">The resolver to register with.</param>
+    /// <param name="assemblies">The assemblies to scan.</param>
+    private static void InvokeRegisterReactiveUIViews(IMutableDependencyResolver? resolver, Assembly[]? assemblies)
+    {
+        var method = typeof(AppBuilderExtensions)
+            .GetMethods(BindingFlags.NonPublic | BindingFlags.Static)
+            .Single(candidate =>
+                candidate.Name == "RegisterReactiveUIViews" &&
+                candidate.GetParameters() is [{ ParameterType: var resolverType }, { ParameterType: var assembliesType }] &&
+                resolverType == typeof(IMutableDependencyResolver) &&
+                assembliesType == typeof(Assembly[]));
+
+        _ = method.Invoke(null, [resolver, assemblies]);
+    }
+
+    /// <summary>A test view model implementing ITestVm.</summary>
+    public sealed class TestVm : ReactiveObject, ITestVm
+    {
+        /// <inheritdoc/>
+        public object? TestContract => null;
+    }
+
+    /// <summary>Attribute to specify a view contract name.</summary>
     /// <param name="contract">The contract name.</param>
     [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
-    private sealed class ViewContractAttribute(string contract) : Attribute
+    public sealed class ViewContractAttribute(string contract) : Attribute
     {
-        /// <summary>
-        /// Gets the contract name.
-        /// </summary>
+        /// <summary>Gets the contract name.</summary>
         public string Contract { get; } = contract;
     }
 
-    /// <summary>
-    /// A test view for TestVm without a contract.
-    /// </summary>
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1812:Avoid uninstantiated internal classes", Justification = "Instantiated via reflection by RegisterViewsInternal.")]
-    private sealed class TestView : UserControl, IViewFor<TestVm>
+    /// <summary>A test view for TestVm without a contract.</summary>
+    public sealed class TestView : UserControl, IViewFor<TestVm>
     {
-        /// <summary>
-        /// Gets or sets the view model.
-        /// </summary>
+        /// <summary>Gets or sets the view model.</summary>
         public TestVm? ViewModel { get; set; }
 
         /// <inheritdoc/>
@@ -186,16 +343,11 @@ public class AppBuilderExtensionsRegistrationTests
         }
     }
 
-    /// <summary>
-    /// A test view for TestVm with contract "C1".
-    /// </summary>
+    /// <summary>A test view for TestVm with contract "C1".</summary>
     [ViewContract("C1")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1812:Avoid uninstantiated internal classes", Justification = "Instantiated via reflection by RegisterViewsInternal.")]
-    private sealed class ContractedTestView : UserControl, IViewFor<TestVm>
+    public sealed class ContractedTestView : UserControl, IViewFor<TestVm>
     {
-        /// <summary>
-        /// Gets or sets the view model.
-        /// </summary>
+        /// <summary>Gets or sets the view model.</summary>
         public TestVm? ViewModel { get; set; }
 
         /// <inheritdoc/>
@@ -206,14 +358,10 @@ public class AppBuilderExtensionsRegistrationTests
         }
     }
 
-    /// <summary>
-    /// A DI-backed test view for TestVm.
-    /// </summary>
-    private sealed class DiBackedView : UserControl, IViewFor<TestVm>
+    /// <summary>A DI-backed test view for TestVm.</summary>
+    public sealed class DiBackedView : UserControl, IViewFor<TestVm>
     {
-        /// <summary>
-        /// Gets or sets the view model.
-        /// </summary>
+        /// <summary>Gets or sets the view model.</summary>
         public TestVm? ViewModel { get; set; }
 
         /// <inheritdoc/>
@@ -224,23 +372,34 @@ public class AppBuilderExtensionsRegistrationTests
         }
     }
 
-    /// <summary>
-    /// A distinct view model used to validate duplicate assembly handling.
-    /// </summary>
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1812:Avoid uninstantiated internal classes", Justification = "Instantiated via reflection by RegisterViewsInternal.")]
-    private sealed class DistinctRegistrationVm : ReactiveObject
+    /// <summary>A view model for a view decorated by an attribute without a Contract property.</summary>
+    public sealed class NoContractVm : ReactiveObject;
+
+    /// <summary>A view with an attribute named ViewContractAttribute that has no Contract property.</summary>
+    [MissingContract.ViewContract]
+    public sealed class NoContractView : UserControl, IViewFor<NoContractVm>
     {
+        /// <summary>Gets or sets the view model.</summary>
+        public NoContractVm? ViewModel { get; set; }
+
+        /// <inheritdoc/>
+        object? IViewFor.ViewModel
+        {
+            get => ViewModel;
+            set => ViewModel = (NoContractVm?)value;
+        }
     }
 
-    /// <summary>
-    /// A distinct view used to validate duplicate assembly handling.
-    /// </summary>
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1812:Avoid uninstantiated internal classes", Justification = "Instantiated via reflection by RegisterViewsInternal.")]
-    private sealed class DistinctRegistrationView : UserControl, IViewFor<DistinctRegistrationVm>
+    /// <summary>A view used to validate Activator fallback.</summary>
+    public sealed class FallbackView : UserControl;
+
+    /// <summary>A distinct view model used to validate duplicate assembly handling.</summary>
+    public sealed class DistinctRegistrationVm : ReactiveObject;
+
+    /// <summary>A distinct view used to validate duplicate assembly handling.</summary>
+    public sealed class DistinctRegistrationView : UserControl, IViewFor<DistinctRegistrationVm>
     {
-        /// <summary>
-        /// Gets or sets the view model.
-        /// </summary>
+        /// <summary>Gets or sets the view model.</summary>
         public DistinctRegistrationVm? ViewModel { get; set; }
 
         /// <inheritdoc/>
@@ -249,5 +408,13 @@ public class AppBuilderExtensionsRegistrationTests
             get => ViewModel;
             set => ViewModel = (DistinctRegistrationVm?)value;
         }
+    }
+
+    /// <summary>Contains an attribute named ViewContractAttribute without a Contract property.</summary>
+    private static class MissingContract
+    {
+        /// <summary>An attribute that intentionally has no Contract property.</summary>
+        [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
+        public sealed class ViewContractAttribute : Attribute;
     }
 }

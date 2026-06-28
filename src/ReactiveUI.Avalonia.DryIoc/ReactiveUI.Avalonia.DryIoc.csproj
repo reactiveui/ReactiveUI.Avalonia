@@ -2,8 +2,6 @@
   <PropertyGroup>
     <TargetFrameworks>$(AvaloniaTargetFrameworks)</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <LangVersion>preview</LangVersion>
     <PackageDescription>Contains the ReactiveUI platform specific extensions for Avalonia</PackageDescription>
     <PackageTags>mvvm;reactiveui;rx;reactive extensions;observable;LINQ;events;frp;avalonia;net;netcore</PackageTags>
   </PropertyGroup>
@@ -12,5 +10,13 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ReactiveUI.Avalonia\ReactiveUI.Avalonia.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Using Include="DryIoc" />
+    <Using Include="ReactiveUI.Builder" />
+    <Using Include="Splat" />
+    <Using Include="Splat.Builder" />
+    <Using Include="Avalonia.AppBuilder" Alias="AppBuilder" />
+    <Using Include="Splat.Builder.AppBuilder" Alias="SplatBuilder" />
   </ItemGroup>
 </Project>

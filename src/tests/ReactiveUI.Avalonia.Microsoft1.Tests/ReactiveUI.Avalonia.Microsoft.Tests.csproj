@@ -1,8 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>$(AvaloniaTestTargetFrameworks)</TargetFrameworks>
+    <TargetFrameworks>$(AvaloniaTargetFrameworks)</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
     <OutputType>Exe</OutputType>
     <IsTestProject>true</IsTestProject>
     <DefineConstants>$(DefineConstants);MICROSOFT1</DefineConstants>
@@ -21,5 +20,8 @@
     <PackageReference Include="Avalonia.Desktop" />
     <PackageReference Include="Avalonia.Themes.Fluent" />
     <PackageReference Include="Avalonia.Fonts.Inter" />
+  </ItemGroup>
+  <ItemGroup>
+    <Using Include="ReactiveUI.Primitives.Disposables" />
   </ItemGroup>
 </Project>

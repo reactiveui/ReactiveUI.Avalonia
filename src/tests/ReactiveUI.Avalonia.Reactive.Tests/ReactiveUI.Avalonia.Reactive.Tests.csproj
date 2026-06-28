@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>$(AvaloniaTargetFrameworks)</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <OutputType>Exe</OutputType>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\ReactiveUI.Avalonia.Reactive\ReactiveUI.Avalonia.Reactive.csproj" Aliases="global,reactivecore" />
+    <ProjectReference Include="..\..\ReactiveUI.Avalonia.Autofac.Reactive\ReactiveUI.Avalonia.Autofac.Reactive.csproj" Aliases="global,reactiveautofac" />
+    <ProjectReference Include="..\..\ReactiveUI.Avalonia.DryIoc.Reactive\ReactiveUI.Avalonia.DryIoc.Reactive.csproj" Aliases="global,reactivedryioc" />
+    <ProjectReference Include="..\..\ReactiveUI.Avalonia.Microsoft.Extensions.DependencyInjection.Reactive\ReactiveUI.Avalonia.Microsoft.Extensions.DependencyInjection.Reactive.csproj" Aliases="global,reactivemicrosoft" />
+    <ProjectReference Include="..\..\ReactiveUI.Avalonia.Ninject.Reactive\ReactiveUI.Avalonia.Ninject.Reactive.csproj" Aliases="global,reactiveninject" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Avalonia" />
+    <PackageReference Include="Avalonia.Desktop" />
+    <PackageReference Include="Avalonia.Headless" />
+    <PackageReference Include="Avalonia.Themes.Fluent" />
+    <PackageReference Include="Avalonia.Fonts.Inter" />
+  </ItemGroup>
+  <ItemGroup>
+    <Using Include="ReactiveUI.Avalonia.Reactive" />
+    <Using Include="ReactiveUI.Primitives.Disposables" />
+    <Using Include="ReactiveUI.Primitives.Signals" />
+    <Using Include="ReactiveUI.Reactive.ReactiveObject" Alias="ReactiveObject" />
+  </ItemGroup>
+</Project>

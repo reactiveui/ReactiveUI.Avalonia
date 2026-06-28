@@ -1,36 +1,51 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>$(AvaloniaTargetFrameworks)</TargetFrameworks>
-    <Nullable>enable</Nullable>
-    <LangVersion>preview</LangVersion>
-    <NoWarn>$(NoWarn);SA1633;SA1518</NoWarn>
     <PackageDescription>Contains the ReactiveUI platform specific extensions for Avalonia</PackageDescription>
     <PackageTags>mvvm;reactiveui;rx;reactive extensions;observable;LINQ;events;frp;avalonia;net;netcore</PackageTags>
+    <IsAotCompatible>false</IsAotCompatible>
+    <EnableAotAnalyzer>false</EnableAotAnalyzer>
+    <EnableTrimAnalyzer>false</EnableTrimAnalyzer>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Avalonia" />
-    <PackageReference Include="ReactiveUI" />
+    <PackageReference Include="ReactiveUI" ExcludeAssets="analyzers" />
   </ItemGroup>
 
   <ItemGroup>
-    <Using Include="System"/>
-    <Using Include="System.Linq"/>
-    <Using Include="System.Reflection"/>
-    <Using Include="Avalonia"/>
-    <Using Include="ReactiveUI.Builder"/>
-    <Using Include="Splat"/>
-    <Using Include="Avalonia.Controls"/>
-    <Using Include="Avalonia.Controls.Templates"/>
-    <Using Include="Avalonia.Data"/>
-    <Using Include="Avalonia.Input"/>
-    <Using Include="Avalonia.Layout"/>
-    <Using Include="Avalonia.Threading"/>
-    <Using Include="System.Reactive"/>
-    <Using Include="System.Reactive.Disposables"/>
-    <Using Include="System.Reactive.Linq"/>
-    <Using Include="System.Reactive.Subjects"/>
-    <Using Include="System.Threading"/>
-    <Using Include="Avalonia.Controls.ApplicationLifetimes"/>
-    <Using Include="Avalonia.Interactivity"/>
+    <Using Include="System" />
+    <Using Include="System.Collections.Generic" />
+    <Using Include="System.Diagnostics.CodeAnalysis" />
+    <Using Include="System.Linq" />
+    <Using Include="System.Linq.Expressions" />
+    <Using Include="System.Reflection" />
+    <Using Include="System.Threading" />
+    <Using Include="Avalonia" />
+    <Using Include="Avalonia.Controls" />
+    <Using Include="Avalonia.Controls.Templates" />
+    <Using Include="Avalonia.Data" />
+    <Using Include="Avalonia.Input" />
+    <Using Include="Avalonia.Layout" />
+    <Using Include="Avalonia.Threading" />
+    <Using Include="Avalonia.Controls.ApplicationLifetimes" />
+    <Using Include="Avalonia.Interactivity" />
+    <Using Include="ReactiveUI.Builder" />
+    <Using Include="ReactiveUI.Primitives" />
+    <Using Include="ReactiveUI.ViewLocator" Alias="CurrentViewLocator" />
+    <Using Include="ReactiveUI.Primitives.Concurrency" />
+    <Using Include="ReactiveUI.Primitives.Disposables" />
+    <Using Include="ReactiveUI.Primitives.Signals" />
+    <Using Include="ReactiveUI.Primitives.LinqExtensions" Alias="PrimitivesLinqExtensions" />
+    <Using Include="ReactiveUI.Primitives.RxVoid" Alias="Unit" />
+    <Using Include="ReactiveUI.Primitives.Signals.Signal" Alias="Observable" />
+    <Using Include="ReactiveUI.Primitives.Concurrency.ISequencer" Alias="IScheduler" />
+    <Using Include="ReactiveUI.Primitives.Concurrency.Sequencer" Alias="Scheduler" />
+    <Using Include="ReactiveUI.Primitives.Concurrency.TaskPoolSequencer" Alias="TaskPoolScheduler" />
+    <Using Include="ReactiveUI.Primitives.Concurrency.ThreadPoolSequencer" Alias="ThreadPoolScheduler" />
+    <Using Include="ReactiveUI.Primitives.Advanced.Witness" Alias="Observer" />
+    <Using Include="ReactiveUI.Primitives.Disposables.Scope" Alias="Disposable" />
+    <Using Include="ReactiveUI.Primitives.Disposables.MultipleDisposable" Alias="ActivationDisposables" />
+    <Using Include="ReactiveUI.Primitives.Disposables.MultipleDisposable" Alias="CompositeDisposable" />
+    <Using Include="Splat" />
   </ItemGroup>
 </Project>

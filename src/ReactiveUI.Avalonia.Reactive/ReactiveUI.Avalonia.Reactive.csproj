@@ -1,0 +1,56 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>$(AvaloniaTargetFrameworks)</TargetFrameworks>
+    <PackageDescription>Contains the ReactiveUI Reactive platform specific extensions for Avalonia</PackageDescription>
+    <PackageTags>mvvm;reactiveui;rx;reactive extensions;observable;LINQ;events;frp;avalonia;net;netcore</PackageTags>
+    <DefineConstants>$(DefineConstants);REACTIVE_SHIM</DefineConstants>
+    <IsAotCompatible>false</IsAotCompatible>
+    <EnableAotAnalyzer>false</EnableAotAnalyzer>
+    <EnableTrimAnalyzer>false</EnableTrimAnalyzer>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Avalonia" />
+    <PackageReference Include="ReactiveUI.Reactive" ExcludeAssets="analyzers" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\ReactiveUI.Avalonia\*.cs" Exclude="..\ReactiveUI.Avalonia\bin\**;..\ReactiveUI.Avalonia\obj\**" Link="%(Filename)%(Extension)" />
+  </ItemGroup>
+  <ItemGroup>
+    <Using Include="System" />
+    <Using Include="System.Collections.Generic" />
+    <Using Include="System.Diagnostics.CodeAnalysis" />
+    <Using Include="System.Linq" />
+    <Using Include="System.Linq.Expressions" />
+    <Using Include="System.Reflection" />
+    <Using Include="System.Threading" />
+    <Using Include="System.Reactive" />
+    <Using Include="System.Reactive.Concurrency" />
+    <Using Include="System.Reactive.Disposables" />
+    <Using Include="System.Reactive.Linq" />
+    <Using Include="System.Reactive.Subjects" />
+    <Using Include="Avalonia" />
+    <Using Include="Avalonia.Controls" />
+    <Using Include="Avalonia.Controls.Templates" />
+    <Using Include="Avalonia.Data" />
+    <Using Include="Avalonia.Input" />
+    <Using Include="Avalonia.Layout" />
+    <Using Include="Avalonia.Threading" />
+    <Using Include="Avalonia.Controls.ApplicationLifetimes" />
+    <Using Include="Avalonia.Interactivity" />
+    <Using Include="ReactiveUI" />
+    <Using Include="ReactiveUI.Reactive" />
+    <Using Include="ReactiveUI.Reactive.Builder" />
+    <Using Include="ReactiveUI.Primitives.Signals" />
+    <Using Include="ReactiveUI.ViewLocator" Alias="CurrentViewLocator" />
+    <Using Include="ReactiveUI.Primitives.LinqExtensions" Alias="PrimitivesLinqExtensions" />
+    <Using Include="ReactiveUI.Reactive.Builder.ReactiveUIBuilder" Alias="ReactiveUIBuilder" />
+    <Using Include="ReactiveUI.Reactive.Builder.IReactiveUIBuilder" Alias="IReactiveUIBuilder" />
+    <Using Include="ReactiveUI.Reactive.Builder.RxAppBuilder" Alias="RxAppBuilder" />
+    <Using Include="ReactiveUI.Primitives.Disposables.MultipleDisposable" Alias="ActivationDisposables" />
+    <Using Include="ReactiveUI.Reactive.RoutingState" Alias="RoutingState" />
+    <Using Include="ReactiveUI.Reactive.RxSchedulers" Alias="RxSchedulers" />
+    <Using Include="ReactiveUI.Reactive.RxSuspension" Alias="RxSuspension" />
+    <Using Include="System.Reactive.Concurrency.TaskPoolScheduler" Alias="TaskPoolScheduler" />
+    <Using Include="Splat" />
+  </ItemGroup>
+</Project>

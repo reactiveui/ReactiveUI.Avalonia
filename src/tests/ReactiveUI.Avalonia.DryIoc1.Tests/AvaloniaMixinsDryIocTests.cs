@@ -1,7 +1,6 @@
-// Copyright (c) 2019-2026 ReactiveUI and Avalonia Teams, and Contributors. All rights reserved.
-// Licensed under the MIT license.
+// Copyright (c) 2019-2026 ReactiveUI Association Incorporated. All rights reserved.
+// ReactiveUI Association Incorporated licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for full license information.
-
 using Avalonia;
 using DryIoc;
 using ReactiveUI.Avalonia.Splat;
@@ -9,15 +8,10 @@ using Splat.DryIoc;
 
 namespace ReactiveUI.Avalonia.DryIoc.Tests;
 
-/// <summary>
-/// Tests for DryIoc-based Avalonia mixin registration and resolution.
-/// </summary>
+/// <summary>Tests for DryIoc-based Avalonia mixin registration and resolution.</summary>
 public class AvaloniaMixinsDryIocTests
 {
-    /// <summary>
-    /// Verifies that <see cref="AvaloniaMixins.UseReactiveUIWithDryIoc"/> throws
-    /// <see cref="ArgumentNullException"/> when the builder is null.
-    /// </summary>
+    /// <summary>Verifies that <see cref="AvaloniaMixins.UseReactiveUIWithDryIoc"/> throws <see cref="ArgumentNullException"/> when the builder is null.</summary>
     /// <returns>A <see cref="Task"/> representing the asynchronous test.</returns>
     [Test]
     public async Task UseReactiveUIWithDryIoc_ThrowsOnNullBuilder()
@@ -27,9 +21,7 @@ public class AvaloniaMixinsDryIocTests
             AvaloniaMixins.UseReactiveUIWithDryIoc(builder!, _ => { })).ThrowsExactly<ArgumentNullException>();
     }
 
-    /// <summary>
-    /// Verifies that <see cref="AvaloniaMixins.UseReactiveUIWithDryIoc"/> returns the same builder instance.
-    /// </summary>
+    /// <summary>Verifies that <see cref="AvaloniaMixins.UseReactiveUIWithDryIoc"/> returns the same builder instance.</summary>
     /// <returns>A <see cref="Task"/> representing the asynchronous test.</returns>
     [Test]
     public async Task UseReactiveUIWithDryIoc_ReturnsBuilder_NoThrow()
@@ -39,10 +31,7 @@ public class AvaloniaMixinsDryIocTests
         await Assert.That(result).IsSameReferenceAs(builder);
     }
 
-    /// <summary>
-    /// Verifies that <see cref="AppBuilderExtensions.UseReactiveUIWithDIContainer{TContainer}"/> throws
-    /// <see cref="ArgumentNullException"/> when the builder is null.
-    /// </summary>
+    /// <summary>Verifies that <see cref="AppBuilderExtensions.UseReactiveUIWithDIContainer{TContainer}"/> throws <see cref="ArgumentNullException"/> when the builder is null.</summary>
     /// <returns>A <see cref="Task"/> representing the asynchronous test.</returns>
     [Test]
     public async Task UseReactiveUIWithDIContainer_ThrowsOnNullBuilder()
@@ -57,10 +46,7 @@ public class AvaloniaMixinsDryIocTests
                 _ => { })).ThrowsExactly<ArgumentNullException>();
     }
 
-    /// <summary>
-    /// Verifies that <see cref="AppBuilderExtensions.UseReactiveUIWithDIContainer{TContainer}"/> returns
-    /// the same builder instance with valid arguments.
-    /// </summary>
+    /// <summary>Verifies that <see cref="AppBuilderExtensions.UseReactiveUIWithDIContainer{TContainer}"/> returns the same builder instance with valid arguments.</summary>
     /// <returns>A <see cref="Task"/> representing the asynchronous test.</returns>
     [Test]
     public async Task UseReactiveUIWithDIContainer_ReturnsBuilder_NoThrow()
@@ -77,10 +63,7 @@ public class AvaloniaMixinsDryIocTests
         await Assert.That(result).IsSameReferenceAs(builder);
     }
 
-    /// <summary>
-    /// Verifies that <see cref="DryIocDependencyResolver"/> can register and resolve services
-    /// both with and without contracts.
-    /// </summary>
+    /// <summary>Verifies that <see cref="DryIocDependencyResolver"/> can register and resolve services both with and without contracts.</summary>
     /// <returns>A <see cref="Task"/> representing the asynchronous test.</returns>
     [Test]
     public async Task DryIocDependencyResolver_Register_And_Resolve_WithAndWithoutContract()
@@ -92,13 +75,13 @@ public class AvaloniaMixinsDryIocTests
         resolver.Register<string>(() => "b");
         resolver.Register<string>(() => "c", "x");
 
-        var noContract = resolver.GetService(typeof(string));
+        var noContract = resolver.GetService<string>();
         await Assert.That(noContract).IsEqualTo("b");
 
-        var withContract = resolver.GetService(typeof(string), "x");
+        var withContract = resolver.GetService<string>("x");
         await Assert.That(withContract).IsEqualTo("c");
 
-        var all = resolver.GetServices(typeof(string)).ToArray();
+        var all = resolver.GetServices<string>().ToArray();
         await Assert.That(all).Contains("a");
         await Assert.That(all).Contains("b");
     }

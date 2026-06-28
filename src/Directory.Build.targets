@@ -7,27 +7,16 @@
     <EnableVSTestReferences>false</EnableVSTestReferences>
   </PropertyGroup>
 
-  <PropertyGroup Condition="$(TargetFramework.StartsWith('netstandard'))">
-    <DefineConstants>$(DefineConstants);NETSTANDARD;PORTABLE</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition="$(TargetFramework.StartsWith('net4'))">
-    <DefineConstants>$(DefineConstants);NET_461;XAML</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition="$(TargetFramework.EndsWith('0-maccatalyst')) or $(TargetFramework.EndsWith('0-ios'))">
-    <DefineConstants>$(DefineConstants);MONO;UIKIT;COCOA;IOS</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition="$(TargetFramework.EndsWith('0-macos'))">
-    <DefineConstants>$(DefineConstants);MONO;COCOA;MAC</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition="$(TargetFramework.EndsWith('0-tvos'))">
-    <DefineConstants>$(DefineConstants);MONO;UIKIT;COCOA;TVOS</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition="$(TargetFramework.EndsWith('0-android'))">
-    <DefineConstants>$(DefineConstants);MONO;ANDROID</DefineConstants>
-  </PropertyGroup>
+  <!-- Keep ReactiveUI.Primitives bridge generation disabled when SDK analyzer resolution ignores ExcludeAssets. -->
+  <Target Name="ApplyReactiveUIPrimitivesBridgeAnalyzerExclusion" AfterTargets="ResolveLockFileAnalyzers" BeforeTargets="CoreCompile">
+    <ItemGroup>
+      <Analyzer Remove="@(Analyzer)" Condition="'%(Analyzer.NuGetPackageId)' == 'ReactiveUI.Primitives' and '%(Analyzer.Filename)%(Analyzer.Extension)' == 'ReactiveUI.Primitives.R3Bridge.Generator.dll'" />
+    </ItemGroup>
+  </Target>
 
   <!-- Use a safe boolean condition so missing IsTestProject doesn't break build -->
   <Target Name="ValidateNugetProperties" Condition="'$(IsTestProject)' != 'true'" BeforeTargets="Compile">
     <Error Condition="$(PackageDescription) == '' or $(PackageDescription) == $(DefaultPackageDescription)" Text="The Nuget PackageDescription property needs to be set for the project. Currently : '$(PackageDescription)'" />
   </Target>
+
 </Project>
