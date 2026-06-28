@@ -215,11 +215,8 @@ internal class AvaloniaCreatesCommandBinding : ICreatesCommandBinding
             _routedEvent = routedEvent;
             _command = command;
 
-#if REACTIVE_SHIM
-            _commandSubscription = commandParameter.Subscribe(OnCommandParameterChanged, SubscriptionErrors.Throw);
-#else
-            _commandSubscription = commandParameter.SubscribeSafe(OnCommandParameterChanged, SubscriptionErrors.Throw);
-#endif
+            _commandSubscription = PrimitivesLinqExtensions.SubscribeSafe(commandParameter, OnCommandParameterChanged, SubscriptionErrors.Throw);
+
             element.AddHandler(routedEvent, Handler, RoutingStrategies.Bubble);
         }
 

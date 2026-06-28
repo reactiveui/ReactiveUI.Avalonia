@@ -90,7 +90,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="ReactiveUI.Primitives" ExcludeAssets="analyzers" PrivateAssets="all" />
     <PackageReference Include="MinVer" PrivateAssets="all" />
     <PackageReference Include="StyleSharp.Analyzers" PrivateAssets="all"/>
     <PackageReference Include="Roslynator.Analyzers" PrivateAssets="All" />
