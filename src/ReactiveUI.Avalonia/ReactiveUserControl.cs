@@ -1,51 +1,31 @@
-// Copyright (c) 2019-2026 ReactiveUI and Avalonia Teams, and Contributors. All rights reserved.
-// Licensed under the MIT license.
+// Copyright (c) 2019-2026 ReactiveUI Association Incorporated. All rights reserved.
+// ReactiveUI Association Incorporated licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for full license information.
-
+#if REACTIVE_SHIM
+namespace ReactiveUI.Avalonia.Reactive;
+#else
 namespace ReactiveUI.Avalonia;
+#endif
 
-/// <summary>
-/// A ReactiveUI <see cref="UserControl"/> that implements the <see cref="IViewFor{TViewModel}"/> interface and
-/// will activate your ViewModel automatically if the view model implements <see cref="IActivatableViewModel"/>.
-/// When the DataContext property changes, this class will update the ViewModel property with the new DataContext
-/// value, and vice versa.
-/// </summary>
+/// <summary>A ReactiveUI <see cref="UserControl"/> that implements <see cref="IViewFor{TViewModel}"/>.</summary>
 /// <typeparam name="TViewModel">ViewModel type.</typeparam>
-public class ReactiveUserControl<TViewModel> : UserControl, IViewFor<TViewModel>
+public class ReactiveUserControl<TViewModel> : ReactiveUserControlBase, IViewFor<TViewModel>, IViewFor
     where TViewModel : class
 {
-    /// <summary>
-    /// Identifies the ViewModel dependency property for a ReactiveUserControl.
-    /// </summary>
-    /// <remarks>This property enables data binding of a view model to a ReactiveUserControl instance in
-    /// Avalonia applications. It is typically used to associate a view model with the control for reactive UI
-    /// scenarios.</remarks>
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("AvaloniaProperty", "AVP1002", Justification = "Generic avalonia property is expected here.")]
-    public static readonly StyledProperty<TViewModel?> ViewModelProperty = AvaloniaProperty
-        .Register<ReactiveUserControl<TViewModel>, TViewModel?>(nameof(ViewModel));
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ReactiveUserControl{TViewModel}"/> class and sets up activation handling for the control.
-    /// </summary>
-    /// <remarks>When the control is activated, this constructor ensures that any activation logic defined in
-    /// the associated ViewModel is also executed, provided the ViewModel implements IActivatableViewModel. This enables
-    /// coordinated activation and deactivation between the view and its ViewModel, which is useful for managing
-    /// resources and subscriptions in reactive UI scenarios.</remarks>
+    /// <summary>Initializes a new instance of the <see cref="ReactiveUserControl{TViewModel}"/> class.</summary>
+    [RequiresUnreferencedCode("ReactiveUI activation evaluates expression-based member chains via reflection; members may be trimmed.")]
     public ReactiveUserControl()
     {
-        // This WhenActivated block calls ViewModel's WhenActivated
-        // block if the ViewModel implements IActivatableViewModel.
-        this.WhenActivated(disposables => { });
     }
 
     /// <inheritdoc cref="IViewFor{TViewModel}.ViewModel"/>
-    public TViewModel? ViewModel
+    public new TViewModel? ViewModel
     {
-        get => GetValue(ViewModelProperty);
-        set => SetValue(ViewModelProperty, value);
+        get => (TViewModel?)base.ViewModel;
+        set => base.ViewModel = value;
     }
 
-    /// <inheritdoc cref="IViewFor{TViewModel}.ViewModel"/>
+    /// <inheritdoc/>
     object? IViewFor.ViewModel
     {
         get => ViewModel;
@@ -53,25 +33,5 @@ public class ReactiveUserControl<TViewModel> : UserControl, IViewFor<TViewModel>
     }
 
     /// <inheritdoc/>
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "Parameter is guaranteed non-null by the Avalonia framework.")]
-    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
-    {
-        base.OnPropertyChanged(change);
-
-        if (change.Property == DataContextProperty)
-        {
-            if (ReferenceEquals(change.OldValue, ViewModel)
-                && change.NewValue is null or TViewModel)
-            {
-                SetCurrentValue(ViewModelProperty, change.NewValue);
-            }
-        }
-        else if (change.Property == ViewModelProperty)
-        {
-            if (ReferenceEquals(change.OldValue, DataContext))
-            {
-                SetCurrentValue(DataContextProperty, change.NewValue);
-            }
-        }
-    }
+    protected override bool IsValidViewModelValue(object? value) => value is null or TViewModel;
 }

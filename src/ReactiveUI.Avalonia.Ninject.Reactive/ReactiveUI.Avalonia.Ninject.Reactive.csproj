@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>$(AvaloniaTargetFrameworks)</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <PackageDescription>Contains the ReactiveUI Reactive platform specific extensions for Avalonia Ninject</PackageDescription>
+    <PackageTags>mvvm;reactiveui;rx;reactive extensions;observable;LINQ;events;frp;avalonia;net;netcore</PackageTags>
+    <DefineConstants>$(DefineConstants);REACTIVE_SHIM</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\ReactiveUI.Avalonia.Ninject\*.cs" Exclude="..\ReactiveUI.Avalonia.Ninject\bin\**;..\ReactiveUI.Avalonia.Ninject\obj\**" Link="%(Filename)%(Extension)" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Splat.Ninject" />
+    <ProjectReference Include="..\ReactiveUI.Avalonia.Reactive\ReactiveUI.Avalonia.Reactive.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Using Include="System.Reactive" />
+    <Using Include="System.Reactive.Concurrency" />
+    <Using Include="Ninject" />
+    <Using Include="ReactiveUI" />
+    <Using Include="ReactiveUI.Reactive.Builder" />
+    <Using Include="Splat" />
+    <Using Include="Splat.Builder" />
+    <Using Include="Avalonia.AppBuilder" Alias="AppBuilder" />
+    <Using Include="Splat.Builder.AppBuilder" Alias="SplatBuilder" />
+    <Using Include="ReactiveUI.Reactive.Builder.ReactiveUIBuilder" Alias="ReactiveUIBuilder" />
+  </ItemGroup>
+</Project>

@@ -1,8 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>$(AvaloniaTestTargetFrameworks)</TargetFrameworks>
+    <TargetFrameworks>$(AvaloniaTargetFrameworks)</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
     <OutputType>Exe</OutputType>
     <IsTestProject>true</IsTestProject>
     <DefineConstants>$(DefineConstants);DRYIOC1</DefineConstants>

@@ -1,7 +1,6 @@
-// Copyright (c) 2019-2026 ReactiveUI and Avalonia Teams, and Contributors. All rights reserved.
-// Licensed under the MIT license.
+// Copyright (c) 2019-2026 ReactiveUI Association Incorporated. All rights reserved.
+// ReactiveUI Association Incorporated licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for full license information.
-
 using ReactiveUI.Builder;
 using Splat;
 using TUnit.Core.Interfaces;
@@ -16,9 +15,9 @@ namespace ReactiveUI.Avalonia.Tests;
 public class AutofacIsolatedTestExecutor : ITestExecutor
 {
     /// <inheritdoc/>
-    public async ValueTask ExecuteTest(TestContext context, Func<ValueTask> testAction)
+    public async ValueTask ExecuteTest(TestContext context, Func<ValueTask> action)
     {
-        ArgumentNullException.ThrowIfNull(testAction);
+        ArgumentNullException.ThrowIfNull(action);
 
         // Run on the shared headless UI thread for consistency with AvaloniaTestExecutor.
         await AvaloniaTestSession.Instance.Dispatch(
@@ -28,7 +27,7 @@ public class AutofacIsolatedTestExecutor : ITestExecutor
 
                 try
                 {
-                    await testAction();
+                    await action();
                 }
                 finally
                 {
@@ -36,7 +35,7 @@ public class AutofacIsolatedTestExecutor : ITestExecutor
 
                     ReactiveUIBuilder.ResetBuilderStateForTests();
 
-                    AppLocator.CurrentMutable.CreateReactiveUIBuilder()
+                    _ = AppLocator.CurrentMutable.CreateReactiveUIBuilder()
                         .WithCoreServices()
                         .BuildApp();
                 }

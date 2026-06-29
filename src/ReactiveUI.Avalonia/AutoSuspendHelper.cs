@@ -1,13 +1,13 @@
-// Copyright (c) 2019-2026 ReactiveUI and Avalonia Teams, and Contributors. All rights reserved.
-// Licensed under the MIT license.
+// Copyright (c) 2019-2026 ReactiveUI Association Incorporated. All rights reserved.
+// ReactiveUI Association Incorporated licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for full license information.
-
+#if REACTIVE_SHIM
+namespace ReactiveUI.Avalonia.Reactive;
+#else
 namespace ReactiveUI.Avalonia;
+#endif
 
-/// <summary>
-/// Provides automatic suspension and state persistence support for Avalonia applications by wiring application lifetime
-/// events to the ReactiveUI suspension system.
-/// </summary>
+/// <summary>Provides automatic suspension and state persistence support for Avalonia applications.</summary>
 /// <remarks>Use this helper to enable automatic state persistence and restoration in Avalonia applications. Pass
 /// the application's lifetime object to the constructor, and call OnFrameworkInitializationCompleted in your
 /// App.OnFrameworkInitializationCompleted method to signal application launch. This class integrates with ReactiveUI's
@@ -15,20 +15,16 @@ namespace ReactiveUI.Avalonia;
 /// intended for use in design mode, where state persistence is disabled.</remarks>
 public sealed class AutoSuspendHelper : IEnableLogger, IDisposable
 {
-    /// <summary>
-    /// Subject that signals when application state should be persisted.
-    /// </summary>
-    private readonly Subject<IDisposable> _shouldPersistState = new();
+    /// <summary>Signals when application state should be persisted.</summary>
+    private readonly Signal<IDisposable> _shouldPersistState = new();
 
-    /// <summary>
-    /// Subject that signals when the application is launching for the first time.
-    /// </summary>
-    private readonly Subject<Unit> _isLaunchingNew = new();
+    /// <summary>Signals when the application is launching for the first time.</summary>
+    private readonly Signal<Unit> _isLaunchingNew = new();
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="AutoSuspendHelper"/> class, configuring application suspension and state.
-    /// persistence based on the provided application lifetime.
-    /// </summary>
+    /// <summary>Signals when process state should be invalidated after an unhandled exception.</summary>
+    private readonly Signal<Unit> _shouldInvalidateState = new();
+
+    /// <summary>Initializes a new instance of the <see cref="AutoSuspendHelper"/> class.</summary>
     /// <remarks>If the application is running in design mode, state persistence is disabled. For supported
     /// lifetimes, application exit events are wired to enable state persistence. This constructor should be called
     /// after Avalonia application initialization is completed.</remarks>
@@ -52,7 +48,7 @@ public sealed class AutoSuspendHelper : IEnableLogger, IDisposable
             controlled.Exit += (sender, args) => OnControlledApplicationLifetimeExit();
             RxSuspension.SuspensionHost.ShouldPersistState = _shouldPersistState;
         }
-        else if (lifetime != null)
+        else if (lifetime is not null)
         {
             var type = lifetime.GetType().FullName;
             var message = $"Don't know how to detect app exit event for {type}.";
@@ -63,37 +59,37 @@ public sealed class AutoSuspendHelper : IEnableLogger, IDisposable
             const string message = "ApplicationLifetime is null. "
                           + "Ensure you are initializing AutoSuspendHelper "
                           + "after Avalonia application initialization is completed.";
-            throw new ArgumentNullException(message);
+            throw new ArgumentNullException(nameof(lifetime), message);
         }
 
-        var errored = new Subject<Unit>();
-        AppDomain.CurrentDomain.UnhandledException += (o, e) => errored.OnNext(Unit.Default);
-        RxSuspension.SuspensionHost.ShouldInvalidateState = errored;
+        AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
+        RxSuspension.SuspensionHost.ShouldInvalidateState = _shouldInvalidateState;
     }
 
-    /// <summary>
-    /// Signals that the framework initialization process has completed.
-    /// </summary>
+    /// <summary>Signals that the framework initialization process has completed.</summary>
     /// <remarks>This method should be called once all necessary framework setup is finished and the
     /// application is ready to proceed. It notifies observers that initialization is complete, which may trigger
     /// subsequent application logic. Typically used in application startup routines.</remarks>
     public void OnFrameworkInitializationCompleted() => _isLaunchingNew.OnNext(Unit.Default);
 
-    /// <summary>
-    /// Releases all resources used by the current instance.
-    /// </summary>
+    /// <summary>Releases all resources used by the current instance.</summary>
     /// <remarks>Call this method when you are finished using the instance to ensure that all unmanaged and
     /// managed resources are properly released. After calling Dispose, the instance should not be used.</remarks>
     public void Dispose()
     {
+        AppDomain.CurrentDomain.UnhandledException -= OnUnhandledException;
         _shouldPersistState.Dispose();
         _isLaunchingNew.Dispose();
+        _shouldInvalidateState.Dispose();
     }
 
-    /// <summary>
-    /// Handles the exit event for a controlled application lifetime, ensuring that any required state persistence
-    /// actions are completed before shutdown.
-    /// </summary>
+    /// <summary>Handles unhandled process exceptions by invalidating persisted state.</summary>
+    /// <param name="sender">The event sender.</param>
+    /// <param name="args">The unhandled exception event data.</param>
+    internal void OnUnhandledException(object? sender, UnhandledExceptionEventArgs args) =>
+        _shouldInvalidateState.OnNext(Unit.Default);
+
+    /// <summary>Handles the exit event for a controlled application lifetime, ensuring that any required state persistence actions are completed before shutdown.</summary>
     /// <remarks>This method blocks until all registered state persistence actions have finished executing. It
     /// should be called during application shutdown to guarantee that state is saved reliably. Calling this method from
     /// a non-shutdown context may result in the application waiting indefinitely.</remarks>
@@ -101,9 +97,9 @@ public sealed class AutoSuspendHelper : IEnableLogger, IDisposable
     {
         this.Log().Debug("Received IControlledApplicationLifetime exit event.");
         var manual = new ManualResetEvent(false);
-        _shouldPersistState.OnNext(Disposable.Create(() => manual.Set()));
+        _shouldPersistState.OnNext(Disposable.Create(() => _ = manual.Set()));
 
-        manual.WaitOne();
+        _ = manual.WaitOne();
         this.Log().Debug("Completed actions on IControlledApplicationLifetime exit event.");
     }
 }
