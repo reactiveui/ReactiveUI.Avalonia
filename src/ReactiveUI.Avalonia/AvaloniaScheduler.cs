@@ -124,7 +124,7 @@ public sealed class AvaloniaScheduler :
 
         var scheduledWork = new ScheduledWork<TState>(this, state, action);
         scheduledWork.Disposables.Add(Disposable.Empty);
-        scheduledWork.Disposables.Add(DispatcherTimer.RunOnce(scheduledWork.Execute, dueTime));
+        scheduledWork.Disposables.Add(RunOnce(scheduledWork.Execute, dueTime));
 
         return scheduledWork.Disposables;
     }
@@ -145,6 +145,35 @@ public sealed class AvaloniaScheduler :
         scheduledWork.Disposables.Add(scheduledWork.Cancellation);
 
         return scheduledWork.Disposables;
+    }
+
+    /// <summary>Runs a callback once after the specified interval on the Avalonia UI thread.</summary>
+    /// <remarks>This mirrors <see cref="DispatcherTimer.RunOnce(Action, TimeSpan, DispatcherPriority)"/> but
+    /// explicitly binds the timer to <see cref="Dispatcher.UIThread"/>. Avalonia's built-in helper creates the
+    /// timer against <see cref="Dispatcher.CurrentDispatcher"/>, so delayed work scheduled from a background
+    /// thread would otherwise tick on that thread and break the scheduler's UI-thread guarantee.</remarks>
+    /// <param name="action">The callback to invoke after the interval elapses.</param>
+    /// <param name="interval">The interval after which to invoke the callback.</param>
+    /// <param name="priority">The dispatcher priority to use.</param>
+    /// <returns>A disposable that cancels the timer.</returns>
+    private static IDisposable RunOnce(
+        Action action,
+        TimeSpan interval,
+        DispatcherPriority priority = default)
+    {
+        interval = (interval != TimeSpan.Zero) ? interval : TimeSpan.FromTicks(1);
+
+        var timer = new DispatcherTimer(priority, Dispatcher.UIThread) { Interval = interval };
+
+        timer.Tick += (_, _) =>
+        {
+            action();
+            timer.Stop();
+        };
+
+        timer.Start();
+
+        return Disposable.Create(() => timer.Stop());
     }
 
     /// <summary>Stores scheduled dispatcher work without compiler-generated callback bodies.</summary>
@@ -191,37 +220,5 @@ public sealed class AvaloniaScheduler :
 
             Execute();
         }
-    }
-
-    /// <summary>
-    /// Runs a method once, after the specified interval.
-    /// Difference from Avalonia's RunOnce impl is only that
-    /// we ensure that DispatcherTimer is being created
-    /// using UI dispatcher.
-    /// </summary>
-    /// <param name="action">
-    /// The method to call after the interval has elapsed.
-    /// </param>
-    /// <param name="interval">The interval after which to call the method.</param>
-    /// <param name="priority">The priority to use.</param>
-    /// <returns>An <see cref="IDisposable"/> used to cancel the timer.</returns>
-    private static IDisposable RunOnce(
-        Action action,
-        TimeSpan interval,
-        DispatcherPriority priority = default)
-    {
-        interval = (interval != TimeSpan.Zero) ? interval : TimeSpan.FromTicks(1);
-
-        var timer = new DispatcherTimer(priority, Dispatcher.UIThread) { Interval = interval };
-
-        timer.Tick += (s, e) =>
-        {
-            action();
-            timer.Stop();
-        };
-
-        timer.Start();
-
-        return Disposable.Create(() => timer.Stop());
     }
 }
