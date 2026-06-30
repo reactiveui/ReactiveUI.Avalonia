@@ -1,7 +1,6 @@
-// Copyright (c) 2019-2026 ReactiveUI and Avalonia Teams, and Contributors. All rights reserved.
-// Licensed under the MIT license.
+// Copyright (c) 2019-2026 ReactiveUI Association Incorporated. All rights reserved.
+// ReactiveUI Association Incorporated licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for full license information.
-
 extern alias autofac;
 
 using Autofac;
@@ -15,14 +14,10 @@ using SplatAppBuilder = Splat.Builder.AppBuilder;
 
 namespace ReactiveUI.Avalonia.Tests;
 
-/// <summary>
-/// Tests for the Autofac-based AvaloniaMixins extension methods.
-/// </summary>
+/// <summary>Tests for the Autofac-based AvaloniaMixins extension methods.</summary>
 public class AvaloniaMixinsAutofacTests
 {
-    /// <summary>
-    /// Verifies that UseReactiveUIWithAutofac throws on a null builder.
-    /// </summary>
+    /// <summary>Verifies that UseReactiveUIWithAutofac throws on a null builder.</summary>
     /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task UseReactiveUIWithAutofac_Extension_ThrowsOnNullBuilder()
@@ -32,9 +27,7 @@ public class AvaloniaMixinsAutofacTests
             AvaloniaMixins.UseReactiveUIWithAutofac(builder!, _ => { }, null, null)).ThrowsExactly<ArgumentNullException>();
     }
 
-    /// <summary>
-    /// Verifies that the UseReactiveUIWithAutofac overload throws on a null builder.
-    /// </summary>
+    /// <summary>Verifies that the UseReactiveUIWithAutofac overload throws on a null builder.</summary>
     /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task UseReactiveUIWithAutofac_Overload_ThrowsOnNullBuilder()
@@ -44,9 +37,7 @@ public class AvaloniaMixinsAutofacTests
             AvaloniaMixins.UseReactiveUIWithAutofac(builder!, _ => { }, null, null)).ThrowsExactly<ArgumentNullException>();
     }
 
-    /// <summary>
-    /// Verifies that UseReactiveUIWithAutofac returns the builder without throwing.
-    /// </summary>
+    /// <summary>Verifies that UseReactiveUIWithAutofac returns the builder without throwing.</summary>
     /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task UseReactiveUIWithAutofac_ReturnsBuilder_NoThrow()
@@ -56,9 +47,7 @@ public class AvaloniaMixinsAutofacTests
         await Assert.That(result).IsSameReferenceAs(builder);
     }
 
-    /// <summary>
-    /// Verifies that the UseReactiveUIWithAutofac overload returns the builder and invokes callbacks.
-    /// </summary>
+    /// <summary>Verifies that the UseReactiveUIWithAutofac overload returns the builder and invokes callbacks.</summary>
     /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task UseReactiveUIWithAutofac_Overload_ReturnsBuilder_NoThrow()
@@ -67,8 +56,8 @@ public class AvaloniaMixinsAutofacTests
         var result = AvaloniaMixins.UseReactiveUIWithAutofac(
             builder,
             _ => { },
-            r => { _ = r is AutofacDependencyResolver; },
-            rx => { _ = rx is not null; });
+            r => _ = r is AutofacDependencyResolver,
+            rx => _ = rx is not null);
 
         await Assert.That(result).IsSameReferenceAs(builder);
     }
@@ -111,7 +100,7 @@ public class AvaloniaMixinsAutofacTests
 
         // Simulate what UsingSplatModule does: enqueue Configure but don't invoke it
         var splatBuilder = new SplatAppBuilder(AppLocator.CurrentMutable, AppLocator.Current);
-        splatBuilder.UsingModule(module);
+        _ = splatBuilder.UsingModule(module);
 
         // Build the Autofac container without having invoked Configure
         var container = containerBuilder.Build();

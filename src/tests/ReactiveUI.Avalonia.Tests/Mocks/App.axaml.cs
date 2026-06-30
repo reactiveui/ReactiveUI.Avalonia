@@ -1,7 +1,6 @@
-// Copyright (c) 2019-2026 ReactiveUI and Avalonia Teams, and Contributors. All rights reserved.
-// Licensed under the MIT license.
+// Copyright (c) 2019-2026 ReactiveUI Association Incorporated. All rights reserved.
+// ReactiveUI Association Incorporated licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for full license information.
-
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
@@ -12,17 +11,15 @@ using Splat;
 
 namespace ReactiveUIDemo;
 
-/// <summary>
-/// Demo application for testing view registration and lifecycle.
-/// </summary>
+/// <summary>Demo application for testing view registration and lifecycle.</summary>
 public class App : Application
 {
     /// <inheritdoc/>
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
-        AppLocator.CurrentMutable.Register(() => new FooView(), typeof(IViewFor<FooViewModel>));
-        AppLocator.CurrentMutable.Register(() => new BarView(), typeof(IViewFor<BarViewModel>));
+        AppLocator.CurrentMutable.Register<IViewFor<FooViewModel>>(() => new FooView());
+        AppLocator.CurrentMutable.Register<IViewFor<BarViewModel>>(() => new BarView());
     }
 
     /// <inheritdoc/>

@@ -1,20 +1,15 @@
-// Copyright (c) 2019-2026 ReactiveUI and Avalonia Teams, and Contributors. All rights reserved.
-// Licensed under the MIT license.
+// Copyright (c) 2019-2026 ReactiveUI Association Incorporated. All rights reserved.
+// ReactiveUI Association Incorporated licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for full license information.
-
 using System.Reflection;
 using Avalonia;
 
 namespace ReactiveUI.Avalonia.Tests;
 
-/// <summary>
-/// Tests for the views API surface of AppBuilderExtensions.
-/// </summary>
+/// <summary>Tests for the views API surface of AppBuilderExtensions.</summary>
 public class AppBuilderExtensionsViewsApiTests
 {
-    /// <summary>
-    /// Verifies that RegisterReactiveUIViews returns the same builder and handles empty arrays.
-    /// </summary>
+    /// <summary>Verifies that RegisterReactiveUIViews returns the same builder and handles empty arrays.</summary>
     /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task RegisterReactiveUIViews_Returns_Same_Builder_And_Handles_NullOrEmpty()
@@ -24,9 +19,7 @@ public class AppBuilderExtensionsViewsApiTests
         await Assert.That(result).IsSameReferenceAs(builder);
     }
 
-    /// <summary>
-    /// Verifies that RegisterReactiveUIViewsFromAssemblyOf registers types from the specified assembly.
-    /// </summary>
+    /// <summary>Verifies that RegisterReactiveUIViewsFromAssemblyOf registers types from the specified assembly.</summary>
     /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task RegisterReactiveUIViewsFromAssemblyOf_Registers_Types()
@@ -36,15 +29,13 @@ public class AppBuilderExtensionsViewsApiTests
         await Assert.That(result).IsSameReferenceAs(builder);
 
         var resolver = global::Splat.AppLocator.CurrentMutable!;
+        Assembly[] assemblies = [typeof(AppBuilderExtensionsRegistrationTests).Assembly];
         var method = typeof(AppBuilderExtensions)
             .GetMethod("RegisterViewsInternal", BindingFlags.NonPublic | BindingFlags.Static)!;
-        method.Invoke(null, [resolver, new[] { typeof(AppBuilderExtensionsRegistrationTests).Assembly }]);
-        var serviceType = typeof(IViewFor<>).MakeGenericType(typeof(AppBuilderExtensionsRegistrationTests));
+        _ = method.Invoke(null, [resolver, assemblies]);
     }
 
-    /// <summary>
-    /// Verifies that RegisterReactiveUIViewsFromEntryAssembly returns the same builder instance.
-    /// </summary>
+    /// <summary>Verifies that RegisterReactiveUIViewsFromEntryAssembly returns the same builder instance.</summary>
     /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task RegisterReactiveUIViewsFromEntryAssembly_Returns_Same_Builder()
