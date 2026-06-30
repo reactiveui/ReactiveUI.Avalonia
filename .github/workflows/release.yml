@@ -14,6 +14,17 @@ on:
           - minor
           - major
 
+      channel:
+        description: 'Release channel. none = stable RTM; alpha/beta/rc cut a pre-release (e.g. major + beta -> 13.0.0-beta.1, then 13.0.0-beta.2). Finalise by re-running with the same bump and channel=none.'
+        required: true
+        default: none
+        type: choice
+        options:
+          - none
+          - alpha
+          - beta
+          - rc
+
       versionOverride:
         description: 'Exact version to stamp (e.g. 11.4.13) for an out-of-sequence / backport release (e.g. an 11.4.x patch while main is on 12.x). Overrides bump. Pair with sourceRef to build the matching maintenance branch.'
         required: false
@@ -41,6 +52,7 @@ jobs:
       # versionOverride wins: when it's set, force bump empty so the two version
       # selectors can't collide (the reusable workflow rejects both at once).
       bump: ${{ inputs.versionOverride != '' && '' || inputs.bump }}
+      preRelease: ${{ inputs.channel != 'none' && inputs.channel || '' }}
       versionOverride: ${{ inputs.versionOverride }}
       ref: ${{ inputs.sourceRef }}
     secrets:
@@ -84,3 +96,4 @@ jobs:
       version: ${{ needs.release.outputs.semver2 }}
       tag: ${{ needs.release.outputs.tag }}
       target: ${{ needs.release.outputs.sourceSha }}
+      prerelease: ${{ needs.release.outputs.prerelease == 'true' }}
