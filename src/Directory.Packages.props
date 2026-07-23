@@ -32,9 +32,9 @@
   </ItemGroup>
 
   <ItemGroup Label="Test packages">
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.7.0" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.8.1" />
     <PackageVersion Include="Microsoft.Testing.Extensions.CodeCoverage" Version="18.9.0" />
     <PackageVersion Include="TUnit" Version="1.61.15" />
-    <PackageVersion Include="Verify.TUnit" Version="31.21.0" />
+    <PackageVersion Include="Verify.TUnit" Version="31.25.0" />
   </ItemGroup>
 </Project>
