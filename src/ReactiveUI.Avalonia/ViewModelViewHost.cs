@@ -11,17 +11,23 @@ namespace ReactiveUI.Avalonia;
 public class ViewModelViewHost : TransitioningContentControl, IViewFor, IEnableLogger
 {
     /// <summary>Identifies the ViewModel dependency property for the ViewModelViewHost control.</summary>
-    /// <remarks>This field is used to reference the ViewModel property in property system operations, such as data binding or property change notifications. It is typically used when interacting with Avalonia's property system APIs.</remarks>
+    /// <remarks>
+    /// Use this property identifier for Avalonia data binding and property-change operations.
+    /// </remarks>
     public static readonly AvaloniaProperty<object?> ViewModelProperty =
         AvaloniaProperty.Register<ViewModelViewHost, object?>(nameof(ViewModel));
 
     /// <summary>Identifies the ViewContract dependency property for the ViewModelViewHost control.</summary>
-    /// <remarks>This field is used to register and reference the ViewContract property within Avalonia's property system. It enables styling, binding, and change notification for the ViewContract property in XAML and code.</remarks>
+    /// <remarks>
+    /// This property identifier enables ViewContract styling, binding, and change notification.
+    /// </remarks>
     public static readonly StyledProperty<string?> ViewContractProperty =
         AvaloniaProperty.Register<ViewModelViewHost, string?>(nameof(ViewContract));
 
     /// <summary>Identifies the default content property for the ViewModelViewHost control.</summary>
-    /// <remarks>This property can be used to set or retrieve the default content displayed by the ViewModelViewHost when no view model is present. It is typically used in XAML bindings or when customizing the control's appearance.</remarks>
+    /// <remarks>
+    /// Use this property identifier to bind the content displayed when no view model is present.
+    /// </remarks>
     public static readonly StyledProperty<object?> DefaultContentProperty =
         AvaloniaProperty.Register<ViewModelViewHost, object?>(nameof(DefaultContent));
 
@@ -29,7 +35,9 @@ public class ViewModelViewHost : TransitioningContentControl, IViewFor, IEnableL
     private CompositeDisposable? _navigationDisposables;
 
     /// <summary>Gets or sets the data context for the control.</summary>
-    /// <remarks>Assigning a view model to this property enables the control to bind its UI elements to properties and commands exposed by the view model. Changing the value will update data bindings accordingly. This property is commonly used in frameworks that support the Model-View-ViewModel pattern.</remarks>
+    /// <remarks>
+    /// Assigning a view model updates the view selected by this host and the bindings within that view.
+    /// </remarks>
     public object? ViewModel
     {
         get => GetValue(ViewModelProperty);
@@ -44,7 +52,7 @@ public class ViewModelViewHost : TransitioningContentControl, IViewFor, IEnableL
     }
 
     /// <summary>Gets or sets the default content to display when no explicit content is provided.</summary>
-    /// <remarks>The value can be any object, such as a string, UI element, or data model, depending on the context in which the property is used. If set to <see langword="null"/>, no default content will be shown.</remarks>
+    /// <remarks>A null value means that no default content is shown.</remarks>
     public object? DefaultContent
     {
         get => GetValue(DefaultContentProperty);
@@ -52,17 +60,17 @@ public class ViewModelViewHost : TransitioningContentControl, IViewFor, IEnableL
     }
 
     /// <summary>Gets or sets the view locator used to resolve views for view models.</summary>
-    /// <remarks>Assign an implementation of <see cref="IViewLocator"/> to customize how views are located and instantiated. If <see langword="null"/>, the default view resolution strategy will be used.</remarks>
+    /// <remarks>
+    /// Assign an <see cref="IViewLocator"/> to customize view resolution. A null value uses the default locator.
+    /// </remarks>
     public IViewLocator? ViewLocator { get; set; }
 
     /// <inheritdoc/>
     protected override Type StyleKeyOverride => typeof(TransitioningContentControl);
 
     /// <inheritdoc/>
-    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
-    {
+    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e) =>
         _ = LazyInitializer.EnsureInitialized(ref _navigationDisposables, () => CreateNavigationDisposables(e));
-    }
 
     /// <inheritdoc/>
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
@@ -84,16 +92,22 @@ public class ViewModelViewHost : TransitioningContentControl, IViewFor, IEnableL
                 this.GetObservable(ViewContractProperty),
                 static (viewModel, contract) => new NavigationTarget(viewModel, contract));
 
-        var subscription = PrimitivesLinqExtensions.SubscribeSafe(viewModel, target => NavigateToViewModel(target.ViewModel, target.Contract), SubscriptionErrors.Throw);
+        var subscription = PrimitivesLinqExtensions.SubscribeSafe(
+            viewModel,
+            target => NavigateToViewModel(target.ViewModel, target.Contract),
+            SubscriptionErrors.Throw);
 
         disposables.Add(subscription);
         return disposables;
     }
 
     /// <summary>Navigates to the view associated with the specified view model and contract.</summary>
-    /// <remarks>If no view can be resolved for the provided view model and contract, the content falls back to the default. The resolved view's data context and view model are set to the provided instance, ensuring proper binding. Logging is performed to indicate navigation actions and fallback scenarios.</remarks>
-    /// <param name="viewModel">The view model instance for which to resolve and display the corresponding view. If <paramref name="viewModel"/> is <see langword="null"/>, the default content is shown.</param>
-    /// <param name="contract">An optional contract string used to distinguish between multiple views for the same view model type. If <paramref name="contract"/> is <see langword="null"/>, the default view is used.</param>
+    /// <remarks>
+    /// Missing views display the default content. A resolved view receives the supplied view model through ViewModel
+    /// and DataContext.
+    /// </remarks>
+    /// <param name="viewModel">The view model to display, or null to display the default content.</param>
+    /// <param name="contract">The optional contract used to distinguish registered views.</param>
     private void NavigateToViewModel(object? viewModel, string? contract)
     {
         if (viewModel is null)

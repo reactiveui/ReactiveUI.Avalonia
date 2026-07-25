@@ -21,6 +21,7 @@
   </ItemGroup>
   <ItemGroup>
     <Using Include="ReactiveUI.Avalonia.Reactive" />
+    <Using Include="ReactiveUI.Primitives.Reactive.Concurrency" />
     <Using Include="ReactiveUI.Primitives.Disposables" />
     <Using Include="ReactiveUI.Primitives.Signals" />
     <Using Include="ReactiveUI.Reactive.ReactiveObject" Alias="ReactiveObject" />

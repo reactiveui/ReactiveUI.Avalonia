@@ -12,6 +12,7 @@
     <PackageReference Include="Avalonia" />
     <PackageReference Include="ReactiveUI.Reactive" ExcludeAssets="analyzers" />
     <PackageReference Include="ReactiveUI.Primitives.Reactive" ExcludeAssets="analyzers" />
+    <PackageReference Include="ReactiveUI.Primitives.Avalonia.Reactive" ExcludeAssets="analyzers" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\ReactiveUI.Avalonia\*.cs" Exclude="..\ReactiveUI.Avalonia\bin\**;..\ReactiveUI.Avalonia\obj\**" Link="%(Filename)%(Extension)" />
@@ -41,6 +42,7 @@
     <Using Include="ReactiveUI" />
     <Using Include="ReactiveUI.Reactive" />
     <Using Include="ReactiveUI.Reactive.Builder" />
+    <Using Include="ReactiveUI.Primitives.Reactive.Concurrency" />
     <Using Include="ReactiveUI.Primitives.Signals" />
     <Using Include="ReactiveUI.ViewLocator" Alias="CurrentViewLocator" />
     <Using Include="ReactiveUI.Primitives.LinqExtensions" Alias="PrimitivesLinqExtensions" />

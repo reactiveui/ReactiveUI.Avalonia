@@ -9,25 +9,40 @@ namespace ReactiveUI.Avalonia;
 
 /// <summary>Hosts the view associated with the current ReactiveUI routing state.</summary>
 /// <remarks>
-/// <para>ReactiveUI routing consists of an IScreen that contains current RoutingState, several IRoutableViewModels, and a platform-specific XAML control called RoutedViewHost.</para>
-/// <para>RoutingState manages the ViewModel navigation stack and allows ViewModels to navigate to other ViewModels. IScreen is the root of a navigation stack; despite the name, its views do not have to occupy the whole screen. RoutedViewHost monitors an instance of RoutingState, responding to any changes in the navigation stack by creating and embedding the appropriate view.</para>
-/// <para>Place this control in a view containing a ViewModel that implements IScreen, and bind IScreen.Router to RoutedViewHost.Router.</para>
-/// <para>See <see href="https://reactiveui.net/docs/handbook/routing/">ReactiveUI routing documentation website</see> for more info.</para>
+/// <para>
+/// ReactiveUI routing consists of an IScreen containing a RoutingState, several IRoutableViewModels, and a
+/// platform-specific RoutedViewHost control.
+/// </para>
+/// <para>
+/// RoutingState manages the view-model navigation stack. RoutedViewHost monitors that state and embeds the view for the
+/// current view model.
+/// </para>
+/// <para>Bind IScreen.Router to RoutedViewHost.Router in a view whose view model implements IScreen.</para>
+/// <para>
+/// See <see href="https://reactiveui.net/docs/handbook/routing/">ReactiveUI routing documentation</see>.
+/// </para>
 /// </remarks>
 public class RoutedViewHost : TransitioningContentControl, IActivatableView, IEnableLogger
 {
     /// <summary>Identifies the Router styled property for the associated RoutedViewHost control.</summary>
-    /// <remarks>This property is typically used to bind or observe the navigation state within a RoutedViewHost. Changes to the routing state can trigger view transitions or updates in navigation-aware controls.</remarks>
+    /// <remarks>
+    /// Bind or observe this property to update navigation-aware controls when the routing state changes.
+    /// </remarks>
     public static readonly StyledProperty<RoutingState?> RouterProperty =
         AvaloniaProperty.Register<RoutedViewHost, RoutingState?>(nameof(Router));
 
     /// <summary>Identifies the ViewContract styled property used to resolve views in the routed view host.</summary>
-    /// <remarks>Set this property to control which view implementation is selected when navigating between views. The contract name is typically used to distinguish between multiple views registered for the same view model type. If the property is null, the default view will be used.</remarks>
+    /// <remarks>
+    /// The contract distinguishes multiple views registered for the same view-model type. A null contract selects the
+    /// default view.
+    /// </remarks>
     public static readonly StyledProperty<string?> ViewContractProperty =
         AvaloniaProperty.Register<RoutedViewHost, string?>(nameof(ViewContract));
 
     /// <summary>Identifies the default content property for the <see cref="RoutedViewHost"/> control.</summary>
-    /// <remarks>This property enables styling and binding of the content displayed by <see cref="RoutedViewHost"/>. It is typically used in XAML to set or bind the content shown when no view is available for the current view model.</remarks>
+    /// <remarks>
+    /// Use this in XAML to set or bind the content shown when no view is available for the current view model.
+    /// </remarks>
     public static readonly StyledProperty<object?> DefaultContentProperty =
         ViewModelViewHost.DefaultContentProperty.AddOwner<RoutedViewHost>();
 
@@ -56,17 +71,17 @@ public class RoutedViewHost : TransitioningContentControl, IActivatableView, IEn
     }
 
     /// <summary>Gets or sets the view locator used to resolve views for view models.</summary>
-    /// <remarks>Assign an implementation of <see cref="IViewLocator"/> to customize how views are located and instantiated. If <see langword="null"/>, the default view resolution strategy will be used.</remarks>
+    /// <remarks>
+    /// Assign an <see cref="IViewLocator"/> to customize view resolution. A null value uses the default locator.
+    /// </remarks>
     public IViewLocator? ViewLocator { get; set; }
 
     /// <inheritdoc/>
     protected override Type StyleKeyOverride => typeof(TransitioningContentControl);
 
     /// <inheritdoc/>
-    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
-    {
+    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e) =>
         _ = LazyInitializer.EnsureInitialized(ref _navigationDisposables, () => CreateNavigationDisposables(e));
-    }
 
     /// <inheritdoc/>
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
@@ -95,16 +110,22 @@ public class RoutedViewHost : TransitioningContentControl, IActivatableView, IEn
             .Merge(routerRemoved)
             .CombineLatest(viewContract, static (viewModel, contract) => new NavigationTarget(viewModel, contract));
 
-        var subscription = PrimitivesLinqExtensions.SubscribeSafe(navigation, target => NavigateToViewModel(target.ViewModel, target.Contract), SubscriptionErrors.Throw);
+        var subscription = PrimitivesLinqExtensions.SubscribeSafe(
+            navigation,
+            target => NavigateToViewModel(target.ViewModel, target.Contract),
+            SubscriptionErrors.Throw);
 
         disposables.Add(subscription);
         return disposables;
     }
 
     /// <summary>Navigates to the view associated with the specified view model and contract.</summary>
-    /// <remarks>If the router or view model is null, or if no view can be resolved for the given view model and contract, the method falls back to displaying the default content. The resolved view's ViewModel and DataContext, if applicable, are set to the provided view model.</remarks>
-    /// <param name="viewModel">The view model instance for which to resolve and display a corresponding view. If null, the default content is shown.</param>
-    /// <param name="contract">An optional contract string used to distinguish between multiple views for the same view model type. If null, the default view resolution is used.</param>
+    /// <remarks>
+    /// Missing routers, view models, or views display the default content. A resolved view receives the supplied view
+    /// model through both ViewModel and DataContext when supported.
+    /// </remarks>
+    /// <param name="viewModel">The view model to display, or null to display the default content.</param>
+    /// <param name="contract">The optional view contract used during resolution.</param>
     private void NavigateToViewModel(object? viewModel, string? contract)
     {
         if (Router is null)

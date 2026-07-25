@@ -9,7 +9,7 @@ namespace ReactiveUI.Avalonia;
 
 /// <summary>A ReactiveUI <see cref="UserControl"/> that implements <see cref="IViewFor{TViewModel}"/>.</summary>
 /// <typeparam name="TViewModel">ViewModel type.</typeparam>
-public class ReactiveUserControl<TViewModel> : ReactiveUserControlBase, IViewFor<TViewModel>, IViewFor
+public class ReactiveUserControl<TViewModel> : ReactiveUserControlBase, IViewFor<TViewModel>
     where TViewModel : class
 {
     /// <summary>Initializes a new instance of the <see cref="ReactiveUserControl{TViewModel}"/> class.</summary>

@@ -6,20 +6,28 @@ extern alias reactivedryioc;
 extern alias reactivemicrosoft;
 extern alias reactiveninject;
 
+using ReactiveAvaloniaScheduler = ReactiveUI.Primitives.Reactive.Concurrency.AvaloniaScheduler;
+
 namespace ReactiveUI.Avalonia.Reactive.Tests;
 
 /// <summary>Tests for the ReactiveUI.Avalonia.*.Reactive sibling assemblies.</summary>
 public class ReactiveShimProjectsTests
 {
+    /// <summary>The namespace exported by reactive dependency-injection integrations.</summary>
+    private const string ReactiveSplatNamespace = "ReactiveUI.Avalonia.Reactive.Splat";
+
     /// <summary>Verifies that the core reactive assembly uses the Reactive namespace.</summary>
     /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task ReactiveCoreAssembly_UsesReactiveNamespace()
     {
-        var schedulerType = typeof(AvaloniaScheduler);
+        var coreType = typeof(AppBuilderExtensions);
+        var schedulerType = typeof(ReactiveAvaloniaScheduler);
 
-        await Assert.That(schedulerType.Assembly.GetName().Name).IsEqualTo("ReactiveUI.Avalonia.Reactive");
-        await Assert.That(schedulerType.Namespace).IsEqualTo("ReactiveUI.Avalonia.Reactive");
+        await Assert.That(coreType.Assembly.GetName().Name).IsEqualTo("ReactiveUI.Avalonia.Reactive");
+        await Assert.That(coreType.Namespace).IsEqualTo("ReactiveUI.Avalonia.Reactive");
+        await Assert.That(schedulerType.Assembly.GetName().Name).IsEqualTo("ReactiveUI.Primitives.Avalonia.Reactive");
+        await Assert.That(schedulerType.Namespace).IsEqualTo("ReactiveUI.Primitives.Reactive.Concurrency");
     }
 
     /// <summary>Verifies that each dependency injection reactive assembly uses the Reactive.Splat namespace.</summary>
@@ -37,9 +45,9 @@ public class ReactiveShimProjectsTests
         await Assert.That(microsoftType.Assembly.GetName().Name).IsEqualTo("ReactiveUI.Avalonia.Microsoft.Extensions.DependencyInjection.Reactive");
         await Assert.That(ninjectType.Assembly.GetName().Name).IsEqualTo("ReactiveUI.Avalonia.Ninject.Reactive");
 
-        await Assert.That(autofacType.Namespace).IsEqualTo("ReactiveUI.Avalonia.Reactive.Splat");
-        await Assert.That(dryIocType.Namespace).IsEqualTo("ReactiveUI.Avalonia.Reactive.Splat");
-        await Assert.That(microsoftType.Namespace).IsEqualTo("ReactiveUI.Avalonia.Reactive.Splat");
-        await Assert.That(ninjectType.Namespace).IsEqualTo("ReactiveUI.Avalonia.Reactive.Splat");
+        await Assert.That(autofacType.Namespace).IsEqualTo(ReactiveSplatNamespace);
+        await Assert.That(dryIocType.Namespace).IsEqualTo(ReactiveSplatNamespace);
+        await Assert.That(microsoftType.Namespace).IsEqualTo(ReactiveSplatNamespace);
+        await Assert.That(ninjectType.Namespace).IsEqualTo(ReactiveSplatNamespace);
     }
 }

@@ -73,8 +73,8 @@ public class ReactiveControlsTests
         var inheritsFromUserControl = false;
         while (currentType is not null && currentType != typeof(object))
         {
-            if (currentType == typeof(UserControl) ||
-                currentType.Name.Contains("UserControl"))
+            if (currentType == typeof(UserControl)
+                || currentType.Name.Contains("UserControl"))
             {
                 inheritsFromUserControl = true;
                 break;
@@ -98,8 +98,8 @@ public class ReactiveControlsTests
         var inheritsFromWindow = false;
         while (currentType is not null && currentType != typeof(object))
         {
-            if (currentType == typeof(Window) ||
-                currentType.Name.Contains("Window"))
+            if (currentType == typeof(Window)
+                || currentType.Name.Contains("Window"))
             {
                 inheritsFromWindow = true;
                 break;
@@ -123,8 +123,8 @@ public class ReactiveControlsTests
         var inheritsFromContentControl = false;
         while (currentType is not null && currentType != typeof(object))
         {
-            if (currentType == typeof(ContentControl) ||
-                currentType.Name.Contains("ContentControl"))
+            if (currentType == typeof(ContentControl)
+                || currentType.Name.Contains("ContentControl"))
             {
                 inheritsFromContentControl = true;
                 break;
@@ -148,8 +148,8 @@ public class ReactiveControlsTests
         var inheritsFromContentControl = false;
         while (currentType is not null && currentType != typeof(object))
         {
-            if (currentType == typeof(ContentControl) ||
-                currentType.Name.Contains("ContentControl"))
+            if (currentType == typeof(ContentControl)
+                || currentType.Name.Contains("ContentControl"))
             {
                 inheritsFromContentControl = true;
                 break;
@@ -230,8 +230,8 @@ public class ReactiveControlsTests
             ?.GetValue(null);
         var method = closureType.GetMethods(BindingFlags.Instance | BindingFlags.NonPublic)
             .Single(candidate =>
-                candidate.GetParameters() is [{ ParameterType: var parameterType }] &&
-                parameterType == typeof(ActivationDisposables));
+                candidate.GetParameters() is [{ ParameterType: var parameterType }]
+                && parameterType == typeof(ActivationDisposables));
 
         using var disposables = new ActivationDisposables();
         _ = method.Invoke(instance, [disposables]);

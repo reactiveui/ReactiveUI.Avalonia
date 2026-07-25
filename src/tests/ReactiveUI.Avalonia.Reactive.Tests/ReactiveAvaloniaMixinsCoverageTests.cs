@@ -22,9 +22,7 @@ public class ReactiveAvaloniaMixinsCoverageTests
     /// <summary>Covers reactive Autofac setup callback execution.</summary>
     /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
-    public async Task ReactiveAutofacMixins_InvokePlatformSetup_CoversContainerWiring()
-    {
-        await RunWithLocatorRestore(async () =>
+    public async Task ReactiveAutofacMixins_InvokePlatformSetup_CoversContainerWiring() => await RunWithLocatorRestore(async () =>
         {
             AppBuilder? builder = null;
             await Assert.That(() =>
@@ -33,6 +31,10 @@ public class ReactiveAvaloniaMixinsCoverageTests
             builder = AppBuilder.Configure<Application>();
             await Assert.That(() =>
                 ReactiveAutofacMixins.UseReactiveUIWithAutofac(builder, null!, null, null)).ThrowsExactly<ArgumentNullException>();
+
+            builder = AppBuilder.Configure<Application>();
+            await Assert.That(ReactiveAutofacMixins.UseReactiveUIWithAutofac(builder, _ => { })).IsSameReferenceAs(builder);
+            await Assert.That(ReactiveAutofacMixins.UseReactiveUIWithAutofac(builder, _ => { }, _ => { })).IsSameReferenceAs(builder);
 
             ResetReactiveBuilderState();
 
@@ -59,14 +61,11 @@ public class ReactiveAvaloniaMixinsCoverageTests
             InvokeAfterPlatformServicesSetup(builder);
             await Assert.That(alreadyBuiltContainerConfigured).IsTrue();
         });
-    }
 
     /// <summary>Covers reactive DryIoc setup callback execution.</summary>
     /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
-    public async Task ReactiveDryIocMixins_InvokePlatformSetup_CoversContainerWiring()
-    {
-        await RunWithLocatorRestore(async () =>
+    public async Task ReactiveDryIocMixins_InvokePlatformSetup_CoversContainerWiring() => await RunWithLocatorRestore(async () =>
         {
             AppBuilder? builder = null;
             await Assert.That(() =>
@@ -75,6 +74,9 @@ public class ReactiveAvaloniaMixinsCoverageTests
             builder = AppBuilder.Configure<Application>();
             _ = ReactiveDryIocMixins.UseReactiveUIWithDryIoc(builder, null!, null);
             await Assert.That(() => InvokeAfterPlatformServicesSetup(builder)).ThrowsExactly<ArgumentNullException>();
+
+            builder = AppBuilder.Configure<Application>();
+            await Assert.That(ReactiveDryIocMixins.UseReactiveUIWithDryIoc(builder, _ => { })).IsSameReferenceAs(builder);
 
             ResetReactiveBuilderState();
 
@@ -98,14 +100,11 @@ public class ReactiveAvaloniaMixinsCoverageTests
             InvokeAfterPlatformServicesSetup(builder);
             await Assert.That(alreadyBuiltContainerConfigured).IsTrue();
         });
-    }
 
     /// <summary>Covers reactive Microsoft dependency-injection setup callback execution.</summary>
     /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
-    public async Task ReactiveMicrosoftMixins_InvokePlatformSetup_CoversContainerWiring()
-    {
-        await RunWithLocatorRestore(async () =>
+    public async Task ReactiveMicrosoftMixins_InvokePlatformSetup_CoversContainerWiring() => await RunWithLocatorRestore(async () =>
         {
             AppBuilder? builder = null;
             await Assert.That(() =>
@@ -118,6 +117,10 @@ public class ReactiveAvaloniaMixinsCoverageTests
             builder = AppBuilder.Configure<Application>();
             _ = ReactiveMicrosoftMixins.UseReactiveUIWithMicrosoftDependencyResolver(builder, null!, null, null);
             await Assert.That(() => InvokeAfterPlatformServicesSetup(builder)).ThrowsExactly<ArgumentNullException>();
+
+            builder = AppBuilder.Configure<Application>();
+            await Assert.That(ReactiveMicrosoftMixins.UseReactiveUIWithMicrosoftDependencyResolver(builder, _ => { })).IsSameReferenceAs(builder);
+            await Assert.That(ReactiveMicrosoftMixins.UseReactiveUIWithMicrosoftDependencyResolver(builder, _ => { }, _ => { })).IsSameReferenceAs(builder);
 
             ResetReactiveBuilderState();
 
@@ -148,14 +151,11 @@ public class ReactiveAvaloniaMixinsCoverageTests
             InvokeAfterPlatformServicesSetup(builder);
             await Assert.That(alreadyBuiltContainerConfigured).IsTrue();
         });
-    }
 
     /// <summary>Covers reactive Ninject setup callback execution.</summary>
     /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
-    public async Task ReactiveNinjectMixins_InvokePlatformSetup_CoversContainerWiring()
-    {
-        await RunWithLocatorRestore(async () =>
+    public async Task ReactiveNinjectMixins_InvokePlatformSetup_CoversContainerWiring() => await RunWithLocatorRestore(async () =>
         {
             AppBuilder? builder = null;
             await Assert.That(() =>
@@ -164,6 +164,9 @@ public class ReactiveAvaloniaMixinsCoverageTests
             builder = AppBuilder.Configure<Application>();
             _ = ReactiveNinjectMixins.UseReactiveUIWithNinject(builder, null!, null);
             await Assert.That(() => InvokeAfterPlatformServicesSetup(builder)).ThrowsExactly<ArgumentNullException>();
+
+            builder = AppBuilder.Configure<Application>();
+            await Assert.That(ReactiveNinjectMixins.UseReactiveUIWithNinject(builder, _ => { })).IsSameReferenceAs(builder);
 
             ResetReactiveBuilderState();
 
@@ -187,7 +190,6 @@ public class ReactiveAvaloniaMixinsCoverageTests
             InvokeAfterPlatformServicesSetup(builder);
             await Assert.That(alreadyBuiltContainerConfigured).IsTrue();
         });
-    }
 
     /// <summary>Invokes AppBuilder platform setup callback.</summary>
     /// <param name="builder">The app builder.</param>

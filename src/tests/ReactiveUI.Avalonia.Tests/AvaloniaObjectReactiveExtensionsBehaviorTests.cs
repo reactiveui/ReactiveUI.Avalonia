@@ -11,6 +11,21 @@ namespace ReactiveUI.Avalonia.Tests;
 /// <summary>Tests for AvaloniaObjectReactiveExtensions GetSubject and GetBindingSubject behavior.</summary>
 public class AvaloniaObjectReactiveExtensionsBehaviorTests
 {
+    /// <summary>The value used by the untyped subject round-trip test.</summary>
+    private const int UntypedSubjectValue = 42;
+
+    /// <summary>The value used by the generic subject round-trip test.</summary>
+    private const int GenericSubjectValue = 7;
+
+    /// <summary>The value used by the untyped binding-subject test.</summary>
+    private const int UntypedBindingValue = 99;
+
+    /// <summary>The value used by the generic binding-subject test.</summary>
+    private const int GenericBindingValue = 5;
+
+    /// <summary>The ignored value supplied after signal completion.</summary>
+    private const int IgnoredPostCompletionValue = 123;
+
     /// <summary>Verifies that GetSubject with an untyped AvaloniaProperty writes and observes values.</summary>
     /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
@@ -21,10 +36,10 @@ public class AvaloniaObjectReactiveExtensionsBehaviorTests
         object? observed = null;
         using var sub = subject.SubscribeSafe(v => observed = v, static error => throw error);
 
-        subject.OnNext(42);
+        subject.OnNext(UntypedSubjectValue);
 
-        await Assert.That(ctrl.IntProp).IsEqualTo(42);
-        await Assert.That(observed).IsEqualTo(42);
+        await Assert.That(ctrl.IntProp).IsEqualTo(UntypedSubjectValue);
+        await Assert.That(observed).IsEqualTo(UntypedSubjectValue);
     }
 
     /// <summary>Verifies that GetSubject with a generic StyledProperty writes and observes values.</summary>
@@ -37,10 +52,10 @@ public class AvaloniaObjectReactiveExtensionsBehaviorTests
         int? observed = null;
         using var sub = subject.SubscribeSafe(v => observed = v, static error => throw error);
 
-        subject.OnNext(7);
+        subject.OnNext(GenericSubjectValue);
 
-        await Assert.That(ctrl.IntProp).IsEqualTo(7);
-        await Assert.That(observed).IsEqualTo(7);
+        await Assert.That(ctrl.IntProp).IsEqualTo(GenericSubjectValue);
+        await Assert.That(observed).IsEqualTo(GenericSubjectValue);
     }
 
     /// <summary>Verifies that GetBindingSubject with an untyped AvaloniaProperty only writes on HasValue.</summary>
@@ -56,8 +71,8 @@ public class AvaloniaObjectReactiveExtensionsBehaviorTests
         subject.OnNext(BindingValue<object?>.DoNothing);
         await Assert.That(ctrl.IntProp).IsEqualTo(default(int));
 
-        subject.OnNext(new BindingValue<object?>(99));
-        await Assert.That(ctrl.IntProp).IsEqualTo(99);
+        subject.OnNext(new(UntypedBindingValue));
+        await Assert.That(ctrl.IntProp).IsEqualTo(UntypedBindingValue);
         await Assert.That(observed!.HasValue).IsTrue();
     }
 
@@ -74,8 +89,8 @@ public class AvaloniaObjectReactiveExtensionsBehaviorTests
         subject.OnNext(BindingValue<int>.DoNothing);
         await Assert.That(ctrl.IntProp).IsEqualTo(default(int));
 
-        subject.OnNext(new BindingValue<int>(5));
-        await Assert.That(ctrl.IntProp).IsEqualTo(5);
+        subject.OnNext(new(GenericBindingValue));
+        await Assert.That(ctrl.IntProp).IsEqualTo(GenericBindingValue);
         await Assert.That(observed!.HasValue).IsTrue();
     }
 
@@ -98,7 +113,7 @@ public class AvaloniaObjectReactiveExtensionsBehaviorTests
         await Assert.That(subject.HasObservers).IsFalse();
 
         subject.OnCompleted();
-        subject.OnNext(123);
+        subject.OnNext(IgnoredPostCompletionValue);
 
         await Assert.That(subject.IsDisposed).IsTrue();
         await Assert.That(ctrl.IntProp).IsEqualTo(default(int));

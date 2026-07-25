@@ -9,14 +9,17 @@ namespace ReactiveUI.Avalonia.Tests;
 /// <summary>Tests for verifying the ReactiveUI.Avalonia assembly metadata and type discovery.</summary>
 public class DependencyInjectionTests
 {
+    /// <summary>The name of the core Avalonia integration assembly.</summary>
+    private const string AvaloniaAssemblyName = "ReactiveUI.Avalonia";
+
     /// <summary>Verifies that the ReactiveUI.Avalonia assembly is loaded.</summary>
     /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task ReactiveUIAvaloniaAssembly_IsLoaded()
     {
-        var assembly = ReflectionAssembly.GetAssembly(typeof(AvaloniaScheduler));
+        var assembly = ReflectionAssembly.GetAssembly(typeof(AppBuilderExtensions));
         await Assert.That(assembly).IsNotNull();
-        await Assert.That(assembly!.FullName!).Contains("ReactiveUI.Avalonia");
+        await Assert.That(assembly!.FullName!).Contains(AvaloniaAssemblyName);
     }
 
     /// <summary>Verifies that the assembly contains the expected public types.</summary>
@@ -24,26 +27,21 @@ public class DependencyInjectionTests
     [Test]
     public async Task ReactiveUIAvaloniaAssembly_HasExpectedTypes()
     {
-        var assembly = ReflectionAssembly.GetAssembly(typeof(AvaloniaScheduler));
+        var assembly = ReflectionAssembly.GetAssembly(typeof(AppBuilderExtensions));
         await Assert.That(assembly).IsNotNull();
         var types = assembly!.GetTypes();
 
-        var hasAvaloniaScheduler = false;
         var hasReactiveUserControl = false;
         var hasReactiveWindow = false;
         var hasViewModelViewHost = false;
 
         foreach (var type in types)
         {
-            if (type.Name == "AvaloniaScheduler")
-            {
-                hasAvaloniaScheduler = true;
-            }
-            else if (type.Name.StartsWith("ReactiveUserControl"))
+            if (type.Name.StartsWith("ReactiveUserControl", StringComparison.Ordinal))
             {
                 hasReactiveUserControl = true;
             }
-            else if (type.Name.StartsWith("ReactiveWindow"))
+            else if (type.Name.StartsWith("ReactiveWindow", StringComparison.Ordinal))
             {
                 hasReactiveWindow = true;
             }
@@ -53,7 +51,6 @@ public class DependencyInjectionTests
             }
         }
 
-        await Assert.That(hasAvaloniaScheduler).IsTrue();
         await Assert.That(hasReactiveUserControl).IsTrue();
         await Assert.That(hasReactiveWindow).IsTrue();
         await Assert.That(hasViewModelViewHost).IsTrue();
@@ -65,7 +62,7 @@ public class DependencyInjectionTests
     public async Task ReactiveUIAvaloniaNamespace_IsCorrect()
     {
         var scheduler = typeof(AvaloniaScheduler);
-        await Assert.That(scheduler.Namespace).IsEqualTo("ReactiveUI.Avalonia");
+        await Assert.That(scheduler.Namespace).IsEqualTo("ReactiveUI.Primitives.Concurrency");
 
         var userControl = typeof(ReactiveUserControl<>);
         await Assert.That(userControl.Namespace).IsEqualTo("ReactiveUI.Avalonia");
@@ -79,10 +76,10 @@ public class DependencyInjectionTests
     [Test]
     public async Task AssemblyInfo_HasExpectedMetadata()
     {
-        var assembly = ReflectionAssembly.GetAssembly(typeof(AvaloniaScheduler));
+        var assembly = ReflectionAssembly.GetAssembly(typeof(AppBuilderExtensions));
         var assemblyName = assembly!.GetName();
 
-        await Assert.That(assemblyName.Name).IsEqualTo("ReactiveUI.Avalonia");
+        await Assert.That(assemblyName.Name).IsEqualTo(AvaloniaAssemblyName);
         await Assert.That(assemblyName.Version).IsNotNull();
     }
 
@@ -125,7 +122,7 @@ public class DependencyInjectionTests
     [Test]
     public async Task AssemblyReferences_ContainExpectedDependencies()
     {
-        var assembly = ReflectionAssembly.GetAssembly(typeof(AvaloniaScheduler));
+        var assembly = ReflectionAssembly.GetAssembly(typeof(AppBuilderExtensions));
         var referencedAssemblies = assembly!.GetReferencedAssemblies();
 
         var hasAvaloniaBase = false;

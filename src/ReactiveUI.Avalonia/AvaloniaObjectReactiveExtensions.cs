@@ -8,64 +8,107 @@ namespace ReactiveUI.Avalonia;
 #endif
 
 /// <summary>Provides extension methods for creating reactive property signals for Avalonia properties.</summary>
-/// <remarks>These methods facilitate integration between Avalonia's property system and reactive programming paradigms by exposing property values as reactive subjects or signals. This allows developers to observe changes and push updates to properties using standard reactive interfaces. The extension methods are intended for use with Avalonia objects and properties, supporting both simple and binding-aware scenarios.</remarks>
+/// <remarks>
+/// These methods integrate Avalonia's property system with reactive programming by exposing property values as
+/// reactive subjects or signals. Consumers can observe changes and push updates through standard reactive interfaces.
+/// The extensions support both simple and binding-aware property scenarios.
+/// </remarks>
 public static class AvaloniaObjectReactiveExtensions
 {
     /// <summary>Extends Avalonia objects with reactive property signals.</summary>
     /// <param name="o">The Avalonia object to extend.</param>
     extension(AvaloniaObject o)
     {
-    /// <summary>Creates a reactive property signal for the specified Avalonia property.</summary>
-    /// <remarks>The returned value can be used to observe changes to the property and set its value reactively. This is useful for integrating Avalonia properties with reactive programming patterns.</remarks>
-    /// <param name="property">The Avalonia property to observe and set values for.</param>
-    /// <param name="priority">The binding priority to use when setting the property value. Defaults to <see cref="BindingPriority.LocalValue"/>.</param>
-    /// <returns>A reactive property signal that emits changes to the property value and allows property updates.</returns>
 #if REACTIVE_SHIM
-    public ISubject<object?> GetSubject(
+        /// <summary>Creates a reactive property signal for the specified Avalonia property.</summary>
+        /// <param name="property">The Avalonia property to observe and update.</param>
+        /// <returns>A reactive property signal that emits changes and allows property updates.</returns>
+        public ISubject<object?> GetSubject(AvaloniaProperty property) =>
+            o.GetSubject(property, BindingPriority.LocalValue);
+
+        /// <summary>Creates a reactive property signal with the specified binding priority.</summary>
+        /// <param name="property">The Avalonia property to observe and set values for.</param>
+        /// <param name="priority">The binding priority to use when setting the property value.</param>
+        /// <returns>A reactive property signal that emits changes and allows updates.</returns>
+        public ISubject<object?> GetSubject(
             AvaloniaProperty property,
-            BindingPriority priority = BindingPriority.LocalValue) =>
+            BindingPriority priority) =>
             Subject.Create<object?>(
                 Observer.Create<object?>(x => _ = o.SetValue(property, x, priority)),
                 o.GetObservable(property));
 #else
-    public ISignal<object?> GetSubject(
-            AvaloniaProperty property,
-            BindingPriority priority = BindingPriority.LocalValue) =>
-            new AvaloniaPropertySignal<object?>(
-                x => _ = o.SetValue(property, x, priority),
-                o.GetObservable(property));
+        /// <summary>Creates a reactive property signal for the specified Avalonia property.</summary>
+        /// <param name="property">The Avalonia property to observe and update.</param>
+        /// <returns>A reactive property signal that emits changes and allows property updates.</returns>
+        public ISignal<object?> GetSubject(AvaloniaProperty property) =>
+            o.GetSubject(property, BindingPriority.LocalValue);
+
+        /// <summary>Creates a reactive property signal with the specified binding priority.</summary>
+        /// <param name="property">The Avalonia property to observe and set values for.</param>
+        /// <param name="priority">The binding priority to use when setting the property value.</param>
+        /// <returns>A reactive property signal that emits changes and allows updates.</returns>
+        public ISignal<object?> GetSubject(
+                AvaloniaProperty property,
+                BindingPriority priority) =>
+                new AvaloniaPropertySignal<object?>(
+                    x => _ = o.SetValue(property, x, priority),
+                    o.GetObservable(property));
 #endif
 
-    /// <summary>Creates a typed reactive property signal for the specified Avalonia property.</summary>
-    /// <remarks>The returned value allows two-way reactive binding to the specified property. Pushing a value to the signal updates the property, and changes to the property are emitted by the signal.</remarks>
-    /// <typeparam name="T">The type of the value stored in the Avalonia property.</typeparam>
-    /// <param name="property">The Avalonia property to bind to the signal. Cannot be null.</param>
-    /// <param name="priority">The binding priority to use when setting the property value. Defaults to <see cref="BindingPriority.LocalValue"/>.</param>
-    /// <returns>A typed reactive property signal that emits property changes and updates the property when new values are pushed.</returns>
 #if REACTIVE_SHIM
-    public ISubject<T> GetSubject<T>(
+        /// <summary>Creates a typed reactive property signal for the specified Avalonia property.</summary>
+        /// <typeparam name="T">The type of value stored in the Avalonia property.</typeparam>
+        /// <param name="property">The Avalonia property to observe and update.</param>
+        /// <returns>A typed reactive property signal that emits changes and accepts updates.</returns>
+        public ISubject<T> GetSubject<T>(AvaloniaProperty<T> property) =>
+            o.GetSubject(property, BindingPriority.LocalValue);
+
+        /// <summary>Creates a typed reactive property signal with the specified binding priority.</summary>
+        /// <typeparam name="T">The value stored in the Avalonia property.</typeparam>
+        /// <param name="property">The Avalonia property to bind to the signal.</param>
+        /// <param name="priority">The binding priority to use when setting the property value.</param>
+        /// <returns>A typed reactive property signal that emits changes and accepts updates.</returns>
+        public ISubject<T> GetSubject<T>(
             AvaloniaProperty<T> property,
-            BindingPriority priority = BindingPriority.LocalValue) =>
+            BindingPriority priority) =>
             Subject.Create<T>(
                 Observer.Create<T>(x => _ = o.SetValue(property, x, priority)),
                 o.GetObservable(property));
 #else
-    public ISignal<T> GetSubject<T>(
-            AvaloniaProperty<T> property,
-            BindingPriority priority = BindingPriority.LocalValue) =>
-            new AvaloniaPropertySignal<T>(
-                x => _ = o.SetValue(property, x, priority),
-                o.GetObservable(property));
+        /// <summary>Creates a typed reactive property signal for the specified Avalonia property.</summary>
+        /// <typeparam name="T">The type of value stored in the Avalonia property.</typeparam>
+        /// <param name="property">The Avalonia property to observe and update.</param>
+        /// <returns>A typed reactive property signal that emits changes and accepts updates.</returns>
+        public ISignal<T> GetSubject<T>(AvaloniaProperty<T> property) =>
+            o.GetSubject(property, BindingPriority.LocalValue);
+
+        /// <summary>Creates a typed reactive property signal with the specified binding priority.</summary>
+        /// <typeparam name="T">The value stored in the Avalonia property.</typeparam>
+        /// <param name="property">The Avalonia property to bind to the signal.</param>
+        /// <param name="priority">The binding priority to use when setting the property value.</param>
+        /// <returns>A typed reactive property signal that emits changes and accepts updates.</returns>
+        public ISignal<T> GetSubject<T>(
+                AvaloniaProperty<T> property,
+                BindingPriority priority) =>
+                new AvaloniaPropertySignal<T>(
+                    x => _ = o.SetValue(property, x, priority),
+                    o.GetObservable(property));
 #endif
 
 #if REACTIVE_SHIM
     /// <summary>Creates a reactive binding-value signal for the specified Avalonia property.</summary>
     /// <param name="property">The Avalonia property to bind to and observe for changes.</param>
-    /// <param name="priority">The binding priority to use when setting the property value. Defaults to <see cref="BindingPriority.LocalValue"/>.</param>
-    /// <returns>A reactive binding-value signal that emits property value changes and accepts new values to update the property.</returns>
-    public ISubject<BindingValue<object?>> GetBindingSubject(
+        /// <returns>A reactive binding-value signal that emits changes and accepts property updates.</returns>
+        public ISubject<BindingValue<object?>> GetBindingSubject(AvaloniaProperty property) =>
+            o.GetBindingSubject(property, BindingPriority.LocalValue);
+
+        /// <summary>Creates a reactive binding-value signal with the specified binding priority.</summary>
+        /// <param name="property">The Avalonia property to bind to and observe.</param>
+        /// <param name="priority">The binding priority to use when setting the property value.</param>
+        /// <returns>A reactive binding-value signal that emits changes and accepts updates.</returns>
+        public ISubject<BindingValue<object?>> GetBindingSubject(
             AvaloniaProperty property,
-            BindingPriority priority = BindingPriority.LocalValue) =>
+            BindingPriority priority) =>
             Subject.Create<BindingValue<object?>>(
                 Observer.Create<BindingValue<object?>>(x =>
                 {
@@ -78,35 +121,48 @@ public static class AvaloniaObjectReactiveExtensions
                 }),
                 o.GetBindingObservable(property));
 #else
-    /// <summary>Creates a reactive binding-value signal for the specified Avalonia property.</summary>
-    /// <param name="property">The Avalonia property to bind to and observe for changes.</param>
-    /// <param name="priority">The binding priority to use when setting the property value. Defaults to <see cref="BindingPriority.LocalValue"/>.</param>
-    /// <returns>A reactive binding-value signal that emits property value changes and accepts new values to update the property.</returns>
-    public ISignal<BindingValue<object?>> GetBindingSubject(
-            AvaloniaProperty property,
-            BindingPriority priority = BindingPriority.LocalValue) =>
-            new AvaloniaPropertySignal<BindingValue<object?>>(
-                x =>
-                {
-                    if (!x.HasValue)
-                    {
-                        return;
-                    }
+        /// <summary>Creates a reactive binding-value signal for the specified Avalonia property.</summary>
+        /// <param name="property">The Avalonia property to bind to and observe for changes.</param>
+        /// <returns>A reactive binding-value signal that emits changes and accepts property updates.</returns>
+        public ISignal<BindingValue<object?>> GetBindingSubject(AvaloniaProperty property) =>
+            o.GetBindingSubject(property, BindingPriority.LocalValue);
 
-                    _ = o.SetValue(property, x.Value, priority);
-                },
-                o.GetBindingObservable(property));
+        /// <summary>Creates a reactive binding-value signal with the specified binding priority.</summary>
+        /// <param name="property">The Avalonia property to bind to and observe.</param>
+        /// <param name="priority">The binding priority to use when setting the property value.</param>
+        /// <returns>A reactive binding-value signal that emits changes and accepts updates.</returns>
+        public ISignal<BindingValue<object?>> GetBindingSubject(
+                AvaloniaProperty property,
+                BindingPriority priority) =>
+                new AvaloniaPropertySignal<BindingValue<object?>>(
+                    x =>
+                    {
+                        if (!x.HasValue)
+                        {
+                            return;
+                        }
+
+                        _ = o.SetValue(property, x.Value, priority);
+                    },
+                    o.GetBindingObservable(property));
 #endif
 
 #if REACTIVE_SHIM
     /// <summary>Creates a typed reactive binding-value signal for the specified Avalonia property.</summary>
     /// <typeparam name="T">The type of the value held by the Avalonia property.</typeparam>
     /// <param name="property">The Avalonia property to bind to and observe for value changes.</param>
-    /// <param name="priority">The binding priority to use when setting the property's value. Defaults to <see cref="BindingPriority.LocalValue"/>.</param>
-    /// <returns>A typed reactive binding-value signal that observes changes and allows values to be set reactively.</returns>
-    public ISubject<BindingValue<T>> GetBindingSubject<T>(
+        /// <returns>A typed reactive binding-value signal that observes changes and accepts updates.</returns>
+        public ISubject<BindingValue<T>> GetBindingSubject<T>(AvaloniaProperty<T> property) =>
+            o.GetBindingSubject(property, BindingPriority.LocalValue);
+
+        /// <summary>Creates a typed reactive binding-value signal with the specified binding priority.</summary>
+        /// <typeparam name="T">The value held by the Avalonia property.</typeparam>
+        /// <param name="property">The Avalonia property to bind to and observe.</param>
+        /// <param name="priority">The binding priority to use when setting the property value.</param>
+        /// <returns>A typed reactive binding-value signal that observes changes and accepts updates.</returns>
+        public ISubject<BindingValue<T>> GetBindingSubject<T>(
             AvaloniaProperty<T> property,
-            BindingPriority priority = BindingPriority.LocalValue) =>
+            BindingPriority priority) =>
             Subject.Create<BindingValue<T>>(
                 Observer.Create<BindingValue<T>>(x =>
                 {
@@ -119,53 +175,55 @@ public static class AvaloniaObjectReactiveExtensions
                 }),
                 o.GetBindingObservable(property));
 #else
-    /// <summary>Creates a typed reactive binding-value signal for the specified Avalonia property.</summary>
-    /// <typeparam name="T">The type of the value held by the Avalonia property.</typeparam>
-    /// <param name="property">The Avalonia property to bind to and observe for value changes.</param>
-    /// <param name="priority">The binding priority to use when setting the property's value. Defaults to <see cref="BindingPriority.LocalValue"/>.</param>
-    /// <returns>A typed reactive binding-value signal that observes changes and allows values to be set reactively.</returns>
-    public ISignal<BindingValue<T>> GetBindingSubject<T>(
-            AvaloniaProperty<T> property,
-            BindingPriority priority = BindingPriority.LocalValue) =>
-            new AvaloniaPropertySignal<BindingValue<T>>(
-                x =>
-                {
-                    if (!x.HasValue)
-                    {
-                        return;
-                    }
+        /// <summary>Creates a typed reactive binding-value signal for the specified Avalonia property.</summary>
+        /// <typeparam name="T">The type of the value held by the Avalonia property.</typeparam>
+        /// <param name="property">The Avalonia property to bind to and observe for value changes.</param>
+        /// <returns>A typed reactive binding-value signal that observes changes and accepts updates.</returns>
+        public ISignal<BindingValue<T>> GetBindingSubject<T>(AvaloniaProperty<T> property) =>
+            o.GetBindingSubject(property, BindingPriority.LocalValue);
 
-                    _ = o.SetValue(property, x.Value, priority);
-                },
-                o.GetBindingObservable(property));
+        /// <summary>Creates a typed reactive binding-value signal with the specified binding priority.</summary>
+        /// <typeparam name="T">The value held by the Avalonia property.</typeparam>
+        /// <param name="property">The Avalonia property to bind to and observe.</param>
+        /// <param name="priority">The binding priority to use when setting the property value.</param>
+        /// <returns>A typed reactive binding-value signal that observes changes and accepts updates.</returns>
+        public ISignal<BindingValue<T>> GetBindingSubject<T>(
+                AvaloniaProperty<T> property,
+                BindingPriority priority) =>
+                new AvaloniaPropertySignal<BindingValue<T>>(
+                    x =>
+                    {
+                        if (!x.HasValue)
+                        {
+                            return;
+                        }
+
+                        _ = o.SetValue(property, x.Value, priority);
+                    },
+                    o.GetBindingObservable(property));
 #endif
     }
 
 #if !REACTIVE_SHIM
     /// <summary>Bridges an Avalonia property observable with an observer action for the Primitives build.</summary>
     /// <typeparam name="T">The observed value type.</typeparam>
-    private sealed class AvaloniaPropertySignal<T> : ISignal<T>
+    /// <param name="onNext">The action invoked when a value is pushed.</param>
+    /// <param name="observable">The source observable for property changes.</param>
+    private sealed class AvaloniaPropertySignal<T>(
+        Action<T> onNext,
+        IObservable<T> observable) : ISignal<T>
     {
         /// <summary>The action invoked when a value is pushed into the signal.</summary>
-        private readonly Action<T> _onNext;
+        private readonly Action<T> _onNext = onNext;
 
         /// <summary>The source observable for property changes.</summary>
-        private readonly IObservable<T> _observable;
+        private readonly IObservable<T> _observable = observable;
 
         /// <summary>The current number of active observers.</summary>
         private int _observerCount;
 
         /// <summary>Indicates whether this signal has been disposed.</summary>
         private bool _isDisposed;
-
-        /// <summary>Initializes a new instance of the <see cref="AvaloniaPropertySignal{T}"/> class.</summary>
-        /// <param name="onNext">The action invoked when a value is pushed.</param>
-        /// <param name="observable">The source observable for property changes.</param>
-        public AvaloniaPropertySignal(Action<T> onNext, IObservable<T> observable)
-        {
-            _onNext = onNext;
-            _observable = observable;
-        }
 
         /// <inheritdoc/>
         public bool IsDisposed => _isDisposed;
@@ -221,7 +279,7 @@ public static class AvaloniaObjectReactiveExtensions
         }
 
         /// <inheritdoc/>
-        public void Dispose() => _isDisposed = true;
+        public void Dispose() => OnCompleted();
     }
 #endif
 }

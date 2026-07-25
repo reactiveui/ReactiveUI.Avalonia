@@ -3,7 +3,6 @@
 // See the LICENSE file in the project root for full license information.
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Interactivity;
 
 namespace ReactiveUI.Avalonia.Tests;
 
@@ -53,10 +52,10 @@ public class AvaloniaActivationForViewFetcherTests
 
         using var sub = sut.GetActivationForView(btn).SubscribeSafe(b => last = b, static error => throw error);
 
-        btn.RaiseEvent(new RoutedEventArgs(Button.LoadedEvent));
+        btn.RaiseEvent(new(Button.LoadedEvent));
         await Assert.That(last).IsTrue();
 
-        btn.RaiseEvent(new RoutedEventArgs(Button.UnloadedEvent));
+        btn.RaiseEvent(new(Button.UnloadedEvent));
         await Assert.That(last).IsFalse();
     }
 

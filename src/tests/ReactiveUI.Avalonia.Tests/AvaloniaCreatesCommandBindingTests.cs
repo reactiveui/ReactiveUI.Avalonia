@@ -10,6 +10,12 @@ namespace ReactiveUI.Avalonia.Tests;
 /// <summary>Tests for the AvaloniaCreatesCommandBinding command wiring behavior.</summary>
 public class AvaloniaCreatesCommandBindingTests
 {
+    /// <summary>The expected command-binding affinity for a button.</summary>
+    private const int ButtonAffinity = 10;
+
+    /// <summary>The button click event name.</summary>
+    private const string ClickEventName = "Click";
+
     /// <summary>Verifies that GetAffinityForObject returns expected values for various types.</summary>
     /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
@@ -20,7 +26,7 @@ public class AvaloniaCreatesCommandBindingTests
         await Assert.That(sut.GetAffinityForObject<object>(hasEventTarget: false)).IsEqualTo(0);
         await Assert.That(sut.GetAffinityForObject<InputElement>(hasEventTarget: false)).IsEqualTo(0);
         await Assert.That(sut.GetAffinityForObject<InputElement>(hasEventTarget: true)).IsGreaterThan(0);
-        await Assert.That(sut.GetAffinityForObject<Button>(hasEventTarget: false)).IsEqualTo(10);
+        await Assert.That(sut.GetAffinityForObject<Button>(hasEventTarget: false)).IsEqualTo(ButtonAffinity);
     }
 
     /// <summary>Verifies that BindCommandToObject wires a button's command and parameter correctly.</summary>
@@ -33,17 +39,18 @@ public class AvaloniaCreatesCommandBindingTests
         var btn = new Button();
         var param = new Signal<object?>();
 
-        using var disp = sut.BindCommandToObject(cmd, btn, param)!;
-        param.OnNext("p1");
+        using (var binding = sut.BindCommandToObject(cmd, btn, param)!)
+        {
+            param.OnNext("p1");
 
-        await Assert.That(btn.CommandParameter).IsEqualTo("p1");
+            await Assert.That(btn.CommandParameter).IsEqualTo("p1");
 
-        param.OnNext("p2");
-        await Assert.That(btn.CommandParameter).IsEqualTo("p2");
+            param.OnNext("p2");
+            await Assert.That(btn.CommandParameter).IsEqualTo("p2");
 
-        await Assert.That(btn.Command).IsNotNull();
+            await Assert.That(btn.Command).IsNotNull();
+        }
 
-        disp.Dispose();
         await Assert.That(btn.Command).IsNull();
     }
 
@@ -70,7 +77,7 @@ public class AvaloniaCreatesCommandBindingTests
         param.OnNext("evt3");
         await Assert.That(btn.IsEnabled).IsTrue();
 
-        btn.RaiseEvent(new RoutedEventArgs(InputElement.GotFocusEvent));
+        btn.RaiseEvent(new(InputElement.GotFocusEvent));
         await Assert.That(cmd.ExecutedCount).IsEqualTo(1);
         await Assert.That(cmd.LastParameter).IsEqualTo("evt3");
 
@@ -92,7 +99,7 @@ public class AvaloniaCreatesCommandBindingTests
 
         cmd.SetCanExecute(false);
         param.OnNext("blocked");
-        btn.RaiseEvent(new RoutedEventArgs(InputElement.GotFocusEvent));
+        btn.RaiseEvent(new(InputElement.GotFocusEvent));
 
         await Assert.That(cmd.ExecutedCount).IsEqualTo(0);
         await Assert.That(cmd.LastParameter).IsNull();
@@ -121,13 +128,10 @@ public class AvaloniaCreatesCommandBindingTests
     /// <summary>Verifies that subscription errors preserve the exception type when rethrown.</summary>
     /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
-    public async Task SubscriptionErrors_Throw_RethrowsException()
-    {
-        await Assert.That(() => SubscriptionErrors.Throw(new InvalidOperationException("expected")))
+    public async Task SubscriptionErrors_Throw_RethrowsException() => await Assert.That(() => SubscriptionErrors.Throw(new InvalidOperationException("expected")))
             .ThrowsExactly<InvalidOperationException>();
-    }
 
-    /// <summary>Verifies that BindCommandToObject throws on invalid targets or null arguments.</summary>
+    /// <summary>Verifies that BindCommandToObject handles null and invalid targets.</summary>
     /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task BindCommandToObject_Throws_On_Invalid_Targets_Or_Nulls()
@@ -136,14 +140,31 @@ public class AvaloniaCreatesCommandBindingTests
         var cmd = new TestCommand();
         var param = new Signal<object?>();
 
-        await Assert.That((Action)(() => sut.BindCommandToObject(null!, new object(), param))).ThrowsExactly<ArgumentNullException>();
-        await Assert.That((Action)(() => sut.BindCommandToObject<object>(cmd, null!, param))).ThrowsExactly<ArgumentNullException>();
-        await Assert.That((Action)(() => sut.BindCommandToObject(cmd, new object(), param))).ThrowsExactly<InvalidOperationException>();
+        await Assert.That(sut.BindCommandToObject(null, new object(), param)).IsNull();
+        await Assert.That(sut.BindCommandToObject<object>(cmd, null, param)).IsNull();
+        await Assert.That(CaptureInvalidOperation(() => sut.BindCommandToObject(cmd, new object(), param))).IsNotNull();
+        await Assert.That(CaptureInvalidOperation(() => sut.BindCommandToObject(cmd, new TextBox(), param))).IsNotNull();
 
-        await Assert.That((Action)(() => sut.BindCommandToObject<object, RoutedEventArgs>(null!, new object(), param, "Click"))).ThrowsExactly<ArgumentNullException>();
-        await Assert.That((Action)(() => sut.BindCommandToObject<object, RoutedEventArgs>(cmd, null!, param, "Click"))).ThrowsExactly<ArgumentNullException>();
-        await Assert.That((Action)(() => sut.BindCommandToObject<object, RoutedEventArgs>(cmd, new object(), param, "Click"))).ThrowsExactly<InvalidOperationException>();
-        await Assert.That((Action)(() => sut.BindCommandToObject<object, RoutedEventArgs>(cmd, new Button(), param, "MissingEvent"))).ThrowsExactly<InvalidOperationException>();
+        await Assert.That(sut.BindCommandToObject<object, RoutedEventArgs>(null, new(), param, ClickEventName)).IsNull();
+        await Assert.That(sut.BindCommandToObject<object, RoutedEventArgs>(cmd, null, param, ClickEventName)).IsNull();
+        await Assert.That(CaptureInvalidOperation(() => sut.BindCommandToObject<object, RoutedEventArgs>(cmd, new(), param, ClickEventName))).IsNotNull();
+        await Assert.That(CaptureInvalidOperation(() => sut.BindCommandToObject<Button, RoutedEventArgs>(cmd, new(), param, "MissingEvent"))).IsNotNull();
+    }
+
+    /// <summary>Executes an action and returns the expected invalid-operation exception.</summary>
+    /// <param name="action">The action to execute.</param>
+    /// <returns>The captured exception, or null when the action did not throw.</returns>
+    private static InvalidOperationException? CaptureInvalidOperation(Action action)
+    {
+        try
+        {
+            action();
+            return null;
+        }
+        catch (InvalidOperationException exception)
+        {
+            return exception;
+        }
     }
 
     /// <summary>A test command implementation for verifying command binding.</summary>

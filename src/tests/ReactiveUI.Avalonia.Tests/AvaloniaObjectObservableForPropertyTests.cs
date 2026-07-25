@@ -10,6 +10,9 @@ namespace ReactiveUI.Avalonia.Tests;
 /// <summary>Tests for the AvaloniaObjectObservableForProperty notification behavior.</summary>
 public class AvaloniaObjectObservableForPropertyTests
 {
+    /// <summary>The property name used to exercise missing-property paths.</summary>
+    private const string MissingPropertyName = "Missing";
+
     /// <summary>Verifies that GetAffinity returns a positive value for an AvaloniaObject with a known property.</summary>
     /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
@@ -46,7 +49,7 @@ public class AvaloniaObjectObservableForPropertyTests
     public async Task GetAffinity_AvaloniaObjectMissingProperty_ReturnsZero()
     {
         var sut = new AvaloniaObjectObservableForProperty();
-        var affinity = ((ICreatesObservableForProperty)sut).GetAffinityForObject(typeof(TestControl), "Missing");
+        var affinity = ((ICreatesObservableForProperty)sut).GetAffinityForObject(typeof(TestControl), MissingPropertyName);
         await Assert.That(affinity).IsEqualTo(0);
     }
 
@@ -99,7 +102,7 @@ public class AvaloniaObjectObservableForPropertyTests
         Expression<Func<string?>> expr = () => ctrl.Text;
 
         await Assert.That(() =>
-            ((ICreatesObservableForProperty)sut).GetNotificationForProperty(ctrl, expr, "Missing", beforeChanged: false, suppressWarnings: true)).ThrowsExactly<MissingMemberException>();
+            ((ICreatesObservableForProperty)sut).GetNotificationForProperty(ctrl, expr, MissingPropertyName, beforeChanged: false, suppressWarnings: true)).ThrowsExactly<MissingMemberException>();
     }
 
     /// <summary>Verifies that missing property notifications throw when warning logging is enabled.</summary>
@@ -112,7 +115,7 @@ public class AvaloniaObjectObservableForPropertyTests
         Expression<Func<string?>> expr = () => ctrl.Text;
 
         await Assert.That(() =>
-            ((ICreatesObservableForProperty)sut).GetNotificationForProperty(ctrl, expr, "Missing", beforeChanged: false, suppressWarnings: false)).ThrowsExactly<MissingMemberException>();
+            ((ICreatesObservableForProperty)sut).GetNotificationForProperty(ctrl, expr, MissingPropertyName, beforeChanged: false, suppressWarnings: false)).ThrowsExactly<MissingMemberException>();
     }
 
     /// <summary>Verifies that GetNotification throws when the sender is not an AvaloniaObject.</summary>
@@ -123,14 +126,14 @@ public class AvaloniaObjectObservableForPropertyTests
         var sut = new AvaloniaObjectObservableForProperty();
         Expression<Func<object?>> expr = () => new object();
         await Assert.That(() =>
-            ((ICreatesObservableForProperty)sut).GetNotificationForProperty(new object(), expr, "Foo")).ThrowsExactly<InvalidOperationException>();
+            ((ICreatesObservableForProperty)sut).GetNotificationForProperty(new(), expr, "Foo")).ThrowsExactly<InvalidOperationException>();
     }
 
     /// <summary>A test control with a styled Text property for testing property notifications.</summary>
     private sealed class TestControl : Control
     {
         /// <summary>The styled property for <see cref="Text"/>.</summary>
-        public static readonly StyledProperty<string?> TextProperty =
+        private static readonly StyledProperty<string?> TextProperty =
             AvaloniaProperty.Register<TestControl, string?>(nameof(Text));
 
         /// <summary>Gets or sets the text value.</summary>

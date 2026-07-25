@@ -12,6 +12,9 @@ namespace ReactiveUI.Avalonia.Tests;
 /// <summary>Tests for view registration via AppBuilderExtensions internal methods.</summary>
 public class AppBuilderExtensionsRegistrationTests
 {
+    /// <summary>The name of the internal view-registration method.</summary>
+    private const string RegisterViewsInternalMethodName = "RegisterViewsInternal";
+
     /// <summary>Contract interface for the test view model.</summary>
     public interface ITestVm
     {
@@ -27,7 +30,7 @@ public class AppBuilderExtensionsRegistrationTests
         var resolver = AppLocator.CurrentMutable!;
         Assembly[] assemblies = [typeof(AppBuilderExtensionsRegistrationTests).Assembly];
         var method = typeof(AppBuilderExtensions)
-            .GetMethod("RegisterViewsInternal", BindingFlags.NonPublic | BindingFlags.Static);
+            .GetMethod(RegisterViewsInternalMethodName, BindingFlags.NonPublic | BindingFlags.Static);
         await Assert.That(method).IsNotNull();
 
         _ = method!.Invoke(null, [resolver, assemblies]);
@@ -47,7 +50,7 @@ public class AppBuilderExtensionsRegistrationTests
         var resolver = AppLocator.CurrentMutable!;
         Assembly[] assemblies = [typeof(AppBuilderExtensionsRegistrationTests).Assembly];
         var method = typeof(AppBuilderExtensions)
-            .GetMethod("RegisterViewsInternal", BindingFlags.NonPublic | BindingFlags.Static);
+            .GetMethod(RegisterViewsInternalMethodName, BindingFlags.NonPublic | BindingFlags.Static);
 
         _ = method!.Invoke(null, [resolver, assemblies]);
 
@@ -68,7 +71,7 @@ public class AppBuilderExtensionsRegistrationTests
         var resolver = AppLocator.CurrentMutable!;
         Assembly[] assemblies = [typeof(AppBuilderExtensionsRegistrationTests).Assembly];
         var method = typeof(AppBuilderExtensions)
-            .GetMethod("RegisterViewsInternal", BindingFlags.NonPublic | BindingFlags.Static);
+            .GetMethod(RegisterViewsInternalMethodName, BindingFlags.NonPublic | BindingFlags.Static);
 
         _ = method!.Invoke(null, [resolver, assemblies]);
 
@@ -90,7 +93,7 @@ public class AppBuilderExtensionsRegistrationTests
 
         Assembly[] assemblies = [typeof(AppBuilderExtensionsRegistrationTests).Assembly];
         var method = typeof(AppBuilderExtensions)
-            .GetMethod("RegisterViewsInternal", BindingFlags.NonPublic | BindingFlags.Static);
+            .GetMethod(RegisterViewsInternalMethodName, BindingFlags.NonPublic | BindingFlags.Static);
 
         _ = method!.Invoke(null, [resolver, assemblies]);
 
@@ -120,10 +123,7 @@ public class AppBuilderExtensionsRegistrationTests
     /// <summary>Verifies that CreateView throws when Activator returns null.</summary>
     /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
-    public async Task CreateView_WhenActivatorReturnsNull_ThrowsInvalidOperationException()
-    {
-        await Assert.That(() => InvokeCreateView(typeof(int?))).ThrowsExactly<InvalidOperationException>();
-    }
+    public async Task CreateView_WhenActivatorReturnsNull_ThrowsInvalidOperationException() => await Assert.That(() => InvokeCreateView(typeof(int?))).ThrowsExactly<InvalidOperationException>();
 
     /// <summary>Verifies that RegisterReactiveUIViews throws on a null builder.</summary>
     /// <returns>A task representing the asynchronous test operation.</returns>
@@ -233,7 +233,7 @@ public class AppBuilderExtensionsRegistrationTests
     {
         var resolver = AppLocator.CurrentMutable!;
         var method = typeof(AppBuilderExtensions)
-            .GetMethod("RegisterViewsInternal", BindingFlags.NonPublic | BindingFlags.Static);
+            .GetMethod(RegisterViewsInternalMethodName, BindingFlags.NonPublic | BindingFlags.Static);
 
         var assembly = typeof(DistinctRegistrationVm).Assembly;
         Assembly[] assemblies = [assembly, assembly];
@@ -289,10 +289,10 @@ public class AppBuilderExtensionsRegistrationTests
         var method = typeof(AppBuilderExtensions)
             .GetMethods(BindingFlags.NonPublic | BindingFlags.Static)
             .Single(candidate =>
-                candidate.Name == "RegisterReactiveUIViewsFromEntryAssembly" &&
-                candidate.GetParameters() is [{ ParameterType: var builderType }, { ParameterType: var assemblyType }] &&
-                builderType == typeof(AppBuilder) &&
-                assemblyType == typeof(Assembly));
+                candidate.Name == "RegisterReactiveUIViewsFromEntryAssembly"
+                && candidate.GetParameters() is [{ ParameterType: var builderType }, { ParameterType: var assemblyType }]
+                && builderType == typeof(AppBuilder)
+                && assemblyType == typeof(Assembly));
 
         return (AppBuilder)method.Invoke(null, [builder, entryAssembly])!;
     }
@@ -305,10 +305,10 @@ public class AppBuilderExtensionsRegistrationTests
         var method = typeof(AppBuilderExtensions)
             .GetMethods(BindingFlags.NonPublic | BindingFlags.Static)
             .Single(candidate =>
-                candidate.Name == "RegisterReactiveUIViews" &&
-                candidate.GetParameters() is [{ ParameterType: var resolverType }, { ParameterType: var assembliesType }] &&
-                resolverType == typeof(IMutableDependencyResolver) &&
-                assembliesType == typeof(Assembly[]));
+                candidate.Name == "RegisterReactiveUIViews"
+                && candidate.GetParameters() is [{ ParameterType: var resolverType }, { ParameterType: var assembliesType }]
+                && resolverType == typeof(IMutableDependencyResolver)
+                && assembliesType == typeof(Assembly[]));
 
         _ = method.Invoke(null, [resolver, assemblies]);
     }
@@ -411,10 +411,10 @@ public class AppBuilderExtensionsRegistrationTests
     }
 
     /// <summary>Contains an attribute named ViewContractAttribute without a Contract property.</summary>
-    private static class MissingContract
+    internal static class MissingContract
     {
         /// <summary>An attribute that intentionally has no Contract property.</summary>
         [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
-        public sealed class ViewContractAttribute : Attribute;
+        internal sealed class ViewContractAttribute : Attribute;
     }
 }

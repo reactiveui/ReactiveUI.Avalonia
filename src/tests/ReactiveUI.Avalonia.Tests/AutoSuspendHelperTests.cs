@@ -14,18 +14,12 @@ public class AutoSuspendHelperTests
     /// <summary>Verifies that the constructor throws on a null lifetime argument.</summary>
     /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
-    public async Task Ctor_With_Null_Lifetime_Throws()
-    {
-        await Assert.That(() => new AutoSuspendHelper(null!)).ThrowsExactly<ArgumentNullException>();
-    }
+    public async Task Ctor_With_Null_Lifetime_Throws() => await Assert.That(() => new AutoSuspendHelper(null!)).ThrowsExactly<ArgumentNullException>();
 
     /// <summary>Verifies that the constructor throws for unsupported non-null lifetimes.</summary>
     /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
-    public async Task Ctor_With_Unsupported_Lifetime_Throws()
-    {
-        await Assert.That(() => new AutoSuspendHelper(CreateUnsupportedLifetime())).ThrowsExactly<NotSupportedException>();
-    }
+    public async Task Ctor_With_Unsupported_Lifetime_Throws() => await Assert.That(() => new AutoSuspendHelper(CreateUnsupportedLifetime())).ThrowsExactly<NotSupportedException>();
 
     /// <summary>Verifies that design mode bypasses lifetime-specific exit wiring.</summary>
     /// <returns>A task representing the asynchronous test operation.</returns>
@@ -73,7 +67,7 @@ public class AutoSuspendHelperTests
             },
             static error => throw error);
 
-        lifetime.Shutdown(0);
+        lifetime.Shutdown();
 
         await Assert.That(notified).IsTrue();
         sub.Dispose();
@@ -109,7 +103,7 @@ public class AutoSuspendHelperTests
             _ => count++,
             static error => throw error);
 
-        helper.OnUnhandledException(this, new UnhandledExceptionEventArgs(new InvalidOperationException("expected"), isTerminating: false));
+        helper.OnUnhandledException(this, new(new InvalidOperationException("expected"), isTerminating: false));
 
         await Assert.That(count).IsEqualTo(1);
     }

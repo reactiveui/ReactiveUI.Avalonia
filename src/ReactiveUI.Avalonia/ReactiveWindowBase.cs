@@ -43,20 +43,16 @@ public class ReactiveWindowBase : Window, IViewFor
         ArgumentNullException.ThrowIfNull(change);
         base.OnPropertyChanged(change);
 
-        if (change.Property == DataContextProperty)
+        if (change.Property == DataContextProperty
+            && ReferenceEquals(change.OldValue, ViewModel)
+            && IsValidViewModelValue(change.NewValue))
         {
-            if (ReferenceEquals(change.OldValue, ViewModel)
-                && IsValidViewModelValue(change.NewValue))
-            {
-                SetCurrentValue(ViewModelProperty, change.NewValue);
-            }
+            SetCurrentValue(ViewModelProperty, change.NewValue);
         }
-        else if (change.Property == ViewModelProperty)
+        else if (change.Property == ViewModelProperty
+                 && ReferenceEquals(change.OldValue, DataContext))
         {
-            if (ReferenceEquals(change.OldValue, DataContext))
-            {
-                SetCurrentValue(DataContextProperty, change.NewValue);
-            }
+            SetCurrentValue(DataContextProperty, change.NewValue);
         }
     }
 

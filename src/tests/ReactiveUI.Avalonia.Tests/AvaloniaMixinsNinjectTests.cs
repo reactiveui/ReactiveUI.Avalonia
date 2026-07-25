@@ -28,7 +28,7 @@ public class AvaloniaMixinsNinjectTests
     {
         AppBuilder? builder = null;
         await Assert.That(() =>
-            AvaloniaMixins.UseReactiveUIWithNinject(builder!, _ => { }, null)).ThrowsExactly<ArgumentNullException>();
+            AvaloniaMixins.UseReactiveUIWithNinject(builder!, _ => { })).ThrowsExactly<ArgumentNullException>();
     }
 
     /// <summary>Verifies that UseReactiveUIWithNinject returns the builder without throwing.</summary>

@@ -45,7 +45,7 @@ public class AutoDataTemplateBindingHookTests
             getCurrentViewProperties: () => [ItemsSourceObservedChange(items)],
             direction: BindingDirection.OneWay);
 
-        var control = items.ItemTemplate!.Build(new object());
+        var control = items.ItemTemplate!.Build(new());
 
         await Assert.That(control).IsTypeOf<ViewModelViewHost>();
 
@@ -112,10 +112,7 @@ public class AutoDataTemplateBindingHookTests
     public async Task ExecuteHook_WhenItemTemplateAlreadySet_DoesNotOverride()
     {
         var hook = new AutoDataTemplateBindingHook();
-        var items = new ListBox
-        {
-            ItemTemplate = new FuncDataTemplate<object>((_, _) => new TextBlock(), true)
-        };
+        var items = new ListBox { ItemTemplate = new FuncDataTemplate<object>((_, _) => new TextBlock(), true) };
 
         var res = hook.ExecuteHook(
             null,
@@ -155,7 +152,7 @@ public class AutoDataTemplateBindingHookTests
     {
         var param = Expression.Parameter(typeof(ItemsControl), "x");
         var member = Expression.Property(param, nameof(ItemsControl.Items));
-        return new ObservedChange<object, object>(items, member, items.Items!);
+        return new(items, member, items.Items!);
     }
 
     /// <summary>Creates an observed change for the ItemsSource property of an ItemsControl.</summary>
@@ -165,7 +162,7 @@ public class AutoDataTemplateBindingHookTests
     {
         var param = Expression.Parameter(typeof(ItemsControl), "x");
         var member = Expression.Property(param, nameof(ItemsControl.ItemsSource));
-        return new ObservedChange<object, object>(items, member, items.ItemsSource!);
+        return new(items, member, items.ItemsSource!);
     }
 
     /// <summary>Creates an observed change for the Tag property of a control.</summary>
@@ -175,7 +172,7 @@ public class AutoDataTemplateBindingHookTests
     {
         var param = Expression.Parameter(typeof(Control), "x");
         var member = Expression.Property(param, nameof(Control.Tag));
-        return new ObservedChange<object, object>(control, member, control.Tag!);
+        return new(control, member, control.Tag!);
     }
 
     /// <summary>Creates an observed change for the Text property of a text block.</summary>
@@ -185,6 +182,6 @@ public class AutoDataTemplateBindingHookTests
     {
         var param = Expression.Parameter(typeof(TextBlock), "x");
         var member = Expression.Property(param, nameof(TextBlock.Text));
-        return new ObservedChange<object, object>(text, member, text.Text!);
+        return new(text, member, text.Text!);
     }
 }

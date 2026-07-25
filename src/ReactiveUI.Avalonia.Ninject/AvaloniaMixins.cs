@@ -28,14 +28,22 @@ public static class AvaloniaMixins
     extension(AppBuilder builder)
     {
         /// <summary>Configures the application to use ReactiveUI with a Ninject dependency injection container.</summary>
-        /// <remarks>This method integrates Ninject as the dependency injection container for ReactiveUI applications. The Ninject container is registered with the application's service locator, and the provided configuration delegate allows customization of container bindings.</remarks>
-        /// <param name="containerConfig">A delegate that configures the Ninject container.</param>
-        /// <param name="withReactiveUIBuilder">An optional delegate to further configure the ReactiveUI builder.</param>
+        /// <remarks>
+        /// The Ninject container is registered with the service locator before the ReactiveUI builder is built.
+        /// </remarks>
+        /// <param name="containerConfig">Configures the Ninject container.</param>
         /// <returns>The application builder instance with ReactiveUI and Ninject configured.</returns>
         /// <exception cref="ArgumentNullException">Thrown if the builder or <paramref name="containerConfig"/> is null.</exception>
+        public AppBuilder UseReactiveUIWithNinject(Action<StandardKernel> containerConfig) =>
+            builder.UseReactiveUIWithNinject(containerConfig, null);
+
+        /// <summary>Configures ReactiveUI with Ninject and customizes the ReactiveUI builder.</summary>
+        /// <param name="containerConfig">Configures the Ninject container.</param>
+        /// <param name="withReactiveUIBuilder">Customizes the ReactiveUI builder, or null.</param>
+        /// <returns>The application builder instance.</returns>
         public AppBuilder UseReactiveUIWithNinject(
             Action<StandardKernel> containerConfig,
-            Action<ReactiveUIBuilder>? withReactiveUIBuilder = null) =>
+            Action<ReactiveUIBuilder>? withReactiveUIBuilder) =>
             builder switch
             {
                 null => throw new ArgumentNullException(nameof(builder)),

@@ -157,7 +157,7 @@ ReactiveUI.Avalonia provides platform-specific extensions that integrate Reactiv
 
 ### Project Structure
 
-- `ReactiveUI.Avalonia/` - Core library with reactive controls, schedulers, and Avalonia integrations
+- `ReactiveUI.Avalonia/` - Core library with reactive controls and Avalonia integrations; scheduler/sequencer implementations come from ReactiveUI.Primitives.Avalonia
 - `ReactiveUI.Avalonia.Autofac/` - Autofac DI container integration
 - `ReactiveUI.Avalonia.DryIoc/` - DryIoc DI container integration
 - `ReactiveUI.Avalonia.Microsoft.Extensions.DependencyInjection/` - Microsoft DI container integration
@@ -168,7 +168,7 @@ ReactiveUI.Avalonia provides platform-specific extensions that integrate Reactiv
 
 ### Key Types
 
-- **`AvaloniaScheduler`** - Rx scheduler that dispatches to the Avalonia UI thread
+- **`ReactiveUI.Primitives.Avalonia.*` `AvaloniaScheduler`** - Package-owned Avalonia UI-thread implementation; it provides `ISequencer` in the lean build and `IScheduler` in the reactive build
 - **`ReactiveUserControl<TViewModel>`** - Base user control with ViewModel/DataContext sync
 - **`ReactiveWindow<TViewModel>`** - Base window with ViewModel/DataContext sync
 - **`ViewModelViewHost`** - Content control that resolves and displays views for a given ViewModel
