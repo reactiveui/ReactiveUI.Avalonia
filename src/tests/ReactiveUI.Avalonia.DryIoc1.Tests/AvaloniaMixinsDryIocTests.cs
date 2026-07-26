@@ -18,7 +18,7 @@ public class AvaloniaMixinsDryIocTests
     {
         AppBuilder? builder = null;
         await Assert.That(() =>
-            AvaloniaMixins.UseReactiveUIWithDryIoc(builder!, _ => { })).ThrowsExactly<ArgumentNullException>();
+            AvaloniaMixins.UseReactiveUIWithDryIoc(builder!, static _ => { })).ThrowsExactly<ArgumentNullException>();
     }
 
     /// <summary>Verifies that <c>UseReactiveUIWithDryIoc</c> returns the same builder instance.</summary>
@@ -27,7 +27,7 @@ public class AvaloniaMixinsDryIocTests
     public async Task UseReactiveUIWithDryIoc_ReturnsBuilder_NoThrow()
     {
         var builder = AppBuilder.Configure<Application>();
-        var result = builder.UseReactiveUIWithDryIoc(_ => { });
+        var result = builder.UseReactiveUIWithDryIoc(static _ => { });
         await Assert.That(result).IsSameReferenceAs(builder);
     }
 
@@ -40,10 +40,10 @@ public class AvaloniaMixinsDryIocTests
         await Assert.That(() =>
             AppBuilderExtensions.UseReactiveUIWithDIContainer(
                 builder!,
-                () => new Container(),
-                _ => { },
-                c => new DryIocDependencyResolver(c),
-                _ => { })).ThrowsExactly<ArgumentNullException>();
+                static () => new Container(),
+                static _ => { },
+                static c => new DryIocDependencyResolver(c),
+                static _ => { })).ThrowsExactly<ArgumentNullException>();
     }
 
     /// <summary>Verifies that <see cref="AppBuilderExtensions.UseReactiveUIWithDIContainer{TContainer}"/> returns the same builder instance with valid arguments.</summary>
@@ -56,9 +56,9 @@ public class AvaloniaMixinsDryIocTests
 
         var result = builder.UseReactiveUIWithDIContainer(
             containerFactory: () => container,
-            containerConfig: _ => { },
-            dependencyResolverFactory: c => new DryIocDependencyResolver(c),
-            _ => { });
+            containerConfig: static _ => { },
+            dependencyResolverFactory: static c => new DryIocDependencyResolver(c),
+            static _ => { });
 
         await Assert.That(result).IsSameReferenceAs(builder);
     }
@@ -71,9 +71,9 @@ public class AvaloniaMixinsDryIocTests
         var container = new Container();
         using var resolver = new DryIocDependencyResolver(container);
 
-        resolver.Register(() => "a");
-        resolver.Register(() => "b");
-        resolver.Register(() => "c", "x");
+        resolver.Register(static () => "a");
+        resolver.Register(static () => "b");
+        resolver.Register(static () => "c", "x");
 
         var noContract = resolver.GetService<string>();
         await Assert.That(noContract).IsEqualTo("b");
@@ -81,8 +81,15 @@ public class AvaloniaMixinsDryIocTests
         var withContract = resolver.GetService<string>("x");
         await Assert.That(withContract).IsEqualTo("c");
 
-        var all = resolver.GetServices<string>().ToArray();
-        await Assert.That(all).Contains("a");
-        await Assert.That(all).Contains("b");
+        var hasA = false;
+        var hasB = false;
+        foreach (var service in resolver.GetServices<string>())
+        {
+            hasA |= service == "a";
+            hasB |= service == "b";
+        }
+
+        await Assert.That(hasA).IsTrue();
+        await Assert.That(hasB).IsTrue();
     }
 }

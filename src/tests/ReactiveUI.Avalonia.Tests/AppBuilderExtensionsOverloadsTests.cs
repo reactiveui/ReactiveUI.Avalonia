@@ -14,7 +14,7 @@ public class AppBuilderExtensionsOverloadsTests
     public async Task UseReactiveUI_WithBuilderOverload_ThrowsOnNulls()
     {
         AppBuilder? builder = null;
-        await Assert.That(() => builder!.UseReactiveUI(_ => { })).ThrowsExactly<ArgumentNullException>();
+        await Assert.That(() => builder!.UseReactiveUI(static _ => { })).ThrowsExactly<ArgumentNullException>();
 
         var b = AppBuilder.Configure<Application>();
         await Assert.That(() => b.UseReactiveUI(null!)).ThrowsExactly<ArgumentNullException>();

@@ -45,12 +45,12 @@ public class AvaloniaActivationForViewFetcher : IActivationForViewFetcher
                             .FromEventPattern<RoutedEventArgs>(
                                                                x => control.Loaded += x,
                                                                x => control.Loaded -= x)
-                            .Select(args => true);
+                            .Select(static args => true);
         var controlUnloaded = Observable
                               .FromEventPattern<RoutedEventArgs>(
                                                                  x => control.Unloaded += x,
                                                                  x => control.Unloaded -= x)
-                              .Select(args => false);
+                              .Select(static args => false);
         return controlLoaded
                .Merge(controlUnloaded)
                .DistinctUntilChanged();
@@ -70,12 +70,12 @@ public class AvaloniaActivationForViewFetcher : IActivationForViewFetcher
                            .FromEventPattern<VisualTreeAttachmentEventArgs>(
                                                                             x => visual.AttachedToVisualTree += x,
                                                                             x => visual.AttachedToVisualTree -= x)
-                           .Select(args => true);
+                           .Select(static args => true);
         var visualUnloaded = Observable
                              .FromEventPattern<VisualTreeAttachmentEventArgs>(
                                                                               x => visual.DetachedFromVisualTree += x,
                                                                               x => visual.DetachedFromVisualTree -= x)
-                             .Select(args => false);
+                             .Select(static args => false);
         return visualLoaded
                .Merge(visualUnloaded)
                .DistinctUntilChanged();

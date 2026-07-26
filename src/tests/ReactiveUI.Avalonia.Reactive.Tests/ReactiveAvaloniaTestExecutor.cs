@@ -15,7 +15,7 @@ public class ReactiveAvaloniaTestExecutor : ITestExecutor
 {
     /// <summary>The lazily-created headless Avalonia session.</summary>
     private static readonly Lazy<HeadlessUnitTestSession> Session =
-        new(() => HeadlessUnitTestSession.StartNew(typeof(Application)), LazyThreadSafetyMode.ExecutionAndPublication);
+        new(static () => HeadlessUnitTestSession.StartNew(typeof(Application)), LazyThreadSafetyMode.ExecutionAndPublication);
 
     /// <inheritdoc/>
     public async ValueTask ExecuteTest(TestContext context, Func<ValueTask> action)

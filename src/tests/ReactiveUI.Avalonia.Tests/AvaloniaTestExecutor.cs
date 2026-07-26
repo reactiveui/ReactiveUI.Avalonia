@@ -23,7 +23,7 @@ public class AvaloniaTestExecutor : ITestExecutor
                 ReactiveUIBuilder.ResetBuilderStateForTests();
 
                 _ = AppLocator.CurrentMutable.CreateReactiveUIBuilder()
-                    .WithRegistration(splat =>
+                    .WithRegistration(static splat =>
                     {
                         splat.RegisterConstant<IActivationForViewFetcher>(new AvaloniaActivationForViewFetcher());
                         splat.RegisterConstant<IPropertyBindingHook>(new AutoDataTemplateBindingHook());

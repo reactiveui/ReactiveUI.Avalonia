@@ -65,7 +65,7 @@ public static class AvaloniaMixins
                 {
                     ArgumentNullException.ThrowIfNull(containerConfig);
 
-                    IServiceCollection serviceCollection = new ServiceCollection();
+                    var serviceCollection = new ServiceCollection();
                     var module = new MicrosoftDependencyResolverModule(serviceCollection);
                     module.Configure(default!);
                     AppLocator.CurrentMutable.RegisterConstant(serviceCollection);

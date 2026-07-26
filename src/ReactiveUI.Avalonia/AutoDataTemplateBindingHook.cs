@@ -16,7 +16,7 @@ public class AutoDataTemplateBindingHook : IPropertyBindingHook
 {
     /// <summary>The default data template that wraps items in a <see cref="ViewModelViewHost"/>.</summary>
     private static readonly FuncDataTemplate DefaultItemTemplate = new FuncDataTemplate<object>(
-     (_, _) =>
+     static (_, _) =>
      {
          var control = new ViewModelViewHost();
          var context = control.GetObservable(StyledElement.DataContextProperty);

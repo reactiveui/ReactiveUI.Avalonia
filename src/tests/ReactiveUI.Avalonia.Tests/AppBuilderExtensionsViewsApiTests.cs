@@ -1,7 +1,6 @@
 // Copyright (c) 2019-2026 ReactiveUI Association Incorporated. All rights reserved.
 // ReactiveUI Association Incorporated licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for full license information.
-using System.Reflection;
 using Avalonia;
 
 namespace ReactiveUI.Avalonia.Tests;
@@ -29,10 +28,7 @@ public class AppBuilderExtensionsViewsApiTests
         await Assert.That(result).IsSameReferenceAs(builder);
 
         var resolver = global::Splat.AppLocator.CurrentMutable!;
-        Assembly[] assemblies = [typeof(AppBuilderExtensionsRegistrationTests).Assembly];
-        var method = typeof(AppBuilderExtensions)
-            .GetMethod("RegisterViewsInternal", BindingFlags.NonPublic | BindingFlags.Static)!;
-        _ = method.Invoke(null, [resolver, assemblies]);
+        AppBuilderExtensions.RegisterViewsInternal(resolver, [typeof(AppBuilderExtensionsRegistrationTests).Assembly]);
     }
 
     /// <summary>Verifies that RegisterReactiveUIViewsFromEntryAssembly returns the same builder instance.</summary>

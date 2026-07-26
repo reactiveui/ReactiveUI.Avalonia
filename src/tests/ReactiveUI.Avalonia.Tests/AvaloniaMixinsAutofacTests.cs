@@ -24,7 +24,7 @@ public class AvaloniaMixinsAutofacTests
     {
         AppBuilder? builder = null;
         await Assert.That(() =>
-            AvaloniaMixins.UseReactiveUIWithAutofac(builder!, _ => { }, null, null)).ThrowsExactly<ArgumentNullException>();
+            AvaloniaMixins.UseReactiveUIWithAutofac(builder!, static _ => { }, null, null)).ThrowsExactly<ArgumentNullException>();
     }
 
     /// <summary>Verifies that the UseReactiveUIWithAutofac overload throws on a null builder.</summary>
@@ -34,7 +34,7 @@ public class AvaloniaMixinsAutofacTests
     {
         AppBuilder? builder = null;
         await Assert.That(() =>
-            AvaloniaMixins.UseReactiveUIWithAutofac(builder!, _ => { }, _ => { })).ThrowsExactly<ArgumentNullException>();
+            AvaloniaMixins.UseReactiveUIWithAutofac(builder!, static _ => { }, static _ => { })).ThrowsExactly<ArgumentNullException>();
     }
 
     /// <summary>Verifies that UseReactiveUIWithAutofac returns the builder without throwing.</summary>
@@ -43,7 +43,7 @@ public class AvaloniaMixinsAutofacTests
     public async Task UseReactiveUIWithAutofac_ReturnsBuilder_NoThrow()
     {
         var builder = AppBuilder.Configure<Application>();
-        var result = AvaloniaMixins.UseReactiveUIWithAutofac(builder, _ => { }, null, null);
+        var result = AvaloniaMixins.UseReactiveUIWithAutofac(builder, static _ => { }, null, null);
         await Assert.That(result).IsSameReferenceAs(builder);
     }
 
@@ -55,9 +55,9 @@ public class AvaloniaMixinsAutofacTests
         var builder = AppBuilder.Configure<Application>();
         var result = AvaloniaMixins.UseReactiveUIWithAutofac(
             builder,
-            _ => { },
-            r => _ = r is AutofacDependencyResolver,
-            rx => _ = rx is not null);
+            static _ => { },
+            static r => _ = r is AutofacDependencyResolver,
+            static rx => _ = rx is not null);
 
         await Assert.That(result).IsSameReferenceAs(builder);
     }

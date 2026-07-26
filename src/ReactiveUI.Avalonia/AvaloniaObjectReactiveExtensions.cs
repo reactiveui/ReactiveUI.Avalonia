@@ -209,7 +209,7 @@ public static class AvaloniaObjectReactiveExtensions
     /// <typeparam name="T">The observed value type.</typeparam>
     /// <param name="onNext">The action invoked when a value is pushed.</param>
     /// <param name="observable">The source observable for property changes.</param>
-    private sealed class AvaloniaPropertySignal<T>(
+    internal sealed class AvaloniaPropertySignal<T>(
         Action<T> onNext,
         IObservable<T> observable) : ISignal<T>
     {
@@ -229,7 +229,7 @@ public static class AvaloniaObjectReactiveExtensions
         public bool IsDisposed => _isDisposed;
 
         /// <inheritdoc/>
-        public bool HasObservers => _observerCount > 0;
+        public bool HasObservers => Volatile.Read(ref _observerCount) > 0;
 
         /// <inheritdoc/>
         public void OnCompleted() => _isDisposed = true;

@@ -33,20 +33,7 @@ public static class AppBuilderExtensions
             ArgumentNullException.ThrowIfNull(builder);
             ArgumentNullException.ThrowIfNull(withReactiveUIBuilder);
 
-            return builder.AfterPlatformServicesSetup(platformBuilder =>
-            {
-                var rxuiBuilder = RxAppBuilder.CreateReactiveUIBuilder();
-                _ = rxuiBuilder.WithAvalonia();
-
-                withReactiveUIBuilder(rxuiBuilder);
-
-                if (Splat.Builder.AppBuilder.HasBeenBuilt)
-                {
-                    return;
-                }
-
-                _ = rxuiBuilder.BuildApp();
-            });
+            return builder.AfterPlatformServicesSetup(_ => ConfigureReactiveUI(withReactiveUIBuilder));
         }
 
         /// <summary>Registers ReactiveUI view types from the specified assemblies.</summary>
@@ -141,7 +128,7 @@ public static class AppBuilderExtensions
             return builder
                 .WithMainThreadScheduler(AvaloniaScheduler.Instance)
                 .WithTaskPoolScheduler(TaskPoolScheduler.Default)
-                .WithRegistration(splat =>
+                .WithRegistration(static splat =>
                 {
                     splat.RegisterConstant<IActivationForViewFetcher>(new AvaloniaActivationForViewFetcher());
                     splat.RegisterConstant<IPropertyBindingHook>(new AutoDataTemplateBindingHook());
@@ -151,13 +138,30 @@ public static class AppBuilderExtensions
         }
     }
 
+    /// <summary>Configures and builds ReactiveUI after Avalonia platform services are ready.</summary>
+    /// <param name="configureReactiveUI">The application-specific ReactiveUI configuration.</param>
+    internal static void ConfigureReactiveUI(Action<ReactiveUIBuilder> configureReactiveUI)
+    {
+        var rxuiBuilder = RxAppBuilder.CreateReactiveUIBuilder();
+        _ = rxuiBuilder.WithAvalonia();
+
+        configureReactiveUI(rxuiBuilder);
+
+        if (Splat.Builder.AppBuilder.HasBeenBuilt)
+        {
+            return;
+        }
+
+        _ = rxuiBuilder.BuildApp();
+    }
+
     /// <summary>Configures ReactiveUI with a dependency injection container when a mutable resolver is available.</summary>
     /// <typeparam name="TContainer">The dependency injection container type.</typeparam>
     /// <param name="resolver">The mutable resolver used for container registration.</param>
     /// <param name="containerFactory">The factory used to create the container.</param>
     /// <param name="containerConfig">The configuration action for the container.</param>
     /// <param name="dependencyResolverFactory">The factory used to create the dependency resolver.</param>
-    private static void ConfigureReactiveUIDIContainer<TContainer>(
+    internal static void ConfigureReactiveUIDIContainer<TContainer>(
         IMutableDependencyResolver? resolver,
         Func<TContainer> containerFactory,
         Action<TContainer> containerConfig,
@@ -187,7 +191,7 @@ public static class AppBuilderExtensions
     /// <returns>The same application builder instance.</returns>
     [RequiresUnreferencedCode("Scans assemblies and reflects over view types and attributes during ReactiveUI view registration.")]
     [RequiresDynamicCode("Creates closed generic view service types at runtime during ReactiveUI view registration.")]
-    private static AppBuilder RegisterReactiveUIViewsFromEntryAssembly(AppBuilder builder, Assembly? entryAssembly)
+    internal static AppBuilder RegisterReactiveUIViewsFromEntryAssembly(AppBuilder builder, Assembly? entryAssembly)
     {
         ArgumentNullException.ThrowIfNull(builder);
 
@@ -199,7 +203,7 @@ public static class AppBuilderExtensions
     /// <param name="assemblies">The assemblies to scan.</param>
     [RequiresUnreferencedCode("Scans assemblies and reflects over view types and attributes during ReactiveUI view registration.")]
     [RequiresDynamicCode("Creates closed generic view service types at runtime during ReactiveUI view registration.")]
-    private static void RegisterReactiveUIViews(IMutableDependencyResolver? resolver, Assembly[]? assemblies)
+    internal static void RegisterReactiveUIViews(IMutableDependencyResolver? resolver, Assembly[]? assemblies)
     {
         if (resolver is null || assemblies is null || assemblies.Length == 0)
         {
@@ -218,7 +222,7 @@ public static class AppBuilderExtensions
     /// <param name="assemblies">An array of assemblies to scan for view types implementing IViewFor{T}.</param>
     [RequiresUnreferencedCode("Scans assemblies and reflects over view types and attributes during ReactiveUI view registration.")]
     [RequiresDynamicCode("Creates closed generic view service types at runtime during ReactiveUI view registration.")]
-    private static void RegisterViewsInternal(IMutableDependencyResolver resolver, Assembly[] assemblies)
+    internal static void RegisterViewsInternal(IMutableDependencyResolver resolver, Assembly[] assemblies)
     {
         var uniqueAssemblies = new HashSet<Assembly>();
         foreach (var assembly in assemblies)
@@ -256,7 +260,7 @@ public static class AppBuilderExtensions
     /// <param name="viewType">The view type to inspect.</param>
     /// <returns>The matching IViewFor{T} interface, or null when the type is not a ReactiveUI view.</returns>
     [RequiresUnreferencedCode("Reads implemented interfaces from runtime view types.")]
-    private static Type? FindViewForInterface(Type viewType)
+    internal static Type? FindViewForInterface(Type viewType)
     {
         foreach (var viewInterface in viewType.GetInterfaces())
         {
@@ -273,7 +277,7 @@ public static class AppBuilderExtensions
     /// <param name="viewType">The view type to inspect.</param>
     /// <returns>The view contract, or null when no contract is declared.</returns>
     [RequiresUnreferencedCode("Reads custom attributes and reflected properties from runtime view types.")]
-    private static string? GetViewContract(Type viewType)
+    internal static string? GetViewContract(Type viewType)
     {
         foreach (var attribute in viewType.GetCustomAttributes(true))
         {
@@ -294,7 +298,7 @@ public static class AppBuilderExtensions
     /// <param name="viewType">The view type to create.</param>
     /// <returns>A resolved or newly-created view instance.</returns>
     [RequiresUnreferencedCode("Creates runtime-discovered view types by reflection.")]
-    private static object CreateView(Type viewType)
+    internal static object CreateView(Type viewType)
     {
         try
         {
@@ -316,7 +320,7 @@ public static class AppBuilderExtensions
     /// <param name="viewType">The view type to create.</param>
     /// <param name="error">The service locator error.</param>
     /// <returns>The created view instance.</returns>
-    private static object CreateViewAfterResolutionFailure(Type viewType, Exception error)
+    internal static object CreateViewAfterResolutionFailure(Type viewType, Exception error)
     {
         LogHost.Default.Warn(error, $"Failed to resolve view type '{viewType}' from the service locator. Falling back to Activator.");
         return CreateViewWithActivator(viewType);
@@ -325,7 +329,7 @@ public static class AppBuilderExtensions
     /// <summary>Creates a view instance through Activator.</summary>
     /// <param name="viewType">The view type to create.</param>
     /// <returns>The created view instance.</returns>
-    private static object CreateViewWithActivator(Type viewType) =>
+    internal static object CreateViewWithActivator(Type viewType) =>
         Activator.CreateInstance(viewType)
         ?? throw new InvalidOperationException($"Failed to create view type '{viewType}'.");
 }

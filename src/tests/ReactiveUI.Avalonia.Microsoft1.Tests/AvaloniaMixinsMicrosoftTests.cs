@@ -20,7 +20,7 @@ public class AvaloniaMixinsMicrosoftTests
         await Assert.That(() =>
             AvaloniaMixins.UseReactiveUIWithMicrosoftDependencyResolver(
                 builder!,
-                _ => { },
+                static _ => { },
                 (Action<IServiceProvider?>?)null,
                 (Action<ReactiveUIBuilder>?)null)).ThrowsExactly<ArgumentNullException>();
     }
@@ -32,10 +32,10 @@ public class AvaloniaMixinsMicrosoftTests
     {
         var builder = AppBuilder.Configure<Application>();
         var result = builder.UseReactiveUIWithDIContainer(
-            containerFactory: () => new object(),
-            containerConfig: _ => { },
-            dependencyResolverFactory: _ => new DummyResolver(),
-            _ => { });
+            containerFactory: static () => new object(),
+            containerConfig: static _ => { },
+            dependencyResolverFactory: static _ => new DummyResolver(),
+            static _ => { });
         await Assert.That(result).IsSameReferenceAs(builder);
     }
 
@@ -61,10 +61,28 @@ public class AvaloniaMixinsMicrosoftTests
         public IEnumerable<object> GetServices(Type? serviceType, string? contract) => GetServices(serviceType);
 
         /// <inheritdoc/>
-        public IEnumerable<T> GetServices<T>() => GetServices(typeof(T)).OfType<T>();
+        public IEnumerable<T> GetServices<T>()
+        {
+            foreach (var service in GetServices(typeof(T)))
+            {
+                if (service is T typedService)
+                {
+                    yield return typedService;
+                }
+            }
+        }
 
         /// <inheritdoc/>
-        public IEnumerable<T> GetServices<T>(string? contract) => GetServices(typeof(T), contract).OfType<T>();
+        public IEnumerable<T> GetServices<T>(string? contract)
+        {
+            foreach (var service in GetServices(typeof(T), contract))
+            {
+                if (service is T typedService)
+                {
+                    yield return typedService;
+                }
+            }
+        }
 
         /// <inheritdoc/>
         public bool HasRegistration(Type? serviceType) => false;
@@ -98,13 +116,13 @@ public class AvaloniaMixinsMicrosoftTests
         public void Register<TService, TImplementation>()
             where TService : class
             where TImplementation : class, TService, new() =>
-            Register(() => new TImplementation(), typeof(TService));
+            Register(static () => new TImplementation(), typeof(TService));
 
         /// <inheritdoc/>
         public void Register<TService, TImplementation>(string? contract)
             where TService : class
             where TImplementation : class, TService, new() =>
-            Register(() => new TImplementation(), typeof(TService), contract);
+            Register(static () => new TImplementation(), typeof(TService), contract);
 
         /// <inheritdoc/>
         public void RegisterConstant<T>(T? value)

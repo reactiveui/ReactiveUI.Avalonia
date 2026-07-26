@@ -18,7 +18,7 @@ public class AvaloniaMixinsNinjectTests
     {
         AppBuilder? builder = null;
         await Assert.That(() =>
-            AvaloniaMixins.UseReactiveUIWithNinject(builder!, _ => { }, null)).ThrowsExactly<ArgumentNullException>();
+            AvaloniaMixins.UseReactiveUIWithNinject(builder!, static _ => { }, null)).ThrowsExactly<ArgumentNullException>();
     }
 
     /// <summary>Verifies that the UseReactiveUIWithNinject overload throws on a null builder.</summary>
@@ -28,7 +28,7 @@ public class AvaloniaMixinsNinjectTests
     {
         AppBuilder? builder = null;
         await Assert.That(() =>
-            AvaloniaMixins.UseReactiveUIWithNinject(builder!, _ => { })).ThrowsExactly<ArgumentNullException>();
+            AvaloniaMixins.UseReactiveUIWithNinject(builder!, static _ => { })).ThrowsExactly<ArgumentNullException>();
     }
 
     /// <summary>Verifies that UseReactiveUIWithNinject returns the builder without throwing.</summary>
@@ -37,7 +37,7 @@ public class AvaloniaMixinsNinjectTests
     public async Task UseReactiveUIWithNinject_ReturnsBuilder_NoThrow()
     {
         var builder = AppBuilder.Configure<Application>();
-        var result = AvaloniaMixins.UseReactiveUIWithNinject(builder, _ => { }, null);
+        var result = AvaloniaMixins.UseReactiveUIWithNinject(builder, static _ => { }, null);
         await Assert.That(result).IsSameReferenceAs(builder);
     }
 
@@ -49,8 +49,8 @@ public class AvaloniaMixinsNinjectTests
         var builder = AppBuilder.Configure<Application>();
         var result = AvaloniaMixins.UseReactiveUIWithNinject(
             builder,
-            _ => { },
-            rx => _ = rx is not null);
+            static _ => { },
+            static rx => _ = rx is not null);
         await Assert.That(result).IsSameReferenceAs(builder);
     }
 }

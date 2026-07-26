@@ -1,7 +1,6 @@
 // Copyright (c) 2019-2026 ReactiveUI Association Incorporated. All rights reserved.
 // ReactiveUI Association Incorporated licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for full license information.
-using System.Reflection;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Data;
@@ -105,7 +104,7 @@ public class AvaloniaObjectReactiveExtensionsBehaviorTests
         await Assert.That(subject.HasObservers).IsFalse();
         await Assert.That(subject.IsDisposed).IsFalse();
 
-        using (subject.SubscribeSafe(_ => { }, static error => throw error))
+        using (subject.SubscribeSafe(static _ => { }, static error => throw error))
         {
             await Assert.That(subject.HasObservers).IsTrue();
         }
@@ -157,20 +156,14 @@ public class AvaloniaObjectReactiveExtensionsBehaviorTests
     {
         var subject = CreateThrowingSignal();
 
-        await Assert.That(() => subject.SubscribeSafe(_ => { }, static error => throw error)).ThrowsExactly<InvalidOperationException>();
+        await Assert.That(() => subject.SubscribeSafe(static _ => { }, static error => throw error)).ThrowsExactly<InvalidOperationException>();
         await Assert.That(subject.HasObservers).IsFalse();
     }
 
     /// <summary>Creates an AvaloniaPropertySignal backed by a throwing observable.</summary>
     /// <returns>The created signal.</returns>
-    private static ISignal<int> CreateThrowingSignal()
-    {
-        var signalType = typeof(AvaloniaObjectReactiveExtensions)
-            .GetNestedType("AvaloniaPropertySignal`1", BindingFlags.NonPublic)!
-            .MakeGenericType(typeof(int));
-
-        return (ISignal<int>)Activator.CreateInstance(signalType, new Action<int>(_ => { }), new ThrowingObservable())!;
-    }
+    private static AvaloniaObjectReactiveExtensions.AvaloniaPropertySignal<int> CreateThrowingSignal() =>
+        new(static _ => { }, new ThrowingObservable());
 
     /// <summary>An observable that throws when subscribed.</summary>
     private sealed class ThrowingObservable : IObservable<int>

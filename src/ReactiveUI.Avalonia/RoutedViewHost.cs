@@ -79,46 +79,6 @@ public class RoutedViewHost : TransitioningContentControl, IActivatableView, IEn
     /// <inheritdoc/>
     protected override Type StyleKeyOverride => typeof(TransitioningContentControl);
 
-    /// <inheritdoc/>
-    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e) =>
-        _ = LazyInitializer.EnsureInitialized(ref _navigationDisposables, () => CreateNavigationDisposables(e));
-
-    /// <inheritdoc/>
-    protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
-    {
-        base.OnDetachedFromVisualTree(e);
-        DisposeNavigationDisposables();
-    }
-
-    /// <summary>Creates the active navigation subscriptions for an attached host.</summary>
-    /// <param name="e">The visual tree attachment event arguments.</param>
-    /// <returns>The created navigation subscriptions.</returns>
-    private CompositeDisposable CreateNavigationDisposables(VisualTreeAttachmentEventArgs e)
-    {
-        base.OnAttachedToVisualTree(e);
-
-        var disposables = new CompositeDisposable();
-        IObservable<object?> routerChanges = this.GetObservable(RouterProperty);
-        var routerRemoved = routerChanges
-            .Where(router => router is null);
-
-        var viewContract = this.GetObservable(ViewContractProperty);
-
-        var navigation = this.GetObservable(RouterProperty)
-            .Where(router => router is not null)
-            .SelectMany(router => router!.CurrentViewModel)
-            .Merge(routerRemoved)
-            .CombineLatest(viewContract, static (viewModel, contract) => new NavigationTarget(viewModel, contract));
-
-        var subscription = PrimitivesLinqExtensions.SubscribeSafe(
-            navigation,
-            target => NavigateToViewModel(target.ViewModel, target.Contract),
-            SubscriptionErrors.Throw);
-
-        disposables.Add(subscription);
-        return disposables;
-    }
-
     /// <summary>Navigates to the view associated with the specified view model and contract.</summary>
     /// <remarks>
     /// Missing routers, view models, or views display the default content. A resolved view receives the supplied view
@@ -126,7 +86,7 @@ public class RoutedViewHost : TransitioningContentControl, IActivatableView, IEn
     /// </remarks>
     /// <param name="viewModel">The view model to display, or null to display the default content.</param>
     /// <param name="contract">The optional view contract used during resolution.</param>
-    private void NavigateToViewModel(object? viewModel, string? contract)
+    internal void NavigateToViewModel(object? viewModel, string? contract)
     {
         if (Router is null)
         {
@@ -165,6 +125,60 @@ public class RoutedViewHost : TransitioningContentControl, IActivatableView, IEn
         Content = viewInstance;
     }
 
+    /// <summary>Disposes the active navigation subscriptions when they exist.</summary>
+    internal void DisposeNavigationDisposables()
+    {
+        var disposables = _navigationDisposables;
+        _navigationDisposables = null;
+
+        if (disposables is null)
+        {
+            return;
+        }
+
+        disposables.Dispose();
+    }
+
+    /// <inheritdoc/>
+    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e) =>
+        _navigationDisposables ??= CreateNavigationDisposables(e);
+
+    /// <inheritdoc/>
+    protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnDetachedFromVisualTree(e);
+        DisposeNavigationDisposables();
+    }
+
+    /// <summary>Creates the active navigation subscriptions for an attached host.</summary>
+    /// <param name="e">The visual tree attachment event arguments.</param>
+    /// <returns>The created navigation subscriptions.</returns>
+    private CompositeDisposable CreateNavigationDisposables(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnAttachedToVisualTree(e);
+
+        var disposables = new CompositeDisposable();
+        IObservable<object?> routerChanges = this.GetObservable(RouterProperty);
+        var routerRemoved = routerChanges
+            .Where(static router => router is null);
+
+        var viewContract = this.GetObservable(ViewContractProperty);
+
+        var navigation = this.GetObservable(RouterProperty)
+            .Where(static router => router is not null)
+            .SelectMany(static router => router!.CurrentViewModel)
+            .Merge(routerRemoved)
+            .CombineLatest(viewContract, static (viewModel, contract) => new NavigationTarget(viewModel, contract));
+
+        var subscription = PrimitivesLinqExtensions.SubscribeSafe(
+            navigation,
+            target => NavigateToViewModel(target.ViewModel, target.Contract),
+            SubscriptionErrors.Throw);
+
+        disposables.Add(subscription);
+        return disposables;
+    }
+
     /// <summary>Logs a missing view resolution result.</summary>
     /// <param name="viewModel">The view model that could not be resolved.</param>
     /// <param name="contract">The optional view contract.</param>
@@ -177,20 +191,6 @@ public class RoutedViewHost : TransitioningContentControl, IActivatableView, IEn
         }
 
         this.Log().Warn($"Couldn't find view with contract '{contract}' for '{viewModel}'. Is it registered? Falling back to default content.");
-    }
-
-    /// <summary>Disposes the active navigation subscriptions when they exist.</summary>
-    private void DisposeNavigationDisposables()
-    {
-        var disposables = _navigationDisposables;
-        _navigationDisposables = null;
-
-        if (disposables is null)
-        {
-            return;
-        }
-
-        disposables.Dispose();
     }
 
     /// <summary>Represents a pending navigation target.</summary>

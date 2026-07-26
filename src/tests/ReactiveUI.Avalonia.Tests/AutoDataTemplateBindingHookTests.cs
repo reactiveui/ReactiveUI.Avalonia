@@ -22,7 +22,7 @@ public class AutoDataTemplateBindingHookTests
         var result = hook.ExecuteHook(
             source: null,
             target: items,
-            getCurrentViewModelProperties: () => [],
+            getCurrentViewModelProperties: static () => [],
             getCurrentViewProperties: () => [ItemsObservedChange(items)],
             direction: BindingDirection.TwoWay);
 
@@ -41,7 +41,7 @@ public class AutoDataTemplateBindingHookTests
         _ = hook.ExecuteHook(
             source: null,
             target: items,
-            getCurrentViewModelProperties: () => [],
+            getCurrentViewModelProperties: static () => [],
             getCurrentViewProperties: () => [ItemsSourceObservedChange(items)],
             direction: BindingDirection.OneWay);
 
@@ -61,7 +61,7 @@ public class AutoDataTemplateBindingHookTests
     {
         var hook = new AutoDataTemplateBindingHook();
 
-        await Assert.That(() => hook.ExecuteHook(null, new ListBox(), () => [], null!, BindingDirection.OneWay))
+        await Assert.That(() => hook.ExecuteHook(null, new ListBox(), static () => [], null!, BindingDirection.OneWay))
             .ThrowsExactly<ArgumentNullException>();
     }
 
@@ -73,7 +73,7 @@ public class AutoDataTemplateBindingHookTests
         var hook = new AutoDataTemplateBindingHook();
         var items = new ListBox();
 
-        var result = hook.ExecuteHook(null, items, () => [], () => [], BindingDirection.OneWay);
+        var result = hook.ExecuteHook(null, items, static () => [], static () => [], BindingDirection.OneWay);
 
         await Assert.That(result).IsTrue();
         await Assert.That(items.ItemTemplate).IsNull();
@@ -87,7 +87,7 @@ public class AutoDataTemplateBindingHookTests
         var hook = new AutoDataTemplateBindingHook();
         var text = new TextBlock();
 
-        var result = hook.ExecuteHook(null, text, () => [], () => [TextObservedChange(text)], BindingDirection.OneWay);
+        var result = hook.ExecuteHook(null, text, static () => [], () => [TextObservedChange(text)], BindingDirection.OneWay);
 
         await Assert.That(result).IsTrue();
     }
@@ -100,7 +100,7 @@ public class AutoDataTemplateBindingHookTests
         var hook = new AutoDataTemplateBindingHook();
         var items = new ListBox();
 
-        var result = hook.ExecuteHook(null, items, () => [], () => [TagObservedChange(items)], BindingDirection.OneWay);
+        var result = hook.ExecuteHook(null, items, static () => [], () => [TagObservedChange(items)], BindingDirection.OneWay);
 
         await Assert.That(result).IsTrue();
         await Assert.That(items.ItemTemplate).IsNull();
@@ -112,12 +112,12 @@ public class AutoDataTemplateBindingHookTests
     public async Task ExecuteHook_WhenItemTemplateAlreadySet_DoesNotOverride()
     {
         var hook = new AutoDataTemplateBindingHook();
-        var items = new ListBox { ItemTemplate = new FuncDataTemplate<object>((_, _) => new TextBlock(), true) };
+        var items = new ListBox { ItemTemplate = new FuncDataTemplate<object>(static (_, _) => new TextBlock(), true) };
 
         var res = hook.ExecuteHook(
             null,
             items,
-            () => [],
+            static () => [],
             () => [ItemsObservedChange(items)],
             BindingDirection.OneWay);
 
@@ -132,12 +132,12 @@ public class AutoDataTemplateBindingHookTests
     {
         var hook = new AutoDataTemplateBindingHook();
         var items = new ListBox();
-        items.DataTemplates.Add(new FuncDataTemplate<object>((_, _) => new TextBlock(), true));
+        items.DataTemplates.Add(new FuncDataTemplate<object>(static (_, _) => new TextBlock(), true));
 
         var res = hook.ExecuteHook(
             null,
             items,
-            () => [],
+            static () => [],
             () => [ItemsObservedChange(items)],
             BindingDirection.OneWay);
 

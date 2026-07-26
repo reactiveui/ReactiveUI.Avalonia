@@ -131,11 +131,11 @@ public class DependencyInjectionTests
 
         foreach (var refAssembly in referencedAssemblies)
         {
-            if (refAssembly.Name!.StartsWith("Avalonia.Base") || refAssembly.Name.StartsWith("Avalonia"))
+            if (refAssembly.Name!.StartsWith("Avalonia.Base", System.StringComparison.Ordinal) || refAssembly.Name.StartsWith("Avalonia", System.StringComparison.Ordinal))
             {
                 hasAvaloniaBase = true;
             }
-            else if (refAssembly.Name.StartsWith("ReactiveUI"))
+            else if (refAssembly.Name.StartsWith("ReactiveUI", System.StringComparison.Ordinal))
             {
                 hasReactiveUI = true;
             }

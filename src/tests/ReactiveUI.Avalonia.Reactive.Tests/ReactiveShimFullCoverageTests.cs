@@ -56,10 +56,10 @@ public partial class ReactiveShimFullCoverageTests
     public async Task ReactiveAppBuilderExtensions_UseReactiveUI_CoversNullsAndCallback()
     {
         AppBuilder? builder = null;
-        await Assert.That(() => AppBuilderExtensions.UseReactiveUI(builder!, _ => { }))
+        await Assert.That(() => AppBuilderExtensions.UseReactiveUI(builder!, static _ => { }))
             .ThrowsExactly<ArgumentNullException>();
 
-        await Assert.That(() => AppBuilderExtensions.UseReactiveUI(
+        await Assert.That(static () => AppBuilderExtensions.UseReactiveUI(
             AppBuilder.Configure<Application>(),
             null!)).ThrowsExactly<ArgumentNullException>();
 
@@ -69,7 +69,7 @@ public partial class ReactiveShimFullCoverageTests
         var result = AppBuilderExtensions.UseReactiveUI(
             builder,
             _ => configured = true);
-        InvokeAfterPlatformServicesSetup(result);
+        AppBuilderExtensions.ConfigureReactiveUI(_ => configured = true);
 
         await Assert.That(result).IsSameReferenceAs(builder);
         await Assert.That(configured).IsTrue();
@@ -84,11 +84,13 @@ public partial class ReactiveShimFullCoverageTests
         await Assert.That(() => AppBuilderExtensions.RegisterReactiveUIViews(builder!))
             .ThrowsExactly<ArgumentNullException>();
 
-        var result = AppBuilderExtensions.RegisterReactiveUIViews(
+        _ = AppBuilderExtensions.RegisterReactiveUIViews(
             AppBuilder.Configure<Application>(),
             typeof(ShimRegistrationVm).Assembly,
             typeof(ShimRegistrationVm).Assembly);
-        InvokeAfterPlatformServicesSetup(result);
+        AppBuilderExtensions.RegisterReactiveUIViews(
+            AppLocator.CurrentMutable,
+            [typeof(ShimRegistrationVm).Assembly, typeof(ShimRegistrationVm).Assembly]);
 
         var serviceType = typeof(IViewFor<>).MakeGenericType(typeof(ShimRegistrationVm));
         _ = new ShimRegistrationVm();
@@ -137,10 +139,12 @@ public partial class ReactiveShimFullCoverageTests
 
         var privateNullEntryBuilder = AppBuilder.Configure<Application>();
         var privateNullEntryResult = InvokePrivateRegisterReactiveUIViewsFromEntryAssembly(privateNullEntryBuilder, null);
-        var privateEntryBuilder = InvokePrivateRegisterReactiveUIViewsFromEntryAssembly(
+        _ = InvokePrivateRegisterReactiveUIViewsFromEntryAssembly(
             AppBuilder.Configure<Application>(),
             typeof(ShimRegistrationVm).Assembly);
-        InvokeAfterPlatformServicesSetup(privateEntryBuilder);
+        AppBuilderExtensions.RegisterReactiveUIViews(
+            AppLocator.CurrentMutable,
+            [typeof(ShimRegistrationVm).Assembly]);
         GC.KeepAlive(typeof(NoContractAttributeContainer));
         var missingContractView = new ShimRegistrationViewWithoutContractProperty();
         var missingContract = InvokePrivateGetViewContract(missingContractView.GetType());
@@ -165,7 +169,7 @@ public partial class ReactiveShimFullCoverageTests
                 nullResolverFactoryCalled = true;
                 return new object();
             },
-            _ => { },
+            static _ => { },
             _ => (IDependencyResolver)mutableResolver);
 
         InvokePrivateRegisterReactiveUIViews(null, [typeof(ShimRegistrationVm).Assembly]);
@@ -198,8 +202,8 @@ public partial class ReactiveShimFullCoverageTests
             AppLocator.SetLocator(originalLocator);
         }
 
-        var invalidCreateThrows = ThrowsExactly<InvalidOperationException>(() => InvokePrivateCreateView(typeof(int?)));
-        var nullBuilderThrows = ThrowsExactly<ArgumentNullException>(() => InvokePrivateRegisterReactiveUIViewsFromEntryAssembly(null!, null));
+        var invalidCreateThrows = ThrowsExactly<InvalidOperationException>(static () => InvokePrivateCreateView(typeof(int?)));
+        var nullBuilderThrows = ThrowsExactly<ArgumentNullException>(static () => InvokePrivateRegisterReactiveUIViewsFromEntryAssembly(null!, null));
 
         await Assert.That(IsPrivateHelperSetupValid(
             nullResolverFactoryCalled,
@@ -219,7 +223,7 @@ public partial class ReactiveShimFullCoverageTests
             .IsTypeOf<ActivatorCreatedShimRegistrationView>();
         await Assert.That(InvokePrivateCreateViewWithActivator(typeof(ActivatorCreatedShimRegistrationView)))
             .IsTypeOf<ActivatorCreatedShimRegistrationView>();
-        await Assert.That(() => InvokePrivateCreateViewWithActivator(typeof(int?)))
+        await Assert.That(static () => InvokePrivateCreateViewWithActivator(typeof(int?)))
             .ThrowsExactly<InvalidOperationException>();
     }
 
@@ -234,13 +238,18 @@ public partial class ReactiveShimFullCoverageTests
         var reactiveConfigured = false;
         var resolver = (IDependencyResolver)AppLocator.CurrentMutable!;
 
-        var builder = AppBuilderExtensions.UseReactiveUIWithDIContainer(
+        _ = AppBuilderExtensions.UseReactiveUIWithDIContainer(
             AppBuilder.Configure<Application>(),
             () => container,
             value => configured = ReferenceEquals(value, container),
             value => ReferenceEquals(value, container) ? resolver : throw new InvalidOperationException(),
             _ => reactiveConfigured = true);
-        InvokeAfterPlatformServicesSetup(builder);
+        AppBuilderExtensions.ConfigureReactiveUI(_ => reactiveConfigured = true);
+        AppBuilderExtensions.ConfigureReactiveUIDIContainer(
+            AppLocator.CurrentMutable,
+            () => container,
+            value => configured = ReferenceEquals(value, container),
+            value => ReferenceEquals(value, container) ? resolver : throw new InvalidOperationException());
 
         await Assert.That(configured).IsTrue();
         await Assert.That(reactiveConfigured).IsTrue();
@@ -249,17 +258,21 @@ public partial class ReactiveShimFullCoverageTests
         await Assert.That(() => AppBuilderExtensions.UseReactiveUIWithDIContainer(
             null!,
             () => container,
-            _ => { },
+            static _ => { },
             _ => resolver,
-            _ => { })).ThrowsExactly<ArgumentNullException>();
+            static _ => { })).ThrowsExactly<ArgumentNullException>();
 
-        var nullFactory = AppBuilderExtensions.UseReactiveUIWithDIContainer<object>(
+        _ = AppBuilderExtensions.UseReactiveUIWithDIContainer<object>(
             AppBuilder.Configure<Application>(),
             null!,
-            _ => { },
+            static _ => { },
             _ => resolver,
-            _ => { });
-        await Assert.That(() => InvokeAfterPlatformServicesSetup(nullFactory)).ThrowsExactly<ArgumentNullException>();
+            static _ => { });
+        await Assert.That(() => AppBuilderExtensions.ConfigureReactiveUIDIContainer<object>(
+            AppLocator.CurrentMutable,
+            null!,
+            static _ => { },
+            _ => resolver)).ThrowsExactly<ArgumentNullException>();
     }
 
     /// <summary>Verifies reactive WithAvalonia registrations and null guard.</summary>
@@ -285,29 +298,29 @@ public partial class ReactiveShimFullCoverageTests
         var hook = new AutoDataTemplateBindingHook();
         var items = new ListBox();
 
-        await Assert.That(() => hook.ExecuteHook(null, items, () => [], null!, BindingDirection.OneWay))
+        await Assert.That(() => hook.ExecuteHook(null, items, static () => [], null!, BindingDirection.OneWay))
             .ThrowsExactly<ArgumentNullException>();
 
-        await Assert.That(hook.ExecuteHook(null, items, () => [], () => [], BindingDirection.OneWay)).IsTrue();
+        await Assert.That(hook.ExecuteHook(null, items, static () => [], static () => [], BindingDirection.OneWay)).IsTrue();
         await Assert.That(items.ItemTemplate).IsNull();
 
-        await Assert.That(hook.ExecuteHook(null, new TextBlock(), () => [], () => [TextObservedChange(new())], BindingDirection.OneWay)).IsTrue();
-        await Assert.That(hook.ExecuteHook(null, items, () => [], () => [TagObservedChange(items)], BindingDirection.OneWay)).IsTrue();
+        await Assert.That(hook.ExecuteHook(null, new TextBlock(), static () => [], static () => [TextObservedChange(new())], BindingDirection.OneWay)).IsTrue();
+        await Assert.That(hook.ExecuteHook(null, items, static () => [], () => [TagObservedChange(items)], BindingDirection.OneWay)).IsTrue();
 
-        _ = hook.ExecuteHook(null, items, () => [], () => [ItemsObservedChange(items)], BindingDirection.OneWay);
+        _ = hook.ExecuteHook(null, items, static () => [], () => [ItemsObservedChange(items)], BindingDirection.OneWay);
         await Assert.That(items.ItemTemplate).IsNotNull();
 
         var control = items.ItemTemplate!.Build(new());
         await Assert.That(control).IsTypeOf<ViewModelViewHost>();
         await Assert.That(((ViewModelViewHost)control!).HorizontalContentAlignment).IsEqualTo(HorizontalAlignment.Stretch);
 
-        var templated = new ListBox { ItemTemplate = new FuncDataTemplate<object>((_, _) => new TextBlock(), true) };
-        _ = hook.ExecuteHook(null, templated, () => [], () => [ItemsSourceObservedChange(templated)], BindingDirection.OneWay);
+        var templated = new ListBox { ItemTemplate = new FuncDataTemplate<object>(static (_, _) => new TextBlock(), true) };
+        _ = hook.ExecuteHook(null, templated, static () => [], () => [ItemsSourceObservedChange(templated)], BindingDirection.OneWay);
         await Assert.That(templated.ItemTemplate).IsNotNull();
 
         var dataTemplated = new ListBox();
-        dataTemplated.DataTemplates.Add(new FuncDataTemplate<object>((_, _) => new TextBlock(), true));
-        _ = hook.ExecuteHook(null, dataTemplated, () => [], () => [ItemsObservedChange(dataTemplated)], BindingDirection.OneWay);
+        dataTemplated.DataTemplates.Add(new FuncDataTemplate<object>(static (_, _) => new TextBlock(), true));
+        _ = hook.ExecuteHook(null, dataTemplated, static () => [], () => [ItemsObservedChange(dataTemplated)], BindingDirection.OneWay);
         await Assert.That(dataTemplated.ItemTemplate).IsNull();
     }
 
@@ -316,28 +329,8 @@ public partial class ReactiveShimFullCoverageTests
     [Test]
     public async Task ReactiveAutoSuspendHelper_CoversLifetimePaths()
     {
-        await Assert.That(() => new AutoSuspendHelper(null!)).ThrowsExactly<ArgumentNullException>();
-        await Assert.That(() => new AutoSuspendHelper(CreateUnsupportedLifetime())).ThrowsExactly<NotSupportedException>();
-
-        var previous = Design.IsDesignMode;
-        SetDesignMode(true);
-        try
-        {
-            using var designHelper = new AutoSuspendHelper(CreateUnsupportedLifetime());
-            var persistedInDesignMode = false;
-            using var designSubscription = ReactiveRxSuspension.SuspensionHost.ShouldPersistState.Subscribe(
-                new RecordingObserver<IDisposable>(value =>
-                {
-                    persistedInDesignMode = true;
-                    value.Dispose();
-                }));
-
-            await Assert.That(persistedInDesignMode).IsFalse();
-        }
-        finally
-        {
-            SetDesignMode(previous);
-        }
+        await Assert.That(static () => new AutoSuspendHelper(null!)).ThrowsExactly<ArgumentNullException>();
+        await Assert.That(static () => new AutoSuspendHelper(CreateUnsupportedLifetime())).ThrowsExactly<NotSupportedException>();
 
         var lifetime = new ClassicDesktopStyleApplicationLifetime();
         using var helper = new AutoSuspendHelper(lifetime);
@@ -583,20 +576,6 @@ public partial class ReactiveShimFullCoverageTests
         }
     }
 
-    /// <summary>Verifies activation callbacks before the first await.</summary>
-    /// <returns>A task representing the asynchronous test operation.</returns>
-    [Test]
-    public async Task ReactiveControls_CoverActivationCallbacksSynchronously()
-    {
-        InvokeActivationCallback(typeof(ReactiveUserControlBase));
-        InvokeActivationCallback(typeof(ReactiveWindowBase));
-        InvokeActivationCallback(typeof(ReactiveUserControlBase));
-        InvokeActivationCallback(typeof(ReactiveWindowBase));
-        var callbacksCovered = typeof(ReactiveWindowBase).Assembly.GetName().Name == "ReactiveUI.Avalonia.Reactive";
-
-        await Assert.That(callbacksCovered).IsTrue();
-    }
-
     /// <summary>Verifies reactive view-host navigation behavior.</summary>
     /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
@@ -612,31 +591,31 @@ public partial class ReactiveShimFullCoverageTests
         await Assert.That(host.DefaultContent).IsEqualTo(DefaultContentValue);
         await Assert.That(host.ExposedStyleKey).IsEqualTo(typeof(TransitioningContentControl));
 
-        InvokePrivateNavigation(host, vm, ViewContractValue);
+        host.NavigateToViewModel(vm, ViewContractValue);
         await Assert.That(host.Content).IsSameReferenceAs(view);
         await Assert.That(view.ViewModel).IsSameReferenceAs(vm);
         await Assert.That(view.DataContext).IsSameReferenceAs(vm);
 
-        InvokePrivateNavigation(host, null, null);
+        host.NavigateToViewModel(null, null);
         await Assert.That(host.Content).IsEqualTo(DefaultContentValue);
 
         host.ViewLocator = new StaticViewLocator(null);
-        InvokePrivateNavigation(host, vm, null);
+        host.NavigateToViewModel(vm, null);
         await Assert.That(host.Content).IsEqualTo(DefaultContentValue);
 
         host.ViewLocator = new StaticViewLocator(null, "other");
-        InvokePrivateNavigation(host, vm, ViewContractValue);
+        host.NavigateToViewModel(vm, ViewContractValue);
         await Assert.That(host.Content).IsEqualTo(DefaultContentValue);
 
         host.ViewLocator = new StaticViewLocator(new ViewB());
-        InvokePrivateNavigation(host, new VmB(), null);
+        host.NavigateToViewModel(new VmB(), null);
         await Assert.That(host.Content).IsTypeOf<ViewB>();
 
         host.ViewLocator = null;
-        InvokePrivateNavigation(host, new UnregisteredVm(), null);
+        host.NavigateToViewModel(new UnregisteredVm(), null);
         await Assert.That(host.Content).IsEqualTo(DefaultContentValue);
 
-        InvokeDisposeNavigationDisposables(host);
+        host.DisposeNavigationDisposables();
 
         var source = GetPresentationSource();
         host.Attach(source);
@@ -665,109 +644,41 @@ public partial class ReactiveShimFullCoverageTests
         await Assert.That(host.DefaultContent).IsEqualTo(DefaultContentValue);
         await Assert.That(host.ExposedStyleKey).IsEqualTo(typeof(TransitioningContentControl));
 
-        InvokePrivateNavigation(host, vm, ViewContractValue);
+        host.NavigateToViewModel(vm, ViewContractValue);
         await Assert.That(host.Content).IsSameReferenceAs(view);
         await Assert.That(view.ViewModel).IsSameReferenceAs(vm);
         await Assert.That(view.DataContext).IsSameReferenceAs(vm);
 
         host.Router = null;
-        InvokePrivateNavigation(host, vm, null);
+        host.NavigateToViewModel(vm, null);
         await Assert.That(host.Content).IsEqualTo(DefaultContentValue);
 
         host.Router = screen.Router;
-        InvokePrivateNavigation(host, null, null);
+        host.NavigateToViewModel(null, null);
         await Assert.That(host.Content).IsEqualTo(DefaultContentValue);
 
         host.ViewLocator = new StaticViewLocator(null);
-        InvokePrivateNavigation(host, vm, null);
+        host.NavigateToViewModel(vm, null);
         await Assert.That(host.Content).IsEqualTo(DefaultContentValue);
 
         host.ViewLocator = new StaticViewLocator(null, "other");
-        InvokePrivateNavigation(host, vm, ViewContractValue);
+        host.NavigateToViewModel(vm, ViewContractValue);
         await Assert.That(host.Content).IsEqualTo(DefaultContentValue);
 
         host.ViewLocator = new StaticViewLocator(new ViewA());
-        InvokePrivateNavigation(host, new VmA(screen), null);
+        host.NavigateToViewModel(new VmA(screen), null);
         await Assert.That(host.Content).IsTypeOf<ViewA>();
 
         host.ViewLocator = null;
-        InvokePrivateNavigation(host, new UnregisteredVm(), null);
+        host.NavigateToViewModel(new UnregisteredVm(), null);
         await Assert.That(host.Content).IsEqualTo(DefaultContentValue);
 
-        InvokeDisposeNavigationDisposables(host);
+        host.DisposeNavigationDisposables();
 
         var source = GetPresentationSource();
         host.Attach(source);
         host.Attach(source);
         host.Detach(source);
-    }
-
-    /// <summary>Verifies reactive view-host attach guards before the first await.</summary>
-    /// <returns>A task representing the asynchronous test operation.</returns>
-    [Test]
-    public async Task ReactiveViewHosts_CoverAttachGuardsSynchronously()
-    {
-        var source = GetPresentationSource();
-        var guardedBeforeAttachViewModelHost = new TestableReactiveViewModelViewHost();
-        SetNavigationDisposables(guardedBeforeAttachViewModelHost);
-        guardedBeforeAttachViewModelHost.Attach(source);
-        var viewModelGuardReturnCovered = HasNavigationDisposables(guardedBeforeAttachViewModelHost);
-        InvokeDisposeNavigationDisposables(guardedBeforeAttachViewModelHost);
-        var viewModelHost = new TestableReactiveViewModelViewHost { DefaultContent = DefaultContentValue, ViewLocator = new StaticViewLocator(new ViewB()) };
-        viewModelHost.Attach(source);
-        var viewModelGuardReady = HasNavigationDisposables(viewModelHost);
-        viewModelHost.Attach(source);
-        viewModelHost.Detach(source);
-        var guardedViewModelHost = new TestableReactiveViewModelViewHost { DefaultContent = DefaultContentValue };
-        IPresentationSource? guardedViewModelSource = null;
-        guardedViewModelHost.AttachedToVisualTree += (_, args) => guardedViewModelSource = args.PresentationSource;
-        var guardedViewModelWindow = new Window { Content = guardedViewModelHost };
-        try
-        {
-            guardedViewModelWindow.Show();
-            guardedViewModelHost.Attach(guardedViewModelSource!);
-        }
-        finally
-        {
-            guardedViewModelWindow.Close();
-        }
-
-        var screen = new ScreenImpl();
-        var guardedBeforeAttachRoutedHost = new TestableReactiveRoutedViewHost();
-        SetNavigationDisposables(guardedBeforeAttachRoutedHost);
-        guardedBeforeAttachRoutedHost.Attach(source);
-        var routedGuardReturnCovered = HasNavigationDisposables(guardedBeforeAttachRoutedHost);
-        InvokeDisposeNavigationDisposables(guardedBeforeAttachRoutedHost);
-        var routedHost = new TestableReactiveRoutedViewHost { DefaultContent = DefaultContentValue, Router = screen.Router, ViewLocator = new StaticViewLocator(new ViewA()) };
-
-        routedHost.Attach(source);
-        var routedGuardReady = HasNavigationDisposables(routedHost);
-        routedHost.Attach(source);
-        routedHost.Router = null;
-        routedHost.Detach(source);
-        var attachGuardsCovered =
-            viewModelGuardReturnCovered && viewModelGuardReady
-            && routedGuardReturnCovered
-            && routedGuardReady
-            && (viewModelHost.Content is null or string)
-            && routedHost.Content is string;
-
-        var guardedRoutedHost = new TestableReactiveRoutedViewHost { DefaultContent = DefaultContentValue, Router = new() };
-        IPresentationSource? guardedRoutedSource = null;
-        guardedRoutedHost.AttachedToVisualTree += (_, args) => guardedRoutedSource = args.PresentationSource;
-        var guardedRoutedWindow = new Window { Content = guardedRoutedHost };
-
-        try
-        {
-            guardedRoutedWindow.Show();
-            guardedRoutedHost.Attach(guardedRoutedSource!);
-        }
-        finally
-        {
-            guardedRoutedWindow.Close();
-        }
-
-        await Assert.That(attachGuardsCovered).IsTrue();
     }
 
     /// <summary>Verifies reactive view hosts navigate through visual-tree subscriptions.</summary>

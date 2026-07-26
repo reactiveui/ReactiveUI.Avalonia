@@ -27,7 +27,7 @@ public class ReactiveUserControlBase : UserControl, IViewFor
     {
         // This WhenActivated block calls ViewModel's WhenActivated
         // block if the ViewModel implements IActivatableViewModel.
-        _ = this.WhenActivated((ActivationDisposables disposables) => { });
+        _ = this.WhenActivated(static (ActivationDisposables disposables) => { });
     }
 
     /// <inheritdoc cref="IViewFor.ViewModel"/>

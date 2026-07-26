@@ -1,7 +1,6 @@
 // Copyright (c) 2019-2026 ReactiveUI Association Incorporated. All rights reserved.
 // ReactiveUI Association Incorporated licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for full license information.
-using System.Reflection;
 using Avalonia.Controls;
 using Avalonia.Rendering;
 using Splat;
@@ -17,9 +16,6 @@ public class ViewHostsNavigationTests
     /// <summary>The view contract used by navigation tests.</summary>
     private const string ViewContractValue = "contract";
 
-    /// <summary>The private navigation method invoked by the tests.</summary>
-    private const string NavigateToViewModelMethodName = "NavigateToViewModel";
-
     /// <summary>Verifies that ViewModelViewHost navigates to a resolved view and sets its ViewModel.</summary>
     /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
@@ -29,8 +25,7 @@ public class ViewHostsNavigationTests
         var host = new ViewModelViewHost { DefaultContent = DefaultContentValue };
         var vm = new VmB();
 
-        var m = typeof(ViewModelViewHost).GetMethod(NavigateToViewModelMethodName, BindingFlags.Instance | BindingFlags.NonPublic);
-        _ = m!.Invoke(host, [vm, null]);
+        host.NavigateToViewModel(vm, null);
 
         await Assert.That(host.Content).IsTypeOf<ViewB>();
         await Assert.That(((IViewFor)host.Content!).ViewModel).IsSameReferenceAs(vm);
@@ -139,7 +134,7 @@ public class ViewHostsNavigationTests
     {
         var host = new ViewModelViewHost();
 
-        InvokeDisposeNavigationDisposables(host);
+        host.DisposeNavigationDisposables();
 
         await Assert.That(host.Content).IsNull();
     }
@@ -151,8 +146,7 @@ public class ViewHostsNavigationTests
     {
         var host = new ViewModelViewHost { DefaultContent = DefaultContentValue };
 
-        var m = typeof(ViewModelViewHost).GetMethod(NavigateToViewModelMethodName, BindingFlags.Instance | BindingFlags.NonPublic);
-        _ = m!.Invoke(host, [new object(), null]);
+        host.NavigateToViewModel(new(), null);
 
         await Assert.That(host.Content).IsEqualTo(DefaultContentValue);
     }
@@ -164,8 +158,7 @@ public class ViewHostsNavigationTests
     {
         var host = new ViewModelViewHost { DefaultContent = DefaultContentValue };
 
-        var m = typeof(ViewModelViewHost).GetMethod(NavigateToViewModelMethodName, BindingFlags.Instance | BindingFlags.NonPublic);
-        _ = m!.Invoke(host, [null, null]);
+        host.NavigateToViewModel(null, null);
 
         await Assert.That(host.Content).IsEqualTo(DefaultContentValue);
     }
@@ -179,8 +172,7 @@ public class ViewHostsNavigationTests
         var host = new ViewModelViewHost { DefaultContent = DefaultContentValue, ViewLocator = new StaticViewLocator(view, ViewContractValue) };
         var vm = new VmB();
 
-        var m = typeof(ViewModelViewHost).GetMethod(NavigateToViewModelMethodName, BindingFlags.Instance | BindingFlags.NonPublic);
-        _ = m!.Invoke(host, [vm, ViewContractValue]);
+        host.NavigateToViewModel(vm, ViewContractValue);
 
         await Assert.That(host.Content).IsSameReferenceAs(view);
         await Assert.That(view.ViewModel).IsSameReferenceAs(vm);
@@ -194,8 +186,7 @@ public class ViewHostsNavigationTests
     {
         var host = new ViewModelViewHost { DefaultContent = DefaultContentValue, ViewLocator = new StaticViewLocator(null, "different") };
 
-        var m = typeof(ViewModelViewHost).GetMethod(NavigateToViewModelMethodName, BindingFlags.Instance | BindingFlags.NonPublic);
-        _ = m!.Invoke(host, [new VmB(), ViewContractValue]);
+        host.NavigateToViewModel(new VmB(), ViewContractValue);
 
         await Assert.That(host.Content).IsEqualTo(DefaultContentValue);
     }
@@ -210,8 +201,7 @@ public class ViewHostsNavigationTests
         var host = new RoutedViewHost { DefaultContent = "def", Router = screen.Router };
         var vm = new VmA(screen);
 
-        var m = typeof(RoutedViewHost).GetMethod(NavigateToViewModelMethodName, BindingFlags.Instance | BindingFlags.NonPublic);
-        _ = m!.Invoke(host, [vm, null]);
+        host.NavigateToViewModel(vm, null);
 
         await Assert.That(host.Content).IsTypeOf<ViewA>();
         await Assert.That(((IViewFor)host.Content!).ViewModel).IsSameReferenceAs(vm);
@@ -341,7 +331,7 @@ public class ViewHostsNavigationTests
     {
         var host = new RoutedViewHost();
 
-        InvokeDisposeNavigationDisposables(host);
+        host.DisposeNavigationDisposables();
 
         await Assert.That(host.Content).IsNull();
     }
@@ -353,8 +343,7 @@ public class ViewHostsNavigationTests
     {
         var host = new RoutedViewHost { DefaultContent = "def" };
 
-        var m = typeof(RoutedViewHost).GetMethod(NavigateToViewModelMethodName, BindingFlags.Instance | BindingFlags.NonPublic);
-        _ = m!.Invoke(host, [new object(), null]);
+        host.NavigateToViewModel(new(), null);
 
         await Assert.That(host.Content).IsEqualTo("def");
     }
@@ -366,8 +355,7 @@ public class ViewHostsNavigationTests
     {
         var host = new RoutedViewHost { DefaultContent = "def", Router = new() };
 
-        var m = typeof(RoutedViewHost).GetMethod(NavigateToViewModelMethodName, BindingFlags.Instance | BindingFlags.NonPublic);
-        _ = m!.Invoke(host, [null, null]);
+        host.NavigateToViewModel(null, null);
 
         await Assert.That(host.Content).IsEqualTo("def");
     }
@@ -382,8 +370,7 @@ public class ViewHostsNavigationTests
         var host = new RoutedViewHost { DefaultContent = "def", Router = screen.Router, ViewLocator = new StaticViewLocator(view, ViewContractValue) };
         var vm = new VmA(screen);
 
-        var m = typeof(RoutedViewHost).GetMethod(NavigateToViewModelMethodName, BindingFlags.Instance | BindingFlags.NonPublic);
-        _ = m!.Invoke(host, [vm, ViewContractValue]);
+        host.NavigateToViewModel(vm, ViewContractValue);
 
         await Assert.That(host.Content).IsSameReferenceAs(view);
         await Assert.That(view.ViewModel).IsSameReferenceAs(vm);
@@ -397,8 +384,7 @@ public class ViewHostsNavigationTests
     {
         var host = new RoutedViewHost { DefaultContent = "def", Router = new(), ViewLocator = new StaticViewLocator(null) };
 
-        var m = typeof(RoutedViewHost).GetMethod(NavigateToViewModelMethodName, BindingFlags.Instance | BindingFlags.NonPublic);
-        _ = m!.Invoke(host, [new object(), null]);
+        host.NavigateToViewModel(new(), null);
 
         await Assert.That(host.Content).IsEqualTo("def");
     }
@@ -410,8 +396,7 @@ public class ViewHostsNavigationTests
     {
         var host = new RoutedViewHost { DefaultContent = "def", Router = new(), ViewLocator = new StaticViewLocator(null, "different") };
 
-        var m = typeof(RoutedViewHost).GetMethod(NavigateToViewModelMethodName, BindingFlags.Instance | BindingFlags.NonPublic);
-        _ = m!.Invoke(host, [new object(), ViewContractValue]);
+        host.NavigateToViewModel(new(), ViewContractValue);
 
         await Assert.That(host.Content).IsEqualTo("def");
     }
@@ -419,8 +404,8 @@ public class ViewHostsNavigationTests
     /// <summary>Registers test views into the locator.</summary>
     private static void RegisterViews()
     {
-        Locator.CurrentMutable.Register(() => new ViewA(), typeof(IViewFor<VmA>));
-        Locator.CurrentMutable.Register(() => new ViewB(), typeof(IViewFor<VmB>));
+        Locator.CurrentMutable.Register(static () => new ViewA(), typeof(IViewFor<VmA>));
+        Locator.CurrentMutable.Register(static () => new ViewB(), typeof(IViewFor<VmB>));
     }
 
     /// <summary>Gets a real presentation source from a headless window.</summary>
@@ -441,22 +426,6 @@ public class ViewHostsNavigationTests
         {
             window.Close();
         }
-    }
-
-    /// <summary>Invokes the private ViewModelViewHost navigation disposal helper.</summary>
-    /// <param name="host">The host instance.</param>
-    private static void InvokeDisposeNavigationDisposables(ViewModelViewHost host)
-    {
-        var method = typeof(ViewModelViewHost).GetMethod("DisposeNavigationDisposables", BindingFlags.Instance | BindingFlags.NonPublic);
-        _ = method!.Invoke(host, null);
-    }
-
-    /// <summary>Invokes the private RoutedViewHost navigation disposal helper.</summary>
-    /// <param name="host">The host instance.</param>
-    private static void InvokeDisposeNavigationDisposables(RoutedViewHost host)
-    {
-        var method = typeof(RoutedViewHost).GetMethod("DisposeNavigationDisposables", BindingFlags.Instance | BindingFlags.NonPublic);
-        _ = method!.Invoke(host, null);
     }
 
     /// <summary>A testable ViewModelViewHost that exposes protected members.</summary>

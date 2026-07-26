@@ -10,8 +10,6 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Rendering;
 using Splat;
 
-using ActivationDisposables = ReactiveUI.Primitives.Disposables.MultipleDisposable;
-using ExceptionDispatchInfo = System.Runtime.ExceptionServices.ExceptionDispatchInfo;
 using ReactiveIRoutableViewModel = global::ReactiveUI.Reactive.IRoutableViewModel;
 using ReactiveIScreen = global::ReactiveUI.Reactive.IScreen;
 using ReactiveRoutingState = global::ReactiveUI.Reactive.RoutingState;
@@ -21,9 +19,6 @@ namespace ReactiveUI.Avalonia.Reactive.Tests;
 /// <summary>Test infrastructure for <see cref="ReactiveShimFullCoverageTests"/>.</summary>
 public partial class ReactiveShimFullCoverageTests
 {
-    /// <summary>The private navigation-disposables field name on reactive view hosts.</summary>
-    private const string NavigationDisposablesFieldName = "_navigationDisposables";
-
     /// <summary>Returns whether private registration helpers produced their expected outcomes.</summary>
     /// <param name="nullResolverFactoryCalled">Whether the null resolver factory ran.</param>
     /// <param name="containerConfigured">Whether the container configuration ran.</param>
@@ -46,174 +41,39 @@ public partial class ReactiveShimFullCoverageTests
         && invalidCreateThrows
         && nullBuilderThrows;
 
-    /// <summary>Invokes the application builder callback that completes platform service setup.</summary>
-    /// <param name="builder">The application builder.</param>
-    private static void InvokeAfterPlatformServicesSetup(AppBuilder builder)
-    {
-        var property = typeof(AppBuilder).GetProperty(
-            "AfterPlatformServicesSetupCallback",
-            BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-
-        var callback = (Action<AppBuilder>?)property?.GetValue(builder);
-        callback?.Invoke(builder);
-    }
-
-    /// <summary>Invokes a ViewModelViewHost private navigation method.</summary>
-    /// <param name="host">The host to invoke.</param>
-    /// <param name="viewModel">The view model.</param>
-    /// <param name="contract">The view contract.</param>
-    private static void InvokePrivateNavigation(ViewModelViewHost host, object? viewModel, string? contract)
-    {
-        var method = typeof(ViewModelViewHost)
-            .GetMethod("NavigateToViewModel", BindingFlags.Instance | BindingFlags.NonPublic);
-        _ = method!.Invoke(host, [viewModel, contract]);
-    }
-
-    /// <summary>Invokes a RoutedViewHost private navigation method.</summary>
-    /// <param name="host">The host to invoke.</param>
-    /// <param name="viewModel">The view model.</param>
-    /// <param name="contract">The view contract.</param>
-    private static void InvokePrivateNavigation(RoutedViewHost host, object? viewModel, string? contract)
-    {
-        var method = typeof(RoutedViewHost)
-            .GetMethod("NavigateToViewModel", BindingFlags.Instance | BindingFlags.NonPublic);
-        _ = method!.Invoke(host, [viewModel, contract]);
-    }
-
-    /// <summary>Invokes the private reactive ViewModelViewHost navigation disposal helper.</summary>
-    /// <param name="host">The host instance.</param>
-    private static void InvokeDisposeNavigationDisposables(ViewModelViewHost host)
-    {
-        var method = typeof(ViewModelViewHost)
-            .GetMethod("DisposeNavigationDisposables", BindingFlags.Instance | BindingFlags.NonPublic);
-
-        _ = method!.Invoke(host, null);
-    }
-
-    /// <summary>Invokes the private reactive RoutedViewHost navigation disposal helper.</summary>
-    /// <param name="host">The host instance.</param>
-    private static void InvokeDisposeNavigationDisposables(RoutedViewHost host)
-    {
-        var method = typeof(RoutedViewHost)
-            .GetMethod("DisposeNavigationDisposables", BindingFlags.Instance | BindingFlags.NonPublic);
-
-        _ = method!.Invoke(host, null);
-    }
-
-    /// <summary>Returns whether the reactive view-model host has navigation disposables.</summary>
-    /// <param name="host">The host instance.</param>
-    /// <returns><see langword="true"/> when navigation disposables are present.</returns>
-    private static bool HasNavigationDisposables(ViewModelViewHost host)
-    {
-        var field = typeof(ViewModelViewHost)
-            .GetField(NavigationDisposablesFieldName, BindingFlags.Instance | BindingFlags.NonPublic);
-
-        return field!.GetValue(host) is not null;
-    }
-
-    /// <summary>Returns whether the reactive routed host has navigation disposables.</summary>
-    /// <param name="host">The host instance.</param>
-    /// <returns><see langword="true"/> when navigation disposables are present.</returns>
-    private static bool HasNavigationDisposables(RoutedViewHost host)
-    {
-        var field = typeof(RoutedViewHost)
-            .GetField(NavigationDisposablesFieldName, BindingFlags.Instance | BindingFlags.NonPublic);
-
-        return field!.GetValue(host) is not null;
-    }
-
-    /// <summary>Seeds the reactive view-model host navigation subscriptions.</summary>
-    /// <param name="host">The host instance.</param>
-    private static void SetNavigationDisposables(ViewModelViewHost host)
-    {
-        var field = typeof(ViewModelViewHost)
-            .GetField(NavigationDisposablesFieldName, BindingFlags.Instance | BindingFlags.NonPublic);
-
-        field!.SetValue(host, Activator.CreateInstance(field.FieldType));
-    }
-
-    /// <summary>Seeds the reactive routed host navigation subscriptions.</summary>
-    /// <param name="host">The host instance.</param>
-    private static void SetNavigationDisposables(RoutedViewHost host)
-    {
-        var field = typeof(RoutedViewHost)
-            .GetField(NavigationDisposablesFieldName, BindingFlags.Instance | BindingFlags.NonPublic);
-
-        field!.SetValue(host, Activator.CreateInstance(field.FieldType));
-    }
-
     /// <summary>Invokes the private view factory used by assembly view registration.</summary>
     /// <param name="viewType">The view type to create.</param>
     /// <returns>The created view instance.</returns>
-    private static object InvokePrivateCreateView(Type viewType)
-    {
-        var method = typeof(AppBuilderExtensions)
-            .GetMethod("CreateView", BindingFlags.Static | BindingFlags.NonPublic);
-        return InvokeReflectedMethod(method!, null, [viewType])!;
-    }
+    private static object InvokePrivateCreateView(Type viewType) => AppBuilderExtensions.CreateView(viewType);
 
     /// <summary>Invokes the private Activator-based view factory.</summary>
     /// <param name="viewType">The view type to create.</param>
     /// <returns>The created view instance.</returns>
-    private static object InvokePrivateCreateViewWithActivator(Type viewType)
-    {
-        var method = typeof(AppBuilderExtensions)
-            .GetMethod("CreateViewWithActivator", BindingFlags.Static | BindingFlags.NonPublic);
-        return InvokeReflectedMethod(method!, null, [viewType])!;
-    }
+    private static object InvokePrivateCreateViewWithActivator(Type viewType) => AppBuilderExtensions.CreateViewWithActivator(viewType);
 
     /// <summary>Invokes the private resolver-failure fallback view factory.</summary>
     /// <param name="viewType">The view type to create.</param>
     /// <returns>The created view instance.</returns>
-    private static object InvokePrivateCreateViewAfterResolutionFailure(Type viewType)
-    {
-        var method = typeof(AppBuilderExtensions)
-            .GetMethod("CreateViewAfterResolutionFailure", BindingFlags.Static | BindingFlags.NonPublic);
-        return InvokeReflectedMethod(method!, null, [viewType, new InvalidOperationException("expected")])!;
-    }
+    private static object InvokePrivateCreateViewAfterResolutionFailure(Type viewType) =>
+        AppBuilderExtensions.CreateViewAfterResolutionFailure(viewType, new InvalidOperationException("expected"));
 
     /// <summary>Invokes the private view-contract attribute helper.</summary>
     /// <param name="viewType">The view type to inspect.</param>
     /// <returns>The reflected contract value.</returns>
-    private static string? InvokePrivateGetViewContract(Type viewType)
-    {
-        var method = typeof(AppBuilderExtensions)
-            .GetMethod("GetViewContract", BindingFlags.Static | BindingFlags.NonPublic);
-        return (string?)InvokeReflectedMethod(method!, null, [viewType]);
-    }
+    private static string? InvokePrivateGetViewContract(Type viewType) => AppBuilderExtensions.GetViewContract(viewType);
 
     /// <summary>Invokes the private entry-assembly view registration helper.</summary>
     /// <param name="builder">The builder instance.</param>
     /// <param name="entryAssembly">The entry assembly.</param>
     /// <returns>The returned builder.</returns>
-    private static AppBuilder InvokePrivateRegisterReactiveUIViewsFromEntryAssembly(AppBuilder builder, Assembly? entryAssembly)
-    {
-        var method = typeof(AppBuilderExtensions)
-            .GetMethods(BindingFlags.Static | BindingFlags.NonPublic)
-            .Single(candidate =>
-                candidate.Name == "RegisterReactiveUIViewsFromEntryAssembly"
-                && candidate.GetParameters() is [{ ParameterType: var builderType }, { ParameterType: var assemblyType }]
-                && builderType == typeof(AppBuilder)
-                && assemblyType == typeof(Assembly));
-
-        return (AppBuilder)InvokeReflectedMethod(method, null, [builder, entryAssembly])!;
-    }
+    private static AppBuilder InvokePrivateRegisterReactiveUIViewsFromEntryAssembly(AppBuilder builder, Assembly? entryAssembly) =>
+        AppBuilderExtensions.RegisterReactiveUIViewsFromEntryAssembly(builder, entryAssembly);
 
     /// <summary>Invokes the private guarded view registration helper.</summary>
     /// <param name="resolver">The resolver instance.</param>
     /// <param name="assemblies">The assemblies to scan.</param>
-    private static void InvokePrivateRegisterReactiveUIViews(IMutableDependencyResolver? resolver, Assembly[]? assemblies)
-    {
-        var method = typeof(AppBuilderExtensions)
-            .GetMethods(BindingFlags.Static | BindingFlags.NonPublic)
-            .Single(candidate =>
-                candidate.Name == "RegisterReactiveUIViews"
-                && candidate.GetParameters() is [{ ParameterType: var resolverType }, { ParameterType: var assembliesType }]
-                && resolverType == typeof(IMutableDependencyResolver)
-                && assembliesType == typeof(Assembly[]));
-
-        _ = InvokeReflectedMethod(method, null, [resolver, assemblies]);
-    }
+    private static void InvokePrivateRegisterReactiveUIViews(IMutableDependencyResolver? resolver, Assembly[]? assemblies) =>
+        AppBuilderExtensions.RegisterReactiveUIViews(resolver, assemblies);
 
     /// <summary>Invokes the private dependency-injection container helper.</summary>
     /// <typeparam name="TContainer">The container type.</typeparam>
@@ -226,34 +86,12 @@ public partial class ReactiveShimFullCoverageTests
         Func<TContainer> containerFactory,
         Action<TContainer> containerConfig,
         Func<TContainer, IDependencyResolver> dependencyResolverFactory)
-        where TContainer : class
-    {
-        var method = typeof(AppBuilderExtensions)
-            .GetMethods(BindingFlags.Static | BindingFlags.NonPublic)
-            .Single(candidate => candidate.Name == "ConfigureReactiveUIDIContainer" && candidate.IsGenericMethodDefinition);
-
-        _ = InvokeReflectedMethod(
-            method.MakeGenericMethod(typeof(TContainer)),
-            null,
-            [resolver, containerFactory, containerConfig, dependencyResolverFactory]);
-    }
-
-    /// <summary>Invokes a compiler-generated activation callback.</summary>
-    /// <param name="viewType">The view base type that owns the callback.</param>
-    private static void InvokeActivationCallback(Type viewType)
-    {
-        var closureType = viewType.GetNestedTypes(BindingFlags.NonPublic)
-            .Single(type => type.Name.Contains("<>c", StringComparison.Ordinal));
-        var instance = closureType.GetField("<>9", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public)
-            ?.GetValue(null);
-        var method = closureType.GetMethods(BindingFlags.Instance | BindingFlags.NonPublic)
-            .Single(candidate =>
-                candidate.GetParameters() is [{ ParameterType: var parameterType }]
-                && parameterType == typeof(ActivationDisposables));
-
-        using var disposables = new ActivationDisposables();
-        _ = InvokeReflectedMethod(method, instance, [disposables]);
-    }
+        where TContainer : class =>
+        AppBuilderExtensions.ConfigureReactiveUIDIContainer(
+            resolver,
+            containerFactory,
+            containerConfig,
+            dependencyResolverFactory);
 
     /// <summary>Returns whether the action throws exactly the requested exception type.</summary>
     /// <typeparam name="TException">The expected exception type.</typeparam>
@@ -268,35 +106,11 @@ public partial class ReactiveShimFullCoverageTests
         }
         catch (Exception error)
         {
-            return UnwrapReflectionException(error).GetType() == typeof(TException);
+            return error.GetType() == typeof(TException);
         }
 
         return false;
     }
-
-    /// <summary>Invokes a reflected method and rethrows inner target invocation exceptions.</summary>
-    /// <param name="method">The reflected method.</param>
-    /// <param name="instance">The instance for instance methods.</param>
-    /// <param name="arguments">The method arguments.</param>
-    /// <returns>The reflected method result.</returns>
-    private static object? InvokeReflectedMethod(MethodInfo method, object? instance, object?[] arguments)
-    {
-        try
-        {
-            return method.Invoke(instance, arguments);
-        }
-        catch (TargetInvocationException error) when (error.InnerException is not null)
-        {
-            ExceptionDispatchInfo.Capture(error.InnerException).Throw();
-            throw;
-        }
-    }
-
-    /// <summary>Unwraps reflection invocation exceptions.</summary>
-    /// <param name="error">The thrown exception.</param>
-    /// <returns>The underlying exception when reflection wrapped it.</returns>
-    private static Exception UnwrapReflectionException(Exception error) =>
-        error is TargetInvocationException { InnerException: { } innerException } ? innerException : error;
 
     /// <summary>Creates an observed change for the Items property of an ItemsControl.</summary>
     /// <param name="items">The items control instance.</param>
@@ -350,17 +164,6 @@ public partial class ReactiveShimFullCoverageTests
 
         var lifetimeType = type.CreateType();
         return (IApplicationLifetime)Activator.CreateInstance(lifetimeType)!;
-    }
-
-    /// <summary>Sets the runtime design-mode flag whose public reference metadata exposes only a getter.</summary>
-    /// <param name="isDesignMode">The design-mode value.</param>
-    private static void SetDesignMode(bool isDesignMode)
-    {
-        var property = typeof(Design).GetProperty(
-            nameof(Design.IsDesignMode),
-            BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
-
-        property?.SetMethod?.Invoke(null, [isDesignMode]);
     }
 
     /// <summary>Gets a real presentation source from a headless window.</summary>
@@ -721,7 +524,9 @@ public partial class ReactiveShimFullCoverageTests
     private sealed class ThrowingResolver : IDependencyResolver
     {
         /// <inheritdoc/>
-        public void Dispose() => GC.SuppressFinalize(this);
+        public void Dispose()
+        {
+        }
 
         /// <inheritdoc/>
         public object? GetService(Type? serviceType) =>
@@ -794,13 +599,13 @@ public partial class ReactiveShimFullCoverageTests
         public void Register<TService, TImplementation>()
             where TService : class
             where TImplementation : class, TService, new() =>
-            Register<TImplementation>(() => new());
+            Register<TImplementation>(static () => new());
 
         /// <inheritdoc/>
         public void Register<TService, TImplementation>(string? contract)
             where TService : class
             where TImplementation : class, TService, new() =>
-            Register<TImplementation>(() => new(), contract);
+            Register<TImplementation>(static () => new(), contract);
 
         /// <inheritdoc/>
         public void UnregisterCurrent(Type? serviceType) =>

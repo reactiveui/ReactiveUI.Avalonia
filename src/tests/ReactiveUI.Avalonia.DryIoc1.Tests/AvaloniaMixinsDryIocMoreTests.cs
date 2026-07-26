@@ -19,8 +19,8 @@ public class AvaloniaMixinsDryIocMoreTests
         var builder = AppBuilder.Configure<Application>();
         var result = AvaloniaMixins.UseReactiveUIWithDryIoc(
             builder,
-            containerConfig: c => c.RegisterInstance(new object()),
-            withReactiveUIBuilder: _ => { });
+            containerConfig: static c => c.RegisterInstance(new object()),
+            withReactiveUIBuilder: static _ => { });
 
         await Assert.That(result).IsSameReferenceAs(builder);
     }
@@ -33,10 +33,10 @@ public class AvaloniaMixinsDryIocMoreTests
         var builder = AppBuilder.Configure<Application>();
         var result = AppBuilderExtensions.UseReactiveUIWithDIContainer(
             builder,
-            containerFactory: () => new Container(),
-            containerConfig: _ => { },
-            dependencyResolverFactory: c => new DryIocDependencyResolver(c),
-            _ => { });
+            containerFactory: static () => new Container(),
+            containerConfig: static _ => { },
+            dependencyResolverFactory: static c => new DryIocDependencyResolver(c),
+            static _ => { });
 
         await Assert.That(result).IsSameReferenceAs(builder);
     }
