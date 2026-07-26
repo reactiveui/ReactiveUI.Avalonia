@@ -27,5 +27,5 @@ internal static class AvaloniaTestSession
         new(() => HeadlessUnitTestSession.StartNew(typeof(Application)), LazyThreadSafetyMode.ExecutionAndPublication);
 
     /// <summary>Gets the shared headless session, creating it on first access.</summary>
-    public static HeadlessUnitTestSession Instance => _session.Value;
+    internal static HeadlessUnitTestSession Instance => _session.Value;
 }

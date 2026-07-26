@@ -14,8 +14,12 @@ namespace ReactiveUI.Avalonia;
 /// reactive activation and deactivation handling in Avalonia-based applications.</remarks>
 public class AvaloniaActivationForViewFetcher : IActivationForViewFetcher
 {
+    /// <summary>The affinity assigned to Avalonia visuals.</summary>
+    private const int AvaloniaVisualAffinity = 10;
+
     /// <inheritdoc/>
-    public int GetAffinityForView(Type view) => typeof(Visual).IsAssignableFrom(view) ? 10 : 0;
+    public int GetAffinityForView(Type view) =>
+        typeof(Visual).IsAssignableFrom(view) ? AvaloniaVisualAffinity : 0;
 
     /// <inheritdoc/>
     public IObservable<bool> GetActivationForView(IActivatableView view)

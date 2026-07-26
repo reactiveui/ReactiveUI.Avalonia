@@ -11,7 +11,7 @@ namespace ReactiveUI.Avalonia.DryIoc.Tests;
 /// <summary>Tests for DryIoc-based Avalonia mixin registration and resolution.</summary>
 public class AvaloniaMixinsDryIocTests
 {
-    /// <summary>Verifies that <see cref="AvaloniaMixins.UseReactiveUIWithDryIoc"/> throws <see cref="ArgumentNullException"/> when the builder is null.</summary>
+    /// <summary>Verifies that <c>UseReactiveUIWithDryIoc</c> throws <see cref="ArgumentNullException"/> when the builder is null.</summary>
     /// <returns>A <see cref="Task"/> representing the asynchronous test.</returns>
     [Test]
     public async Task UseReactiveUIWithDryIoc_ThrowsOnNullBuilder()
@@ -21,7 +21,7 @@ public class AvaloniaMixinsDryIocTests
             AvaloniaMixins.UseReactiveUIWithDryIoc(builder!, _ => { })).ThrowsExactly<ArgumentNullException>();
     }
 
-    /// <summary>Verifies that <see cref="AvaloniaMixins.UseReactiveUIWithDryIoc"/> returns the same builder instance.</summary>
+    /// <summary>Verifies that <c>UseReactiveUIWithDryIoc</c> returns the same builder instance.</summary>
     /// <returns>A <see cref="Task"/> representing the asynchronous test.</returns>
     [Test]
     public async Task UseReactiveUIWithDryIoc_ReturnsBuilder_NoThrow()
@@ -52,7 +52,7 @@ public class AvaloniaMixinsDryIocTests
     public async Task UseReactiveUIWithDIContainer_ReturnsBuilder_NoThrow()
     {
         var builder = AppBuilder.Configure<Application>();
-        var container = new Container();
+        using var container = new Container();
 
         var result = builder.UseReactiveUIWithDIContainer(
             containerFactory: () => container,
@@ -69,11 +69,11 @@ public class AvaloniaMixinsDryIocTests
     public async Task DryIocDependencyResolver_Register_And_Resolve_WithAndWithoutContract()
     {
         var container = new Container();
-        var resolver = new DryIocDependencyResolver(container);
+        using var resolver = new DryIocDependencyResolver(container);
 
-        resolver.Register<string>(() => "a");
-        resolver.Register<string>(() => "b");
-        resolver.Register<string>(() => "c", "x");
+        resolver.Register(() => "a");
+        resolver.Register(() => "b");
+        resolver.Register(() => "c", "x");
 
         var noContract = resolver.GetService<string>();
         await Assert.That(noContract).IsEqualTo("b");

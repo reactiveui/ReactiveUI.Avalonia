@@ -27,14 +27,22 @@ public static class AvaloniaMixins
     extension(AppBuilder builder)
     {
         /// <summary>Configures the application to use ReactiveUI with DryIoc as the dependency injection container.</summary>
-        /// <remarks>This method integrates DryIoc with ReactiveUI, allowing services and dependencies to be registered using DryIoc. The provided <paramref name="containerConfig"/> delegate can be used to register application-specific services.</remarks>
-        /// <param name="containerConfig">A delegate that configures the DryIoc container.</param>
-        /// <param name="withReactiveUIBuilder">An optional delegate to further configure the ReactiveUI builder.</param>
+        /// <remarks>
+        /// The container configuration delegate registers application services before the ReactiveUI builder is built.
+        /// </remarks>
+        /// <param name="containerConfig">Configures the DryIoc container.</param>
         /// <returns>The application builder instance, configured to use ReactiveUI with DryIoc.</returns>
         /// <exception cref="ArgumentNullException">Thrown if the builder or <paramref name="containerConfig"/> is null.</exception>
+        public AppBuilder UseReactiveUIWithDryIoc(Action<Container> containerConfig) =>
+            builder.UseReactiveUIWithDryIoc(containerConfig, null);
+
+        /// <summary>Configures ReactiveUI with DryIoc and customizes the ReactiveUI builder.</summary>
+        /// <param name="containerConfig">Configures the DryIoc container.</param>
+        /// <param name="withReactiveUIBuilder">Customizes the ReactiveUI builder, or null.</param>
+        /// <returns>The application builder instance.</returns>
         public AppBuilder UseReactiveUIWithDryIoc(
             Action<Container> containerConfig,
-            Action<ReactiveUIBuilder>? withReactiveUIBuilder = null) =>
+            Action<ReactiveUIBuilder>? withReactiveUIBuilder) =>
             builder switch
             {
                 null => throw new ArgumentNullException(nameof(builder)),

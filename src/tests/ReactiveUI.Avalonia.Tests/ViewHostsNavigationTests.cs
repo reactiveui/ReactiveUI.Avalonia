@@ -2,7 +2,6 @@
 // ReactiveUI Association Incorporated licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for full license information.
 using System.Reflection;
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Rendering;
 using Splat;
@@ -12,16 +11,25 @@ namespace ReactiveUI.Avalonia.Tests;
 /// <summary>Tests for ViewModelViewHost and RoutedViewHost navigation behavior.</summary>
 public class ViewHostsNavigationTests
 {
+    /// <summary>The default content used by ViewModelViewHost tests.</summary>
+    private const string DefaultContentValue = "default";
+
+    /// <summary>The view contract used by navigation tests.</summary>
+    private const string ViewContractValue = "contract";
+
+    /// <summary>The private navigation method invoked by the tests.</summary>
+    private const string NavigateToViewModelMethodName = "NavigateToViewModel";
+
     /// <summary>Verifies that ViewModelViewHost navigates to a resolved view and sets its ViewModel.</summary>
     /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task ViewModelViewHost_Navigates_To_Resolved_View()
     {
         RegisterViews();
-        var host = new ViewModelViewHost { DefaultContent = "default" };
+        var host = new ViewModelViewHost { DefaultContent = DefaultContentValue };
         var vm = new VmB();
 
-        var m = typeof(ViewModelViewHost).GetMethod("NavigateToViewModel", BindingFlags.Instance | BindingFlags.NonPublic);
+        var m = typeof(ViewModelViewHost).GetMethod(NavigateToViewModelMethodName, BindingFlags.Instance | BindingFlags.NonPublic);
         _ = m!.Invoke(host, [vm, null]);
 
         await Assert.That(host.Content).IsTypeOf<ViewB>();
@@ -34,19 +42,14 @@ public class ViewHostsNavigationTests
     public async Task ViewModelViewHost_Properties_Return_Assigned_Values()
     {
         var locator = new StaticViewLocator(new ViewB());
-        var host = new TestableViewModelViewHost
-        {
-            DefaultContent = "default",
-            ViewContract = "contract",
-            ViewLocator = locator
-        };
+        var host = new TestableViewModelViewHost { DefaultContent = DefaultContentValue, ViewContract = ViewContractValue, ViewLocator = locator };
         var vm = new VmB();
 
         host.ViewModel = vm;
 
         await Assert.That(host.ViewModel).IsSameReferenceAs(vm);
-        await Assert.That(host.DefaultContent).IsEqualTo("default");
-        await Assert.That(host.ViewContract).IsEqualTo("contract");
+        await Assert.That(host.DefaultContent).IsEqualTo(DefaultContentValue);
+        await Assert.That(host.ViewContract).IsEqualTo(ViewContractValue);
         await Assert.That(host.ViewLocator).IsSameReferenceAs(locator);
         await Assert.That(host.ExposedStyleKey).IsEqualTo(typeof(TransitioningContentControl));
     }
@@ -56,7 +59,7 @@ public class ViewHostsNavigationTests
     [Test]
     public async Task ViewModelViewHost_AttachAndDetach_ManageNavigationSubscriptions()
     {
-        var host = new TestableViewModelViewHost { DefaultContent = "default" };
+        var host = new TestableViewModelViewHost { DefaultContent = DefaultContentValue };
         IPresentationSource? source = null;
         host.AttachedToVisualTree += (_, args) => source = args.PresentationSource;
         var window = new Window { Content = host };
@@ -69,7 +72,7 @@ public class ViewHostsNavigationTests
             host.Attach(source!);
             window.Content = null;
 
-            await Assert.That(host.Content).IsEqualTo("default");
+            await Assert.That(host.Content).IsEqualTo(DefaultContentValue);
         }
         finally
         {
@@ -83,11 +86,7 @@ public class ViewHostsNavigationTests
     public async Task ViewModelViewHost_AttachedSubscription_Navigates_OnViewModelChange()
     {
         var view = new ViewB();
-        var host = new TestableViewModelViewHost
-        {
-            DefaultContent = "default",
-            ViewLocator = new StaticViewLocator(view)
-        };
+        var host = new TestableViewModelViewHost { DefaultContent = DefaultContentValue, ViewLocator = new StaticViewLocator(view) };
         var window = new Window { Content = host };
         var vm = new VmB();
 
@@ -111,7 +110,7 @@ public class ViewHostsNavigationTests
     public async Task ViewModelViewHost_DetachBeforeAttach_DoesNotThrow()
     {
         var source = GetPresentationSource();
-        var host = new TestableViewModelViewHost { DefaultContent = "default" };
+        var host = new TestableViewModelViewHost { DefaultContent = DefaultContentValue };
 
         host.Detach(source);
 
@@ -124,13 +123,13 @@ public class ViewHostsNavigationTests
     public async Task ViewModelViewHost_AttachThenManualDetach_DisposesNavigationSubscription()
     {
         var source = GetPresentationSource();
-        var host = new TestableViewModelViewHost { DefaultContent = "default" };
+        var host = new TestableViewModelViewHost { DefaultContent = DefaultContentValue };
 
         host.Attach(source);
         host.Detach(source);
         host.Detach(source);
 
-        await Assert.That(host.Content).IsEqualTo("default");
+        await Assert.That(host.Content).IsEqualTo(DefaultContentValue);
     }
 
     /// <summary>Verifies that ViewModelViewHost tolerates disposal when no navigation subscription exists.</summary>
@@ -150,12 +149,12 @@ public class ViewHostsNavigationTests
     [Test]
     public async Task ViewModelViewHost_When_No_View_Falls_Back_To_Default()
     {
-        var host = new ViewModelViewHost { DefaultContent = "default" };
+        var host = new ViewModelViewHost { DefaultContent = DefaultContentValue };
 
-        var m = typeof(ViewModelViewHost).GetMethod("NavigateToViewModel", BindingFlags.Instance | BindingFlags.NonPublic);
+        var m = typeof(ViewModelViewHost).GetMethod(NavigateToViewModelMethodName, BindingFlags.Instance | BindingFlags.NonPublic);
         _ = m!.Invoke(host, [new object(), null]);
 
-        await Assert.That(host.Content).IsEqualTo("default");
+        await Assert.That(host.Content).IsEqualTo(DefaultContentValue);
     }
 
     /// <summary>Verifies that ViewModelViewHost falls back to default content when the view model is null.</summary>
@@ -163,12 +162,12 @@ public class ViewHostsNavigationTests
     [Test]
     public async Task ViewModelViewHost_When_ViewModel_Null_Falls_Back_To_Default()
     {
-        var host = new ViewModelViewHost { DefaultContent = "default" };
+        var host = new ViewModelViewHost { DefaultContent = DefaultContentValue };
 
-        var m = typeof(ViewModelViewHost).GetMethod("NavigateToViewModel", BindingFlags.Instance | BindingFlags.NonPublic);
+        var m = typeof(ViewModelViewHost).GetMethod(NavigateToViewModelMethodName, BindingFlags.Instance | BindingFlags.NonPublic);
         _ = m!.Invoke(host, [null, null]);
 
-        await Assert.That(host.Content).IsEqualTo("default");
+        await Assert.That(host.Content).IsEqualTo(DefaultContentValue);
     }
 
     /// <summary>Verifies that ViewModelViewHost uses contracts when resolving a view.</summary>
@@ -177,15 +176,11 @@ public class ViewHostsNavigationTests
     public async Task ViewModelViewHost_Navigates_To_Contract_View()
     {
         var view = new ViewB();
-        var host = new ViewModelViewHost
-        {
-            DefaultContent = "default",
-            ViewLocator = new StaticViewLocator(view, "contract")
-        };
+        var host = new ViewModelViewHost { DefaultContent = DefaultContentValue, ViewLocator = new StaticViewLocator(view, ViewContractValue) };
         var vm = new VmB();
 
-        var m = typeof(ViewModelViewHost).GetMethod("NavigateToViewModel", BindingFlags.Instance | BindingFlags.NonPublic);
-        _ = m!.Invoke(host, [vm, "contract"]);
+        var m = typeof(ViewModelViewHost).GetMethod(NavigateToViewModelMethodName, BindingFlags.Instance | BindingFlags.NonPublic);
+        _ = m!.Invoke(host, [vm, ViewContractValue]);
 
         await Assert.That(host.Content).IsSameReferenceAs(view);
         await Assert.That(view.ViewModel).IsSameReferenceAs(vm);
@@ -197,16 +192,12 @@ public class ViewHostsNavigationTests
     [Test]
     public async Task ViewModelViewHost_When_Contract_View_Missing_Falls_Back_To_Default()
     {
-        var host = new ViewModelViewHost
-        {
-            DefaultContent = "default",
-            ViewLocator = new StaticViewLocator(null, "different")
-        };
+        var host = new ViewModelViewHost { DefaultContent = DefaultContentValue, ViewLocator = new StaticViewLocator(null, "different") };
 
-        var m = typeof(ViewModelViewHost).GetMethod("NavigateToViewModel", BindingFlags.Instance | BindingFlags.NonPublic);
-        _ = m!.Invoke(host, [new VmB(), "contract"]);
+        var m = typeof(ViewModelViewHost).GetMethod(NavigateToViewModelMethodName, BindingFlags.Instance | BindingFlags.NonPublic);
+        _ = m!.Invoke(host, [new VmB(), ViewContractValue]);
 
-        await Assert.That(host.Content).IsEqualTo("default");
+        await Assert.That(host.Content).IsEqualTo(DefaultContentValue);
     }
 
     /// <summary>Verifies that RoutedViewHost navigates to a resolved view when a Router is set.</summary>
@@ -219,7 +210,7 @@ public class ViewHostsNavigationTests
         var host = new RoutedViewHost { DefaultContent = "def", Router = screen.Router };
         var vm = new VmA(screen);
 
-        var m = typeof(RoutedViewHost).GetMethod("NavigateToViewModel", BindingFlags.Instance | BindingFlags.NonPublic);
+        var m = typeof(RoutedViewHost).GetMethod(NavigateToViewModelMethodName, BindingFlags.Instance | BindingFlags.NonPublic);
         _ = m!.Invoke(host, [vm, null]);
 
         await Assert.That(host.Content).IsTypeOf<ViewA>();
@@ -233,17 +224,11 @@ public class ViewHostsNavigationTests
     {
         var router = new RoutingState();
         var locator = new StaticViewLocator(new ViewA());
-        var host = new TestableRoutedViewHost
-        {
-            DefaultContent = "def",
-            Router = router,
-            ViewContract = "contract",
-            ViewLocator = locator
-        };
+        var host = new TestableRoutedViewHost { DefaultContent = "def", Router = router, ViewContract = ViewContractValue, ViewLocator = locator };
 
         await Assert.That(host.Router).IsSameReferenceAs(router);
         await Assert.That(host.DefaultContent).IsEqualTo("def");
-        await Assert.That(host.ViewContract).IsEqualTo("contract");
+        await Assert.That(host.ViewContract).IsEqualTo(ViewContractValue);
         await Assert.That(host.ViewLocator).IsSameReferenceAs(locator);
         await Assert.That(host.ExposedStyleKey).IsEqualTo(typeof(TransitioningContentControl));
     }
@@ -281,11 +266,7 @@ public class ViewHostsNavigationTests
     {
         RegisterViews();
         var screen = new ScreenImpl();
-        var host = new TestableRoutedViewHost
-        {
-            DefaultContent = "def",
-            Router = screen.Router
-        };
+        var host = new TestableRoutedViewHost { DefaultContent = "def", Router = screen.Router };
         var window = new Window { Content = host };
         var vm = new VmA(screen);
 
@@ -309,11 +290,7 @@ public class ViewHostsNavigationTests
     public async Task RoutedViewHost_AttachedSubscription_FallsBack_WhenRouterRemoved()
     {
         var screen = new ScreenImpl();
-        var host = new TestableRoutedViewHost
-        {
-            DefaultContent = "def",
-            Router = screen.Router
-        };
+        var host = new TestableRoutedViewHost { DefaultContent = "def", Router = screen.Router };
         var window = new Window { Content = host };
 
         try
@@ -348,11 +325,7 @@ public class ViewHostsNavigationTests
     public async Task RoutedViewHost_AttachThenManualDetach_DisposesNavigationSubscription()
     {
         var source = GetPresentationSource();
-        var host = new TestableRoutedViewHost
-        {
-            DefaultContent = "def",
-            Router = new()
-        };
+        var host = new TestableRoutedViewHost { DefaultContent = "def", Router = new() };
 
         host.Attach(source);
         host.Detach(source);
@@ -380,7 +353,7 @@ public class ViewHostsNavigationTests
     {
         var host = new RoutedViewHost { DefaultContent = "def" };
 
-        var m = typeof(RoutedViewHost).GetMethod("NavigateToViewModel", BindingFlags.Instance | BindingFlags.NonPublic);
+        var m = typeof(RoutedViewHost).GetMethod(NavigateToViewModelMethodName, BindingFlags.Instance | BindingFlags.NonPublic);
         _ = m!.Invoke(host, [new object(), null]);
 
         await Assert.That(host.Content).IsEqualTo("def");
@@ -393,7 +366,7 @@ public class ViewHostsNavigationTests
     {
         var host = new RoutedViewHost { DefaultContent = "def", Router = new() };
 
-        var m = typeof(RoutedViewHost).GetMethod("NavigateToViewModel", BindingFlags.Instance | BindingFlags.NonPublic);
+        var m = typeof(RoutedViewHost).GetMethod(NavigateToViewModelMethodName, BindingFlags.Instance | BindingFlags.NonPublic);
         _ = m!.Invoke(host, [null, null]);
 
         await Assert.That(host.Content).IsEqualTo("def");
@@ -406,16 +379,11 @@ public class ViewHostsNavigationTests
     {
         var view = new ViewA();
         var screen = new ScreenImpl();
-        var host = new RoutedViewHost
-        {
-            DefaultContent = "def",
-            Router = screen.Router,
-            ViewLocator = new StaticViewLocator(view, "contract")
-        };
+        var host = new RoutedViewHost { DefaultContent = "def", Router = screen.Router, ViewLocator = new StaticViewLocator(view, ViewContractValue) };
         var vm = new VmA(screen);
 
-        var m = typeof(RoutedViewHost).GetMethod("NavigateToViewModel", BindingFlags.Instance | BindingFlags.NonPublic);
-        _ = m!.Invoke(host, [vm, "contract"]);
+        var m = typeof(RoutedViewHost).GetMethod(NavigateToViewModelMethodName, BindingFlags.Instance | BindingFlags.NonPublic);
+        _ = m!.Invoke(host, [vm, ViewContractValue]);
 
         await Assert.That(host.Content).IsSameReferenceAs(view);
         await Assert.That(view.ViewModel).IsSameReferenceAs(vm);
@@ -427,14 +395,9 @@ public class ViewHostsNavigationTests
     [Test]
     public async Task RoutedViewHost_When_Default_View_Missing_Falls_Back_To_Default()
     {
-        var host = new RoutedViewHost
-        {
-            DefaultContent = "def",
-            Router = new(),
-            ViewLocator = new StaticViewLocator(null)
-        };
+        var host = new RoutedViewHost { DefaultContent = "def", Router = new(), ViewLocator = new StaticViewLocator(null) };
 
-        var m = typeof(RoutedViewHost).GetMethod("NavigateToViewModel", BindingFlags.Instance | BindingFlags.NonPublic);
+        var m = typeof(RoutedViewHost).GetMethod(NavigateToViewModelMethodName, BindingFlags.Instance | BindingFlags.NonPublic);
         _ = m!.Invoke(host, [new object(), null]);
 
         await Assert.That(host.Content).IsEqualTo("def");
@@ -445,15 +408,10 @@ public class ViewHostsNavigationTests
     [Test]
     public async Task RoutedViewHost_When_Contract_View_Missing_Falls_Back_To_Default()
     {
-        var host = new RoutedViewHost
-        {
-            DefaultContent = "def",
-            Router = new(),
-            ViewLocator = new StaticViewLocator(null, "different")
-        };
+        var host = new RoutedViewHost { DefaultContent = "def", Router = new(), ViewLocator = new StaticViewLocator(null, "different") };
 
-        var m = typeof(RoutedViewHost).GetMethod("NavigateToViewModel", BindingFlags.Instance | BindingFlags.NonPublic);
-        _ = m!.Invoke(host, [new object(), "contract"]);
+        var m = typeof(RoutedViewHost).GetMethod(NavigateToViewModelMethodName, BindingFlags.Instance | BindingFlags.NonPublic);
+        _ = m!.Invoke(host, [new object(), ViewContractValue]);
 
         await Assert.That(host.Content).IsEqualTo("def");
     }
@@ -510,12 +468,12 @@ public class ViewHostsNavigationTests
         /// <summary>Raises the attached-to-visual-tree hook.</summary>
         /// <param name="source">The presentation source.</param>
         public void Attach(IPresentationSource source) =>
-            OnAttachedToVisualTree(new VisualTreeAttachmentEventArgs(this, source));
+            OnAttachedToVisualTree(new(this, source));
 
         /// <summary>Raises the detached-from-visual-tree hook.</summary>
         /// <param name="source">The presentation source.</param>
         public void Detach(IPresentationSource source) =>
-            OnDetachedFromVisualTree(new VisualTreeAttachmentEventArgs(this, source));
+            OnDetachedFromVisualTree(new(this, source));
     }
 
     /// <summary>A testable RoutedViewHost that exposes protected members.</summary>
@@ -527,31 +485,24 @@ public class ViewHostsNavigationTests
         /// <summary>Raises the attached-to-visual-tree hook.</summary>
         /// <param name="source">The presentation source.</param>
         public void Attach(IPresentationSource source) =>
-            OnAttachedToVisualTree(new VisualTreeAttachmentEventArgs(this, source));
+            OnAttachedToVisualTree(new(this, source));
 
         /// <summary>Raises the detached-from-visual-tree hook.</summary>
         /// <param name="source">The presentation source.</param>
         public void Detach(IPresentationSource source) =>
-            OnDetachedFromVisualTree(new VisualTreeAttachmentEventArgs(this, source));
+            OnDetachedFromVisualTree(new(this, source));
     }
 
     /// <summary>A minimal view locator for host tests.</summary>
-    private sealed class StaticViewLocator : IViewLocator
+    /// <param name="view">The view to return.</param>
+    /// <param name="contract">The optional contract to match.</param>
+    private sealed class StaticViewLocator(IViewFor? view, string? contract = null) : IViewLocator
     {
         /// <summary>The view returned for matching contracts.</summary>
-        private readonly IViewFor? _view;
+        private readonly IViewFor? _view = view;
 
         /// <summary>The contract that must match.</summary>
-        private readonly string? _contract;
-
-        /// <summary>Initializes a new instance of the <see cref="StaticViewLocator"/> class.</summary>
-        /// <param name="view">The view to return.</param>
-        /// <param name="contract">The optional contract to match.</param>
-        public StaticViewLocator(IViewFor? view, string? contract = null)
-        {
-            _view = view;
-            _contract = contract;
-        }
+        private readonly string? _contract = contract;
 
         /// <inheritdoc/>
         public IViewFor<TViewModel>? ResolveView<TViewModel>()

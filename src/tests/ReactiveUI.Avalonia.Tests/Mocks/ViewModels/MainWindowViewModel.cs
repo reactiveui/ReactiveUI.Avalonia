@@ -9,5 +9,5 @@ namespace ReactiveUIDemo.ViewModels;
 internal sealed class MainWindowViewModel : ReactiveObject
 {
     /// <summary>Gets the routed view host page view model.</summary>
-    public RoutedViewHostPageViewModel RoutedViewHost { get; } = new();
+    internal RoutedViewHostPageViewModel RoutedViewHost { get; } = RoutedViewHostPageViewModel.Create();
 }

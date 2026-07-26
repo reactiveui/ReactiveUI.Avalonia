@@ -14,5 +14,5 @@ internal static class SubscriptionErrors
 {
     /// <summary>Rethrows the supplied exception without losing the original stack trace.</summary>
     /// <param name="error">The subscription exception.</param>
-    public static void Throw(Exception error) => ExceptionDispatchInfo.Capture(error).Throw();
+    internal static void Throw(Exception error) => ExceptionDispatchInfo.Capture(error).Throw();
 }

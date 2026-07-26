@@ -10,6 +10,18 @@ namespace ReactiveUI.Avalonia.Reactive.Tests;
 /// <summary>Behavioral coverage tests for the ReactiveUI.Avalonia.Reactive shim assembly.</summary>
 public class ReactiveShimBehaviorCoverageTests
 {
+    /// <summary>The first value used to validate the untyped subject overload.</summary>
+    private const int UntypedSubjectValue = 11;
+
+    /// <summary>The second value used to validate the typed subject overload.</summary>
+    private const int TypedSubjectValue = 12;
+
+    /// <summary>The value used to validate the untyped binding subject overload.</summary>
+    private const int UntypedBindingValue = 13;
+
+    /// <summary>The value used to validate the typed binding subject overload.</summary>
+    private const int TypedBindingValue = 14;
+
     /// <summary>Verifies that the reactive shim GetSubject overloads write and observe values.</summary>
     /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
@@ -24,12 +36,12 @@ public class ReactiveShimBehaviorCoverageTests
         using var untypedSubscription = untyped.Subscribe(value => untypedObserved = value);
         using var typedSubscription = typed.Subscribe(value => typedObserved = value);
 
-        untyped.OnNext(11);
-        typed.OnNext(12);
+        untyped.OnNext(UntypedSubjectValue);
+        typed.OnNext(TypedSubjectValue);
 
-        await Assert.That(untypedObserved).IsEqualTo(11);
-        await Assert.That(typedObserved).IsEqualTo(12);
-        await Assert.That(control.IntProp).IsEqualTo(12);
+        await Assert.That(untypedObserved).IsEqualTo(UntypedSubjectValue);
+        await Assert.That(typedObserved).IsEqualTo(TypedSubjectValue);
+        await Assert.That(control.IntProp).IsEqualTo(TypedSubjectValue);
     }
 
     /// <summary>Verifies that the reactive shim GetBindingSubject overloads write only values with HasValue.</summary>
@@ -51,12 +63,12 @@ public class ReactiveShimBehaviorCoverageTests
 
         await Assert.That(control.IntProp).IsEqualTo(0);
 
-        untyped.OnNext(new BindingValue<object?>(13));
-        typed.OnNext(new BindingValue<int>(14));
+        untyped.OnNext(new(UntypedBindingValue));
+        typed.OnNext(new(TypedBindingValue));
 
-        await Assert.That(untypedObserved!.Value.Value).IsEqualTo(13);
-        await Assert.That(typedObserved!.Value.Value).IsEqualTo(14);
-        await Assert.That(control.IntProp).IsEqualTo(14);
+        await Assert.That(untypedObserved!.Value.Value).IsEqualTo(UntypedBindingValue);
+        await Assert.That(typedObserved!.Value.Value).IsEqualTo(TypedBindingValue);
+        await Assert.That(control.IntProp).IsEqualTo(TypedBindingValue);
     }
 
     /// <summary>A test control with an integer styled property.</summary>

@@ -140,7 +140,7 @@ public static AppBuilder BuildAvaloniaApp() => AppBuilder
 ```
 
 Notes
-- `UseReactiveUI` sets `RxApp.MainThreadScheduler` to `AvaloniaScheduler.Instance` and registers the Avalonia-specific activation and binding services.
+- `UseReactiveUI` registers the package-owned Avalonia scheduler from `ReactiveUI.Primitives.Avalonia` (or `ReactiveUI.Primitives.Avalonia.Reactive`) as ReactiveUI's main-thread sequencer/scheduler, and registers the Avalonia-specific activation and binding services.
 - `RegisterReactiveUIViewsFromEntryAssembly()` scans your entry assembly and registers any types implementing `IViewFor<TViewModel>` for view location/navigation.
 - For existing apps, you can keep using `UseReactiveUI()` without a DI container and register services into `Splat` directly if you prefer.
 
@@ -232,7 +232,7 @@ Important types registered by default:
 - `IPropertyBindingHook` ? `AutoDataTemplateBindingHook`
 - `ICreatesCommandBinding` ? `AvaloniaCreatesCommandBinding`
 - `ICreatesObservableForProperty` ? `AvaloniaObjectObservableForProperty`
-- `RxApp.MainThreadScheduler` set to `AvaloniaScheduler.Instance`
+- The main-thread sequencer/scheduler set to the matching `ReactiveUI.Primitives.Avalonia.*` `AvaloniaScheduler.Instance`
 
 Controls and helpers:
 - `RoutedViewHost` — view host that displays the view for the current `RoutingState`

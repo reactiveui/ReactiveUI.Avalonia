@@ -11,7 +11,7 @@ namespace ReactiveUI.Avalonia.DryIoc.Tests;
 /// <summary>Additional tests for DryIoc-based Avalonia mixin registration.</summary>
 public class AvaloniaMixinsDryIocMoreTests
 {
-    /// <summary>Verifies that <see cref="AvaloniaMixins.UseReactiveUIWithDryIoc"/> with the builder overload returns the same builder instance.</summary>
+    /// <summary>Verifies that the <c>UseReactiveUIWithDryIoc</c> builder overload returns the same builder instance.</summary>
     /// <returns>A <see cref="Task"/> representing the asynchronous test.</returns>
     [Test]
     public async Task UseReactiveUIWithDryIoc_WithBuilderOverload_Returns_Builder()

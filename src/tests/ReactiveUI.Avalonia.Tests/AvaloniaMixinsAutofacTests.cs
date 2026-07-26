@@ -34,7 +34,7 @@ public class AvaloniaMixinsAutofacTests
     {
         AppBuilder? builder = null;
         await Assert.That(() =>
-            AvaloniaMixins.UseReactiveUIWithAutofac(builder!, _ => { }, null, null)).ThrowsExactly<ArgumentNullException>();
+            AvaloniaMixins.UseReactiveUIWithAutofac(builder!, _ => { }, _ => { })).ThrowsExactly<ArgumentNullException>();
     }
 
     /// <summary>Verifies that UseReactiveUIWithAutofac returns the builder without throwing.</summary>

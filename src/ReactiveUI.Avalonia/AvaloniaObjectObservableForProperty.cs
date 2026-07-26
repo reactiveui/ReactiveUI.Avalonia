@@ -14,6 +14,9 @@ namespace ReactiveUI.Avalonia;
 /// managed according to Avalonia and ReactiveUI conventions.</remarks>
 internal class AvaloniaObjectObservableForProperty : ICreatesObservableForProperty
 {
+    /// <summary>The affinity assigned to registered Avalonia properties.</summary>
+    private const int AvaloniaPropertyAffinity = 4;
+
     /// <inheritdoc/>
     [RequiresUnreferencedCode("Uses reflection over runtime types which is not trim- or AOT-safe.")]
     public int GetAffinityForObject(Type type, string propertyName) =>
@@ -21,7 +24,7 @@ internal class AvaloniaObjectObservableForProperty : ICreatesObservableForProper
 
     /// <inheritdoc/>
     [RequiresUnreferencedCode("Uses reflection over runtime types which is not trim- or AOT-safe.")]
-    public int GetAffinityForObject(Type? type, string propertyName, bool beforeChanged = false)
+    public int GetAffinityForObject(Type? type, string propertyName, bool beforeChanged)
     {
         if (type is null)
         {
@@ -33,7 +36,7 @@ internal class AvaloniaObjectObservableForProperty : ICreatesObservableForProper
             return 0;
         }
 
-        return GetAvaloniaProperty(type, propertyName) is not null ? 4 : 0;
+        return GetAvaloniaProperty(type, propertyName) is not null ? AvaloniaPropertyAffinity : 0;
     }
 
     /// <inheritdoc/>
@@ -55,7 +58,12 @@ internal class AvaloniaObjectObservableForProperty : ICreatesObservableForProper
 
     /// <inheritdoc/>
     [RequiresUnreferencedCode("Uses reflection over runtime types which is not trim- or AOT-safe.")]
-    public IObservable<IObservedChange<object?, object?>> GetNotificationForProperty(object sender, Expression expression, string propertyName, bool beforeChanged = false, bool suppressWarnings = false)
+    public IObservable<IObservedChange<object?, object?>> GetNotificationForProperty(
+        object sender,
+        Expression expression,
+        string propertyName,
+        bool beforeChanged,
+        bool suppressWarnings)
     {
         ArgumentNullException.ThrowIfNull(sender);
 
@@ -72,7 +80,7 @@ internal class AvaloniaObjectObservableForProperty : ICreatesObservableForProper
         {
             if (!suppressWarnings)
             {
-                this.Log().Error("Couldn't find avalonia property " + propertyName + " on " + type.Name);
+                this.Log().Error($"Couldn't find avalonia property {propertyName} on {type.Name}");
             }
 
             throw new MissingMemberException(type.FullName, propertyName);

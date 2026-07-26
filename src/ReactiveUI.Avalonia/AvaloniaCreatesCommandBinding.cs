@@ -18,6 +18,12 @@ namespace ReactiveUI.Avalonia;
 /// components.</remarks>
 internal class AvaloniaCreatesCommandBinding : ICreatesCommandBinding
 {
+    /// <summary>The affinity assigned to an event-target binding.</summary>
+    private const int EventTargetAffinity = 6;
+
+    /// <summary>The affinity assigned to an <see cref="ICommandSource"/> binding.</summary>
+    private const int CommandSourceAffinity = 10;
+
     /// <summary>Calculates an affinity score indicating how suitable the specified type is for data binding in input scenarios.</summary>
     /// <remarks>A higher affinity score suggests that the type is more appropriate for binding in input or
     /// command scenarios. This method provides best-effort support for event-based bindings and prioritizes command
@@ -42,12 +48,12 @@ internal class AvaloniaCreatesCommandBinding : ICreatesCommandBinding
         {
             // This method doesn't know which event we are going to bind.
             // Best effort support.
-            return 6;
+            return EventTargetAffinity;
         }
 
         // Command/CommandParameter bindings is only available on ICommandSource-types (usually Buttons and MenuItem).
         var isCommandSource = typeof(ICommandSource).IsAssignableFrom(typeof(T));
-        return isCommandSource ? 10 : 0;
+        return isCommandSource ? CommandSourceAffinity : 0;
     }
 
     /// <summary>Binds the specified command to the given target object.</summary>
@@ -55,13 +61,11 @@ internal class AvaloniaCreatesCommandBinding : ICreatesCommandBinding
     /// command parameter. This method is typically used to enable dynamic command parameter updates in UI elements such
     /// as buttons or menu items.</remarks>
     /// <typeparam name="T">The type of the target object. Must be a class that is both an InputElement and implements ICommandSource.</typeparam>
-    /// <param name="command">The command to bind to the target object. Cannot be null.</param>
-    /// <param name="target">The object to which the command will be bound. Must be an InputElement and implement ICommandSource. Cannot be
-    /// null.</param>
+    /// <param name="command">The command to bind, or null when no binding should be created.</param>
+    /// <param name="target">The command target, or null when no binding should be created.</param>
     /// <param name="commandParameter">An observable sequence that provides values for the command parameter. The command parameter will be updated
     /// whenever the observable emits a new value.</param>
     /// <returns>An IDisposable that, when disposed, unbinds the command and command parameter from the target object.</returns>
-    /// <exception cref="ArgumentNullException">Thrown if either the command or target parameter is null.</exception>
     /// <exception cref="InvalidOperationException">Thrown if the target object does not implement both InputElement and ICommandSource.</exception>
     [RequiresUnreferencedCode("String/reflection-based event binding may require members removed by trimming.")]
     public IDisposable? BindCommandToObject<
@@ -71,8 +75,10 @@ internal class AvaloniaCreatesCommandBinding : ICreatesCommandBinding
         IObservable<object?> commandParameter)
         where T : class
     {
-        ArgumentNullException.ThrowIfNull(command);
-        ArgumentNullException.ThrowIfNull(target);
+        if (command is null || target is null)
+        {
+            return null;
+        }
 
         if (target is not (InputElement element and ICommandSource))
         {
@@ -94,13 +100,12 @@ internal class AvaloniaCreatesCommandBinding : ICreatesCommandBinding
     /// method is typically used to enable MVVM-style command binding to UI events.</remarks>
     /// <typeparam name="T">The type of the target object to which the command is bound. Must be a class and an InputElement.</typeparam>
     /// <typeparam name="TEventArgs">The type of the event arguments associated with the event.</typeparam>
-    /// <param name="command">The command to execute when the event is raised. Cannot be null.</param>
-    /// <param name="target">The target object on which to bind the event. Must be an InputElement and cannot be null.</param>
+    /// <param name="command">The command to execute, or null when no binding should be created.</param>
+    /// <param name="target">The event target, or null when no binding should be created.</param>
     /// <param name="commandParameter">An observable sequence that provides the parameter to pass to the command when it is executed.</param>
     /// <param name="eventName">The name of the event on the target object to bind to. Must correspond to a routed event on the target.</param>
     /// <returns>An IDisposable instance that can be used to unbind the command from the event. Returns null if binding is
     /// unsuccessful.</returns>
-    /// <exception cref="ArgumentNullException">Thrown if either the command or target parameter is null.</exception>
     /// <exception cref="InvalidOperationException">Thrown if the target is not an InputElement, or if the specified event is not found on the target object.</exception>
     [RequiresUnreferencedCode("String/reflection-based event binding may require members removed by trimming.")]
     public IDisposable? BindCommandToObject<T, TEventArgs>(
@@ -110,8 +115,11 @@ internal class AvaloniaCreatesCommandBinding : ICreatesCommandBinding
         string eventName)
         where T : class
     {
-        ArgumentNullException.ThrowIfNull(command);
-        ArgumentNullException.ThrowIfNull(target);
+        _ = typeof(TEventArgs);
+        if (command is null || target is null)
+        {
+            return null;
+        }
 
         if (target is not InputElement element)
         {
@@ -158,9 +166,9 @@ internal class AvaloniaCreatesCommandBinding : ICreatesCommandBinding
     {
         // Search the type hierarchy so events declared on base classes (e.g., Button.Click on Button
         // when the target is a derived type) can be located.
-        for (var type = target.GetType(); type is not null && typeof(InputElement).IsAssignableFrom(type); type = type.BaseType)
+        for (Type? type = target.GetType(); typeof(InputElement).IsAssignableFrom(type); type = type!.BaseType)
         {
-            foreach (var routedEvent in RoutedEventRegistry.Instance.GetRegistered(type))
+            foreach (var routedEvent in RoutedEventRegistry.Instance.GetRegistered(type!))
             {
                 if (string.Equals(routedEvent.Name, eventName, StringComparison.Ordinal))
                 {
@@ -191,6 +199,9 @@ internal class AvaloniaCreatesCommandBinding : ICreatesCommandBinding
         /// <summary>The subscription to command parameter changes.</summary>
         private readonly IDisposable _commandSubscription;
 
+        /// <summary>The routed-event handler attached to the input element.</summary>
+        private readonly EventHandler<RoutedEventArgs> _handler;
+
         /// <summary>The most recent command parameter value.</summary>
         private object? _lastCommandParameter;
 
@@ -214,26 +225,19 @@ internal class AvaloniaCreatesCommandBinding : ICreatesCommandBinding
             _element = element;
             _routedEvent = routedEvent;
             _command = command;
+            _handler = (_, _) =>
+            {
+                if (!_command.CanExecute(_lastCommandParameter))
+                {
+                    return;
+                }
+
+                _command.Execute(_lastCommandParameter);
+            };
 
             _commandSubscription = PrimitivesLinqExtensions.SubscribeSafe(commandParameter, OnCommandParameterChanged, SubscriptionErrors.Throw);
 
-            element.AddHandler(routedEvent, Handler, RoutingStrategies.Bubble);
-        }
-
-        /// <summary>Handles the routed event by invoking the associated command if it can be executed.</summary>
-        /// <remarks>This method is intended to be used as an event handler for UI elements that trigger
-        /// command execution. The command is executed only if its CanExecute method returns <see langword="true"/> for
-        /// the last command parameter.</remarks>
-        /// <param name="sender">The source of the event, typically the control that raised the routed event.</param>
-        /// <param name="args">The event data associated with the routed event.</param>
-        public void Handler(object? sender, RoutedEventArgs args)
-        {
-            if (!_command.CanExecute(_lastCommandParameter))
-            {
-                return;
-            }
-
-            _command.Execute(_lastCommandParameter);
+            element.AddHandler(routedEvent, _handler, RoutingStrategies.Bubble);
         }
 
         /// <summary>Releases all resources used by the instance and detaches event handlers.</summary>
@@ -243,7 +247,7 @@ internal class AvaloniaCreatesCommandBinding : ICreatesCommandBinding
         public void Dispose()
         {
             _commandSubscription.Dispose();
-            _element.RemoveHandler(_routedEvent, Handler);
+            _element.RemoveHandler(_routedEvent, _handler);
             _element.ClearValue(InputElement.IsEnabledProperty);
         }
 

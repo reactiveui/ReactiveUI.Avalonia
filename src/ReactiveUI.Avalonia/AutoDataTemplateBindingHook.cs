@@ -45,8 +45,8 @@ public class AutoDataTemplateBindingHook : IPropertyBindingHook
         }
 
         var propertyName = lastViewProperty.GetPropertyName();
-        if (propertyName != "Items" &&
-            propertyName != "ItemsSource")
+        if (propertyName != "Items"
+            && propertyName != "ItemsSource")
         {
             return true;
         }
