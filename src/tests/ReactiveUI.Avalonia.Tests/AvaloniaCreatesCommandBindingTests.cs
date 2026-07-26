@@ -128,7 +128,7 @@ public class AvaloniaCreatesCommandBindingTests
     /// <summary>Verifies that subscription errors preserve the exception type when rethrown.</summary>
     /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
-    public async Task SubscriptionErrors_Throw_RethrowsException() => await Assert.That(() => SubscriptionErrors.Throw(new InvalidOperationException("expected")))
+    public async Task SubscriptionErrors_Throw_RethrowsException() => await Assert.That(static () => SubscriptionErrors.Throw(new InvalidOperationException("expected")))
             .ThrowsExactly<InvalidOperationException>();
 
     /// <summary>Verifies that BindCommandToObject handles null and invalid targets.</summary>

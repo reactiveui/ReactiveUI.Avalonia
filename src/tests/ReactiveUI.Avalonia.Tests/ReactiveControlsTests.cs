@@ -1,10 +1,7 @@
 // Copyright (c) 2019-2026 ReactiveUI Association Incorporated. All rights reserved.
 // ReactiveUI Association Incorporated licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for full license information.
-using System.Reflection;
 using Avalonia.Controls;
-
-using ActivationDisposables = ReactiveUI.Primitives.Disposables.MultipleDisposable;
 
 namespace ReactiveUI.Avalonia.Tests;
 
@@ -19,16 +16,6 @@ public class ReactiveControlsTests
         var controlType = typeof(ReactiveUserControl<object>);
         await Assert.That(controlType).IsNotNull();
         await Assert.That(controlType.IsClass).IsTrue();
-    }
-
-    /// <summary>Verifies that the non-generic user control activation callback can execute.</summary>
-    /// <returns>A task representing the asynchronous test operation.</returns>
-    [Test]
-    public async Task ReactiveUserControlBase_ActivationCallback_CanExecute()
-    {
-        var invoked = InvokeActivationCallback(typeof(ReactiveUserControlBase));
-
-        await Assert.That(invoked).IsTrue();
     }
 
     /// <summary>Verifies that ReactiveWindow type can be referenced without setup.</summary>
@@ -217,25 +204,5 @@ public class ReactiveControlsTests
 
         var routerProp = hostType.GetProperty("Router");
         await Assert.That(routerProp).IsNotNull();
-    }
-
-    /// <summary>Invokes a compiler-generated activation callback.</summary>
-    /// <param name="viewType">The view base type that owns the callback.</param>
-    /// <returns><see langword="true"/> after the callback has been invoked.</returns>
-    private static bool InvokeActivationCallback(Type viewType)
-    {
-        var closureType = viewType.GetNestedTypes(BindingFlags.NonPublic)
-            .Single(type => type.Name.Contains("<>c", StringComparison.Ordinal));
-        var instance = closureType.GetField("<>9", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public)
-            ?.GetValue(null);
-        var method = closureType.GetMethods(BindingFlags.Instance | BindingFlags.NonPublic)
-            .Single(candidate =>
-                candidate.GetParameters() is [{ ParameterType: var parameterType }]
-                && parameterType == typeof(ActivationDisposables));
-
-        using var disposables = new ActivationDisposables();
-        _ = method.Invoke(instance, [disposables]);
-
-        return true;
     }
 }

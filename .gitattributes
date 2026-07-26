@@ -1,5 +1,5 @@
 ﻿# Catch all for anything we forgot. Add rules if you get CRLF to LF warnings.
-* text=auto
+* text=auto eol=lf
 
 # Text files that should be normalized to LF in odb.
 *.cs text eol=lf diff=csharp

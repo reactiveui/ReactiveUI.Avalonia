@@ -18,9 +18,9 @@ public class AvaloniaMixinsMicrosoftMoreTests
         var builder = AppBuilder.Configure<Application>();
         var result = AvaloniaMixins.UseReactiveUIWithMicrosoftDependencyResolver(
             builder,
-            containerConfig: sc => _ = sc.AddSingleton(new object()),
-            withResolver: _ => { },
-            withReactiveUIBuilder: _ => { });
+            containerConfig: static sc => _ = sc.AddSingleton(new object()),
+            withResolver: static _ => { },
+            withReactiveUIBuilder: static _ => { });
 
         await Assert.That(result).IsSameReferenceAs(builder);
     }
@@ -33,8 +33,8 @@ public class AvaloniaMixinsMicrosoftMoreTests
         var builder = AppBuilder.Configure<Application>();
         var result = AvaloniaMixins.UseReactiveUIWithMicrosoftDependencyResolver(
             builder,
-            sc => _ = sc.AddSingleton(new object()),
-            (Action<IServiceProvider?>)(_ => { }));
+            static sc => _ = sc.AddSingleton(new object()),
+            (Action<IServiceProvider?>)(static _ => { }));
 
         await Assert.That(result).IsSameReferenceAs(builder);
     }

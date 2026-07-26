@@ -18,8 +18,8 @@ public class App : Application
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
-        AppLocator.CurrentMutable.Register<IViewFor<FooViewModel>>(() => new FooView());
-        AppLocator.CurrentMutable.Register<IViewFor<BarViewModel>>(() => new BarView());
+        AppLocator.CurrentMutable.Register<IViewFor<FooViewModel>>(static () => new FooView());
+        AppLocator.CurrentMutable.Register<IViewFor<BarViewModel>>(static () => new BarView());
     }
 
     /// <inheritdoc/>

@@ -97,7 +97,7 @@ public sealed class AutoSuspendHelper : IEnableLogger, IDisposable
     {
         this.Log().Debug("Received IControlledApplicationLifetime exit event.");
         var manual = new ManualResetEvent(false);
-        _shouldPersistState.OnNext(Disposable.Create(() => _ = manual.Set()));
+        _shouldPersistState.OnNext(Disposable.Create(manual, static state => _ = state.Set()));
 
         _ = manual.WaitOne();
         this.Log().Debug("Completed actions on IControlledApplicationLifetime exit event.");

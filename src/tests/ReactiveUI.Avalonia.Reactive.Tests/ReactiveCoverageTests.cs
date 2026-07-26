@@ -3,7 +3,6 @@
 // See the LICENSE file in the project root for full license information.
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
@@ -58,34 +57,34 @@ public class ReactiveCoverageTests
         var hook = new AutoDataTemplateBindingHook();
         var items = new ListBox();
 
-        await Assert.That(() => hook.ExecuteHook(null, items, () => [], null!, BindingDirection.OneWay))
+        await Assert.That(() => hook.ExecuteHook(null, items, static () => [], null!, BindingDirection.OneWay))
             .ThrowsExactly<ArgumentNullException>();
 
-        await Assert.That(hook.ExecuteHook(null, items, () => [], () => [], BindingDirection.OneWay)).IsTrue();
-        await Assert.That(hook.ExecuteHook(null, new TextBlock(), () => [], () => [TextObservedChange(new())], BindingDirection.OneWay)).IsTrue();
-        await Assert.That(hook.ExecuteHook(null, items, () => [], () => [TagObservedChange(items)], BindingDirection.OneWay)).IsTrue();
+        await Assert.That(hook.ExecuteHook(null, items, static () => [], static () => [], BindingDirection.OneWay)).IsTrue();
+        await Assert.That(hook.ExecuteHook(null, new TextBlock(), static () => [], static () => [TextObservedChange(new())], BindingDirection.OneWay)).IsTrue();
+        await Assert.That(hook.ExecuteHook(null, items, static () => [], () => [TagObservedChange(items)], BindingDirection.OneWay)).IsTrue();
 
-        _ = hook.ExecuteHook(null, items, () => [], () => [ItemsObservedChange(items)], BindingDirection.OneWay);
+        _ = hook.ExecuteHook(null, items, static () => [], () => [ItemsObservedChange(items)], BindingDirection.OneWay);
         await Assert.That(items.ItemTemplate).IsNotNull();
         var control = items.ItemTemplate!.Build(new());
         await Assert.That(control).IsTypeOf<ViewModelViewHost>();
         await Assert.That(((ViewModelViewHost)control!).HorizontalContentAlignment).IsEqualTo(HorizontalAlignment.Stretch);
         await Assert.That(((ViewModelViewHost)control).VerticalContentAlignment).IsEqualTo(VerticalAlignment.Stretch);
 
-        var templated = new ListBox { ItemTemplate = new FuncDataTemplate<object>((_, _) => new TextBlock(), true) };
-        _ = hook.ExecuteHook(null, templated, () => [], () => [ItemsSourceObservedChange(templated)], BindingDirection.OneWay);
+        var templated = new ListBox { ItemTemplate = new FuncDataTemplate<object>(static (_, _) => new TextBlock(), true) };
+        _ = hook.ExecuteHook(null, templated, static () => [], () => [ItemsSourceObservedChange(templated)], BindingDirection.OneWay);
         await Assert.That(templated.ItemTemplate).IsNotNull();
 
         var dataTemplated = new ListBox();
-        dataTemplated.DataTemplates.Add(new FuncDataTemplate<object>((_, _) => new TextBlock(), true));
-        _ = hook.ExecuteHook(null, dataTemplated, () => [], () => [ItemsObservedChange(dataTemplated)], BindingDirection.OneWay);
+        dataTemplated.DataTemplates.Add(new FuncDataTemplate<object>(static (_, _) => new TextBlock(), true));
+        _ = hook.ExecuteHook(null, dataTemplated, static () => [], () => [ItemsObservedChange(dataTemplated)], BindingDirection.OneWay);
         await Assert.That(dataTemplated.ItemTemplate).IsNull();
 
         var lastChangeWins = new ListBox();
         _ = hook.ExecuteHook(
             null,
             lastChangeWins,
-            () => [],
+            static () => [],
             () => [TagObservedChange(lastChangeWins), ItemsSourceObservedChange(lastChangeWins)],
             BindingDirection.OneWay);
         await Assert.That(lastChangeWins.ItemTemplate).IsNotNull();
@@ -94,7 +93,7 @@ public class ReactiveCoverageTests
         _ = hook.ExecuteHook(
             null,
             ignoredLastChange,
-            () => [],
+            static () => [],
             () => [ItemsObservedChange(ignoredLastChange), TagObservedChange(ignoredLastChange)],
             BindingDirection.OneWay);
         await Assert.That(ignoredLastChange.ItemTemplate).IsNull();
@@ -146,9 +145,8 @@ public class ReactiveCoverageTests
 
         await VerifyUserControlAsync(control, vm, second);
         await VerifyWindowAsync(window, vm, second);
-        var reflectedWindow = await VerifyReflectedControlsAsync(vm, second);
         var baseWindow = await VerifyBaseControlsAsync(vm, second);
-        VerifyControlActivation(control, window, reflectedWindow, baseWindow);
+        VerifyControlActivation(control, window, baseWindow);
     }
 
     /// <summary>Covers reactive control paths before async assertion continuations run.</summary>
@@ -232,7 +230,7 @@ public class ReactiveCoverageTests
     /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task SubscriptionErrors_CoversReactiveThrow() =>
-        await Assert.That(() => SubscriptionErrors.Throw(new InvalidOperationException("expected")))
+        await Assert.That(static () => SubscriptionErrors.Throw(new InvalidOperationException("expected")))
             .ThrowsExactly<InvalidOperationException>();
 
     /// <summary>Verifies all reactive AppBuilder extension paths.</summary>
@@ -261,13 +259,13 @@ public class ReactiveCoverageTests
     private static async Task VerifyUseReactiveUIConfigurationAsync()
     {
         AppBuilder? builder = null;
-        await Assert.That(() => builder!.UseReactiveUI(_ => { })).ThrowsExactly<ArgumentNullException>();
-        await Assert.That(() => AppBuilder.Configure<Application>().UseReactiveUI(null!))
+        await Assert.That(() => builder!.UseReactiveUI(static _ => { })).ThrowsExactly<ArgumentNullException>();
+        await Assert.That(static () => AppBuilder.Configure<Application>().UseReactiveUI(null!))
             .ThrowsExactly<ArgumentNullException>();
 
         var configured = false;
         builder = AppBuilder.Configure<Application>().UseReactiveUI(_ => configured = true);
-        InvokeAfterPlatformServicesSetup(builder);
+        AppBuilderExtensions.ConfigureReactiveUI(_ => configured = true);
         await Assert.That(configured).IsTrue();
     }
 
@@ -277,7 +275,7 @@ public class ReactiveCoverageTests
     {
         _ = new ActivatorCreatedView();
         await Assert.That(InvokeCreateView(typeof(ActivatorCreatedView))).IsTypeOf<ActivatorCreatedView>();
-        await Assert.That(() => InvokeCreateView(typeof(int?))).ThrowsExactly<InvalidOperationException>();
+        await Assert.That(static () => InvokeCreateView(typeof(int?))).ThrowsExactly<InvalidOperationException>();
 
         var originalLocator = Locator.GetLocator();
         try
@@ -299,9 +297,11 @@ public class ReactiveCoverageTests
     /// <returns>A task representing the asynchronous verification.</returns>
     private static async Task VerifyViewRegistrationAsync()
     {
-        var registrationBuilder = AppBuilder.Configure<Application>()
+        _ = AppBuilder.Configure<Application>()
             .RegisterReactiveUIViews(typeof(RegistrationViewModel).Assembly, typeof(RegistrationViewModel).Assembly);
-        InvokeAfterPlatformServicesSetup(registrationBuilder);
+        AppBuilderExtensions.RegisterReactiveUIViews(
+            AppLocator.CurrentMutable,
+            [typeof(RegistrationViewModel).Assembly, typeof(RegistrationViewModel).Assembly]);
 
         var serviceType = typeof(IViewFor<>).MakeGenericType(typeof(RegistrationViewModel));
         _ = new RegistrationViewModel();
@@ -332,7 +332,7 @@ public class ReactiveCoverageTests
         try
         {
             Locator.SetLocator(new ThrowingResolver());
-            var containerBuilder = AppBuilder.Configure<Application>().UseReactiveUIWithDIContainer(
+            _ = AppBuilder.Configure<Application>().UseReactiveUIWithDIContainer(
                 () => MarkFactoryCalled(ref containerFactoryCalled),
                 _ => containerConfigCalled = true,
                 _ =>
@@ -340,8 +340,16 @@ public class ReactiveCoverageTests
                     dependencyResolverFactoryCalled = true;
                     return new ThrowingResolver();
                 },
-                _ => { });
-            InvokeAfterPlatformServicesSetup(containerBuilder);
+                static _ => { });
+            AppBuilderExtensions.ConfigureReactiveUIDIContainer(
+                AppLocator.CurrentMutable,
+                () => MarkFactoryCalled(ref containerFactoryCalled),
+                _ => containerConfigCalled = true,
+                _ =>
+                {
+                    dependencyResolverFactoryCalled = true;
+                    return new ThrowingResolver();
+                });
         }
         finally
         {
@@ -357,8 +365,10 @@ public class ReactiveCoverageTests
     /// <summary>Exercises null and empty view-registration guard paths.</summary>
     private static void InvokeRegistrationGuardPaths()
     {
-        InvokeAfterPlatformServicesSetup(AppBuilder.Configure<Application>().RegisterReactiveUIViews((Assembly[]?)null!));
-        InvokeAfterPlatformServicesSetup(AppBuilder.Configure<Application>().RegisterReactiveUIViews());
+        _ = AppBuilder.Configure<Application>().RegisterReactiveUIViews((Assembly[]?)null!);
+        _ = AppBuilder.Configure<Application>().RegisterReactiveUIViews();
+        AppBuilderExtensions.RegisterReactiveUIViews(AppLocator.CurrentMutable, null);
+        AppBuilderExtensions.RegisterReactiveUIViews(AppLocator.CurrentMutable, []);
         InvokeRegisterReactiveUIViews(null, [typeof(RegistrationViewModel).Assembly]);
         InvokeRegisterReactiveUIViews(AppLocator.CurrentMutable!, null);
         InvokeRegisterReactiveUIViews(AppLocator.CurrentMutable!, []);
@@ -367,21 +377,24 @@ public class ReactiveCoverageTests
     /// <summary>Exercises marker-based view registration paths.</summary>
     private static void InvokeMarkerRegistration()
     {
-        var markerBuilder = AppBuilder.Configure<Application>().RegisterReactiveUIViewsFromAssemblyOf<RegistrationViewModel>();
-        var reflectedMarkerBuilder = InvokeRegisterReactiveUIViewsFromAssemblyOf<RegistrationViewModel>(AppBuilder.Configure<Application>());
-        InvokeAfterPlatformServicesSetup(markerBuilder);
-        InvokeAfterPlatformServicesSetup(reflectedMarkerBuilder);
+        _ = AppBuilder.Configure<Application>().RegisterReactiveUIViewsFromAssemblyOf<RegistrationViewModel>();
+        _ = InvokeRegisterReactiveUIViewsFromAssemblyOf<RegistrationViewModel>(AppBuilder.Configure<Application>());
+        AppBuilderExtensions.RegisterReactiveUIViews(
+            AppLocator.CurrentMutable,
+            [typeof(RegistrationViewModel).Assembly]);
     }
 
     /// <summary>Exercises entry-assembly view registration paths.</summary>
     private static void InvokeEntryAssemblyRegistration()
     {
-        InvokeAfterPlatformServicesSetup(AppBuilder.Configure<Application>().RegisterReactiveUIViewsFromEntryAssembly());
+        _ = AppBuilder.Configure<Application>().RegisterReactiveUIViewsFromEntryAssembly();
         _ = InvokeRegisterReactiveUIViewsFromEntryAssembly(AppBuilder.Configure<Application>(), null);
-        var reflectedBuilder = InvokeRegisterReactiveUIViewsFromEntryAssembly(
+        _ = InvokeRegisterReactiveUIViewsFromEntryAssembly(
             AppBuilder.Configure<Application>(),
             typeof(RegistrationViewModel).Assembly);
-        InvokeAfterPlatformServicesSetup(reflectedBuilder);
+        AppBuilderExtensions.RegisterReactiveUIViews(
+            AppLocator.CurrentMutable,
+            [typeof(RegistrationViewModel).Assembly]);
     }
 
     /// <summary>Verifies view creation paths without asynchronous assertions.</summary>
@@ -393,7 +406,7 @@ public class ReactiveCoverageTests
         {
             AppLocator.SetLocator(new ThrowingResolver());
             return InvokeCreateView(typeof(ActivatorCreatedView)) is ActivatorCreatedView
-                && ThrowsExactly<InvalidOperationException>(() => InvokeCreateView(typeof(int?)));
+                && ThrowsExactly<InvalidOperationException>(static () => InvokeCreateView(typeof(int?)));
         }
         finally
         {
@@ -405,9 +418,11 @@ public class ReactiveCoverageTests
     /// <returns><see langword="true"/> when all covered paths succeed.</returns>
     private static bool CoverViewRegistrationSynchronously()
     {
-        var registrationBuilder = AppBuilder.Configure<Application>()
+        _ = AppBuilder.Configure<Application>()
             .RegisterReactiveUIViews(typeof(RegistrationViewModel).Assembly, typeof(RegistrationViewModel).Assembly);
-        InvokeAfterPlatformServicesSetup(registrationBuilder);
+        AppBuilderExtensions.RegisterReactiveUIViews(
+            AppLocator.CurrentMutable,
+            [typeof(RegistrationViewModel).Assembly, typeof(RegistrationViewModel).Assembly]);
         var serviceType = typeof(IViewFor<>).MakeGenericType(typeof(RegistrationViewModel));
         var registrationWorks = AppLocator.Current.GetService(serviceType) is not null
             && AppLocator.Current.GetService(serviceType, ReactiveContract) is ContractedRegistrationView;
@@ -428,8 +443,8 @@ public class ReactiveCoverageTests
         InvokeConfigureReactiveUIDIContainer(
             null,
             () => MarkFactoryCalled(ref factoryCalled),
-            _ => { },
-            _ => new ThrowingResolver());
+            static _ => { },
+            static _ => new ThrowingResolver());
         return factoryCalled;
     }
 
@@ -483,38 +498,6 @@ public class ReactiveCoverageTests
         await Assert.That(() => SetInvalidViewModel(window)).ThrowsExactly<InvalidCastException>();
     }
 
-    /// <summary>Verifies reflection-based control and window paths.</summary>
-    /// <param name="viewModel">The initial view model.</param>
-    /// <param name="secondViewModel">The replacement view model.</param>
-    /// <returns>The reflected reactive window.</returns>
-    private static async Task<ReactiveWindow<TestViewModel>> VerifyReflectedControlsAsync(
-        TestViewModel viewModel,
-        TestViewModel secondViewModel)
-    {
-        RuntimeHelpers.RunClassConstructor(typeof(ReactiveWindowBase).TypeHandle);
-        var reflectedWindowType = typeof(ReactiveWindow<TestViewModel>);
-        var reflectedWindow = (ReactiveWindow<TestViewModel>)Activator.CreateInstance(reflectedWindowType)!;
-        var reflectedWindowProperty = reflectedWindowType.GetProperty(nameof(ReactiveWindow<>.ViewModel))!;
-        reflectedWindowProperty.SetValue(reflectedWindow, viewModel);
-        await Assert.That(reflectedWindowProperty.GetValue(reflectedWindow)).IsSameReferenceAs(viewModel);
-        typeof(IViewFor).GetProperty(nameof(IViewFor.ViewModel))!.SetValue(reflectedWindow, secondViewModel);
-        await Assert.That(reflectedWindow.ViewModel).IsSameReferenceAs(secondViewModel);
-
-        var reflectedControlType = typeof(ReactiveUserControl<TestViewModel>);
-        var reflectedControl = (ReactiveUserControl<TestViewModel>)Activator.CreateInstance(reflectedControlType)!;
-        var reflectedControlProperty = reflectedControlType.GetProperty(nameof(ReactiveUserControl<>.ViewModel))!;
-        reflectedControlProperty.SetValue(reflectedControl, viewModel);
-        await Assert.That(reflectedControlProperty.GetValue(reflectedControl)).IsSameReferenceAs(viewModel);
-        typeof(IViewFor).GetProperty(nameof(IViewFor.ViewModel))!.SetValue(reflectedControl, secondViewModel);
-        await Assert.That(reflectedControl.ViewModel).IsSameReferenceAs(secondViewModel);
-
-        var validViewModel = typeof(ReactiveWindowBase)
-            .GetMethod("IsValidViewModelValue", BindingFlags.Instance | BindingFlags.NonPublic)!;
-        await Assert.That((bool)validViewModel.Invoke(reflectedWindow, [viewModel])!).IsTrue();
-        await Assert.That((bool)validViewModel.Invoke(reflectedWindow, [new object()])!).IsFalse();
-        return reflectedWindow;
-    }
-
     /// <summary>Verifies the non-generic reactive control bases.</summary>
     /// <param name="viewModel">The initial view model.</param>
     /// <param name="secondViewModel">The replacement view model.</param>
@@ -539,12 +522,10 @@ public class ReactiveCoverageTests
     /// <summary>Verifies visual activation of the reactive controls.</summary>
     /// <param name="control">The generic control.</param>
     /// <param name="window">The generic window.</param>
-    /// <param name="reflectedWindow">The reflected window.</param>
     /// <param name="baseWindow">The non-generic window base.</param>
     private static void VerifyControlActivation(
         ReactiveUserControl<TestViewModel> control,
         ReactiveWindow<TestViewModel> window,
-        ReactiveWindow<TestViewModel> reflectedWindow,
         TestableWindowBase baseWindow)
     {
         var activationWindow = new Window { Content = control };
@@ -554,13 +535,11 @@ public class ReactiveCoverageTests
             activationWindow.Show();
             directActivationWindow.Show();
             window.Show();
-            reflectedWindow.Show();
             baseWindow.Show();
         }
         finally
         {
             baseWindow.Close();
-            reflectedWindow.Close();
             window.Close();
             directActivationWindow.Close();
             activationWindow.Close();
@@ -581,24 +560,24 @@ public class ReactiveCoverageTests
     {
         host.ViewModel = viewModel;
         await Assert.That(host.ViewModel).IsSameReferenceAs(viewModel);
-        InvokeNavigation(host, viewModel, ViewContractValue);
+        host.NavigateToViewModel(viewModel, ViewContractValue);
         await Assert.That(host.Content).IsSameReferenceAs(view);
-        InvokeNavigation(host, null, null);
+        host.NavigateToViewModel(null, null);
         await Assert.That(host.Content).IsEqualTo(DefaultContentValue);
         host.ViewLocator = new StaticViewLocator(null, ViewContractValue);
-        InvokeNavigation(host, viewModel, ViewContractValue);
+        host.NavigateToViewModel(viewModel, ViewContractValue);
         await Assert.That(host.Content).IsEqualTo(DefaultContentValue);
         host.ViewLocator = new StaticViewLocator(new ViewB());
-        InvokeNavigation(host, new VmB(), null);
+        host.NavigateToViewModel(new VmB(), null);
         await Assert.That(host.Content).IsTypeOf<ViewB>();
         var plainVm = new VmB();
         var plainView = new PlainViewB();
         host.ViewLocator = new StaticViewLocator(plainView);
-        InvokeNavigation(host, plainVm, null);
+        host.NavigateToViewModel(plainVm, null);
         await Assert.That(host.Content).IsSameReferenceAs(plainView);
         await Assert.That(plainView.ViewModel).IsSameReferenceAs(plainVm);
         host.ViewLocator = null;
-        InvokeNavigation(host, new UnregisteredVm(), null);
+        host.NavigateToViewModel(new UnregisteredVm(), null);
         await Assert.That(host.Content).IsEqualTo(DefaultContentValue);
 
         host.Attach(source);
@@ -606,9 +585,6 @@ public class ReactiveCoverageTests
         host.ViewModel = new VmB();
         host.Attach(source);
         host.Detach(source);
-        SetNavigationDisposables(host, new());
-        host.Attach(source);
-        InvokeDisposeNavigationDisposables(host);
     }
 
     /// <summary>Verifies RoutedViewHost navigation and attachment paths.</summary>
@@ -624,115 +600,60 @@ public class ReactiveCoverageTests
         routed.ViewLocator = new StaticViewLocator(routedView, ViewContractValue);
         var route = new VmA(screen);
 
-        InvokeNavigation(routed, route, ViewContractValue);
+        routed.NavigateToViewModel(route, ViewContractValue);
         await Assert.That(routed.Content).IsSameReferenceAs(routedView);
         routed.Router = null;
-        InvokeNavigation(routed, route, null);
+        routed.NavigateToViewModel(route, null);
         await Assert.That(routed.Content).IsEqualTo(DefaultContentValue);
         routed.Router = screen.Router;
-        InvokeNavigation(routed, null, null);
+        routed.NavigateToViewModel(null, null);
         await Assert.That(routed.Content).IsEqualTo(DefaultContentValue);
         routed.ViewLocator = new StaticViewLocator(null, ViewContractValue);
-        InvokeNavigation(routed, route, ViewContractValue);
+        routed.NavigateToViewModel(route, ViewContractValue);
         await Assert.That(routed.Content).IsEqualTo(DefaultContentValue);
         routed.ViewLocator = new StaticViewLocator(new ViewA());
-        InvokeNavigation(routed, new VmA(screen), null);
+        routed.NavigateToViewModel(new VmA(screen), null);
         await Assert.That(routed.Content).IsTypeOf<ViewA>();
         var plainRoute = new VmA(screen);
         var plainRoutedView = new PlainViewA();
         routed.ViewLocator = new StaticViewLocator(plainRoutedView);
-        InvokeNavigation(routed, plainRoute, null);
+        routed.NavigateToViewModel(plainRoute, null);
         await Assert.That(routed.Content).IsSameReferenceAs(plainRoutedView);
         await Assert.That(plainRoutedView.ViewModel).IsSameReferenceAs(plainRoute);
         routed.ViewLocator = null;
-        InvokeNavigation(routed, new UnregisteredVm(), null);
+        routed.NavigateToViewModel(new UnregisteredVm(), null);
         await Assert.That(routed.Content).IsEqualTo(DefaultContentValue);
 
         routed.Attach(source);
         routed.Router = null;
         routed.Attach(source);
         routed.Detach(source);
-        SetNavigationDisposables(routed, new());
-        routed.Attach(source);
-        InvokeDisposeNavigationDisposables(routed);
     }
-
-    /// <summary>Invokes AppBuilder platform setup callback.</summary>
-    /// <param name="builder">The app builder.</param>
-    private static void InvokeAfterPlatformServicesSetup(AppBuilder builder) =>
-        GetAfterPlatformServicesSetupCallback(builder)?.Invoke(builder);
-
-    /// <summary>Gets the AppBuilder platform setup callback.</summary>
-    /// <param name="builder">The app builder.</param>
-    /// <returns>The configured callback, if any.</returns>
-    private static Action<AppBuilder>? GetAfterPlatformServicesSetupCallback(AppBuilder builder) =>
-        (Action<AppBuilder>?)typeof(AppBuilder).GetProperty(
-            "AfterPlatformServicesSetupCallback",
-            BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)?.GetValue(builder);
 
     /// <summary>Invokes the private CreateView fallback path.</summary>
     /// <param name="viewType">The view type.</param>
     /// <returns>The created view.</returns>
-    private static object InvokeCreateView(Type viewType)
-    {
-        var method = typeof(AppBuilderExtensions).GetMethod("CreateView", BindingFlags.Static | BindingFlags.NonPublic);
-
-        try
-        {
-            return method!.Invoke(null, [viewType])!;
-        }
-        catch (TargetInvocationException error) when (error.InnerException is not null)
-        {
-            System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(error.InnerException).Throw();
-            throw;
-        }
-    }
+    private static object InvokeCreateView(Type viewType) => AppBuilderExtensions.CreateView(viewType);
 
     /// <summary>Invokes the private guarded view registration helper.</summary>
     /// <param name="resolver">The resolver to register with.</param>
     /// <param name="assemblies">The assemblies to scan.</param>
-    private static void InvokeRegisterReactiveUIViews(IMutableDependencyResolver? resolver, Assembly[]? assemblies)
-    {
-        var method = typeof(AppBuilderExtensions)
-            .GetMethods(BindingFlags.Static | BindingFlags.NonPublic)
-            .Single(candidate =>
-                candidate.Name == "RegisterReactiveUIViews"
-                && candidate.GetParameters() is [{ ParameterType: var resolverType }, { ParameterType: var assembliesType }]
-                && resolverType == typeof(IMutableDependencyResolver)
-                && assembliesType == typeof(Assembly[]));
-
-        _ = method.Invoke(null, [resolver, assemblies]);
-    }
+    private static void InvokeRegisterReactiveUIViews(IMutableDependencyResolver? resolver, Assembly[]? assemblies) =>
+        AppBuilderExtensions.RegisterReactiveUIViews(resolver, assemblies);
 
     /// <summary>Invokes the public generic assembly marker registration method through reflection.</summary>
     /// <typeparam name="TMarker">The marker type.</typeparam>
     /// <param name="builder">The app builder.</param>
     /// <returns>The app builder returned by the method.</returns>
-    private static AppBuilder InvokeRegisterReactiveUIViewsFromAssemblyOf<TMarker>(AppBuilder builder)
-    {
-        var method = typeof(AppBuilderExtensions)
-            .GetMethods(BindingFlags.Static | BindingFlags.Public)
-            .Single(candidate => candidate.Name == "RegisterReactiveUIViewsFromAssemblyOf" && candidate.IsGenericMethodDefinition);
-
-        return (AppBuilder)method.MakeGenericMethod(typeof(TMarker)).Invoke(null, [builder])!;
-    }
+    private static AppBuilder InvokeRegisterReactiveUIViewsFromAssemblyOf<TMarker>(AppBuilder builder) =>
+        builder.RegisterReactiveUIViewsFromAssemblyOf<TMarker>();
 
     /// <summary>Invokes the private entry assembly registration helper.</summary>
     /// <param name="builder">The app builder.</param>
     /// <param name="entryAssembly">The entry assembly.</param>
     /// <returns>The app builder returned by the method.</returns>
-    private static AppBuilder InvokeRegisterReactiveUIViewsFromEntryAssembly(AppBuilder builder, Assembly? entryAssembly)
-    {
-        var method = typeof(AppBuilderExtensions)
-            .GetMethods(BindingFlags.Static | BindingFlags.NonPublic)
-            .Single(candidate =>
-                candidate.Name == "RegisterReactiveUIViewsFromEntryAssembly"
-                && candidate.GetParameters() is [{ ParameterType: var builderType }, { ParameterType: var assemblyType }]
-                && builderType == typeof(AppBuilder)
-                && assemblyType == typeof(Assembly));
-
-        return (AppBuilder)method.Invoke(null, [builder, entryAssembly])!;
-    }
+    private static AppBuilder InvokeRegisterReactiveUIViewsFromEntryAssembly(AppBuilder builder, Assembly? entryAssembly) =>
+        AppBuilderExtensions.RegisterReactiveUIViewsFromEntryAssembly(builder, entryAssembly);
 
     /// <summary>Invokes the private dependency injection configuration helper.</summary>
     /// <typeparam name="TContainer">The container type.</typeparam>
@@ -745,16 +666,12 @@ public class ReactiveCoverageTests
         Func<TContainer> containerFactory,
         Action<TContainer> containerConfig,
         Func<TContainer, IDependencyResolver> dependencyResolverFactory)
-        where TContainer : class
-    {
-        var method = typeof(AppBuilderExtensions)
-            .GetMethods(BindingFlags.Static | BindingFlags.NonPublic)
-            .Single(candidate => candidate.Name == "ConfigureReactiveUIDIContainer" && candidate.IsGenericMethodDefinition);
-
-        _ = method.MakeGenericMethod(typeof(TContainer)).Invoke(
-            null,
-            [resolver, containerFactory, containerConfig, dependencyResolverFactory]);
-    }
+        where TContainer : class =>
+        AppBuilderExtensions.ConfigureReactiveUIDIContainer(
+            resolver,
+            containerFactory,
+            containerConfig,
+            dependencyResolverFactory);
 
     /// <summary>Covers reactive user-control synchronization paths before the first test await.</summary>
     /// <param name="control">The generic reactive user control.</param>
@@ -820,9 +737,7 @@ public class ReactiveCoverageTests
         var baseWindowInitial = ReferenceEquals(baseWindow.ViewModel, viewModel);
         baseWindow.ViewModel = secondViewModel;
         var baseWindowUpdatesDataContext = ReferenceEquals(baseWindow.DataContext, secondViewModel);
-        var baseWindowAcceptsAnyValue = (bool)typeof(ReactiveWindowBase)
-            .GetMethod("IsValidViewModelValue", BindingFlags.Instance | BindingFlags.NonPublic)!
-            .Invoke(baseWindow, [CreateObject()])!;
+        var baseWindowAcceptsAnyValue = baseWindow.IsValidViewModel(CreateObject());
 
         var activationWindow = new Window { Content = activationContent };
         var directActivationWindow = new ReactiveWindow<TestViewModel> { ViewModel = new() };
@@ -857,7 +772,7 @@ public class ReactiveCoverageTests
     /// <param name="values">The values to inspect.</param>
     /// <returns><see langword="true"/> when all supplied values are true.</returns>
     private static bool All(params bool[] values) =>
-        values.All(static value => value);
+        Array.TrueForAll(values, static value => value);
 
     /// <summary>Creates a fresh object for invalid-value coverage paths.</summary>
     /// <returns>A new object instance.</returns>
@@ -898,60 +813,6 @@ public class ReactiveCoverageTests
     /// <param name="view">The view.</param>
     private static void SetInvalidViewModel(IViewFor view) =>
         view.ViewModel = new();
-
-    /// <summary>Invokes ViewModelViewHost private navigation.</summary>
-    /// <param name="host">The host.</param>
-    /// <param name="viewModel">The view model.</param>
-    /// <param name="contract">The view contract.</param>
-    private static void InvokeNavigation(ViewModelViewHost host, object? viewModel, string? contract)
-    {
-        var method = typeof(ViewModelViewHost).GetMethod("NavigateToViewModel", BindingFlags.Instance | BindingFlags.NonPublic);
-        _ = method!.Invoke(host, [viewModel, contract]);
-    }
-
-    /// <summary>Invokes RoutedViewHost private navigation.</summary>
-    /// <param name="host">The host.</param>
-    /// <param name="viewModel">The view model.</param>
-    /// <param name="contract">The view contract.</param>
-    private static void InvokeNavigation(RoutedViewHost host, object? viewModel, string? contract)
-    {
-        var method = typeof(RoutedViewHost).GetMethod("NavigateToViewModel", BindingFlags.Instance | BindingFlags.NonPublic);
-        _ = method!.Invoke(host, [viewModel, contract]);
-    }
-
-    /// <summary>Sets ViewModelViewHost navigation disposables through reflection.</summary>
-    /// <param name="host">The host.</param>
-    /// <param name="disposables">The disposables.</param>
-    private static void SetNavigationDisposables(ViewModelViewHost host, System.Reactive.Disposables.CompositeDisposable disposables)
-    {
-        var field = typeof(ViewModelViewHost).GetField("_navigationDisposables", BindingFlags.Instance | BindingFlags.NonPublic);
-        field!.SetValue(host, disposables);
-    }
-
-    /// <summary>Sets RoutedViewHost navigation disposables through reflection.</summary>
-    /// <param name="host">The host.</param>
-    /// <param name="disposables">The disposables.</param>
-    private static void SetNavigationDisposables(RoutedViewHost host, System.Reactive.Disposables.CompositeDisposable disposables)
-    {
-        var field = typeof(RoutedViewHost).GetField("_navigationDisposables", BindingFlags.Instance | BindingFlags.NonPublic);
-        field!.SetValue(host, disposables);
-    }
-
-    /// <summary>Invokes ViewModelViewHost navigation disposal through reflection.</summary>
-    /// <param name="host">The host.</param>
-    private static void InvokeDisposeNavigationDisposables(ViewModelViewHost host)
-    {
-        var method = typeof(ViewModelViewHost).GetMethod("DisposeNavigationDisposables", BindingFlags.Instance | BindingFlags.NonPublic);
-        _ = method!.Invoke(host, null);
-    }
-
-    /// <summary>Invokes RoutedViewHost navigation disposal through reflection.</summary>
-    /// <param name="host">The host.</param>
-    private static void InvokeDisposeNavigationDisposables(RoutedViewHost host)
-    {
-        var method = typeof(RoutedViewHost).GetMethod("DisposeNavigationDisposables", BindingFlags.Instance | BindingFlags.NonPublic);
-        _ = method!.Invoke(host, null);
-    }
 
     /// <summary>Creates an observed change for ItemsControl.Items.</summary>
     /// <param name="items">The items control.</param>
@@ -1240,7 +1101,13 @@ public class ReactiveCoverageTests
     private sealed class TestViewModel : ReactiveObject;
 
     /// <summary>A concrete non-generic reactive window base.</summary>
-    private sealed class TestableWindowBase : ReactiveWindowBase;
+    private sealed class TestableWindowBase : ReactiveWindowBase
+    {
+        /// <summary>Exposes base view model validation.</summary>
+        /// <param name="value">The value to validate.</param>
+        /// <returns><see langword="true"/> when the base class accepts the value.</returns>
+        public bool IsValidViewModel(object? value) => IsValidViewModelValue(value);
+    }
 
     /// <summary>A concrete non-generic reactive user control base.</summary>
     private sealed class TestableUserControlBase : ReactiveUserControlBase

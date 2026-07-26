@@ -17,10 +17,10 @@ public class UseReactiveUIWithDIContainerTests
     {
         AppBuilder? builder = null;
         await Assert.That(() => builder!.UseReactiveUIWithDIContainer(
-            containerFactory: () => new object(),
-            containerConfig: _ => { },
-            dependencyResolverFactory: _ => new DummyResolver(),
-            _ => { })).ThrowsExactly<ArgumentNullException>();
+            containerFactory: static () => new object(),
+            containerConfig: static _ => { },
+            dependencyResolverFactory: static _ => new DummyResolver(),
+            static _ => { })).ThrowsExactly<ArgumentNullException>();
     }
 
     /// <summary>Verifies that UseReactiveUIWithDIContainer returns the builder without throwing.</summary>
@@ -31,10 +31,10 @@ public class UseReactiveUIWithDIContainerTests
         var builder = AppBuilder.Configure<Application>();
 
         var result = builder.UseReactiveUIWithDIContainer(
-            containerFactory: () => new object(),
-            containerConfig: _ => { },
-            dependencyResolverFactory: _ => new DummyResolver(),
-            _ => { });
+            containerFactory: static () => new object(),
+            containerConfig: static _ => { },
+            dependencyResolverFactory: static _ => new DummyResolver(),
+            static _ => { });
 
         await Assert.That(result).IsSameReferenceAs(builder);
     }
@@ -42,44 +42,33 @@ public class UseReactiveUIWithDIContainerTests
     /// <summary>Verifies that the deferred callback validates a null container factory.</summary>
     /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
-    public async Task UseReactiveUIWithDIContainer_AfterPlatformCallback_Throws_On_Null_ContainerFactory()
-    {
-        var builder = AppBuilder.Configure<Application>().UseReactiveUIWithDIContainer<object>(
-            containerFactory: null!,
-            containerConfig: _ => { },
-            dependencyResolverFactory: _ => new DummyResolver(),
-            _ => { });
-
-        await Assert.That(() => InvokeAfterPlatformServicesSetup(builder)).ThrowsExactly<ArgumentNullException>();
-    }
+    public async Task UseReactiveUIWithDIContainer_AfterPlatformCallback_Throws_On_Null_ContainerFactory() =>
+        await Assert.That(static () => AppBuilderExtensions.ConfigureReactiveUIDIContainer<object>(
+                AppLocator.CurrentMutable,
+                containerFactory: null!,
+                containerConfig: static _ => { },
+                dependencyResolverFactory: static _ => new DummyResolver()))
+            .ThrowsExactly<ArgumentNullException>();
 
     /// <summary>Verifies that the deferred callback validates a null container config action.</summary>
     /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
-    public async Task UseReactiveUIWithDIContainer_AfterPlatformCallback_Throws_On_Null_ContainerConfig()
-    {
-        var builder = AppBuilder.Configure<Application>().UseReactiveUIWithDIContainer(
-            containerFactory: () => new object(),
+    public async Task UseReactiveUIWithDIContainer_AfterPlatformCallback_Throws_On_Null_ContainerConfig() => await Assert.That(static () => AppBuilderExtensions.ConfigureReactiveUIDIContainer(
+            AppLocator.CurrentMutable,
+            containerFactory: static () => new object(),
             containerConfig: null!,
-            dependencyResolverFactory: _ => new DummyResolver(),
-            _ => { });
-
-        await Assert.That(() => InvokeAfterPlatformServicesSetup(builder)).ThrowsExactly<ArgumentNullException>();
-    }
+            dependencyResolverFactory: static _ => new DummyResolver())).ThrowsExactly<ArgumentNullException>();
 
     /// <summary>Verifies that the deferred callback validates a null dependency resolver factory.</summary>
     /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
-    public async Task UseReactiveUIWithDIContainer_AfterPlatformCallback_Throws_On_Null_DependencyResolverFactory()
-    {
-        var builder = AppBuilder.Configure<Application>().UseReactiveUIWithDIContainer(
-            containerFactory: () => new object(),
-            containerConfig: _ => { },
-            dependencyResolverFactory: null!,
-            _ => { });
-
-        await Assert.That(() => InvokeAfterPlatformServicesSetup(builder)).ThrowsExactly<ArgumentNullException>();
-    }
+    public async Task UseReactiveUIWithDIContainer_AfterPlatformCallback_Throws_On_Null_DependencyResolverFactory() =>
+        await Assert.That(static () => AppBuilderExtensions.ConfigureReactiveUIDIContainer(
+                AppLocator.CurrentMutable,
+                containerFactory: static () => new object(),
+                containerConfig: static _ => { },
+                dependencyResolverFactory: null!))
+            .ThrowsExactly<ArgumentNullException>();
 
     /// <summary>Verifies that the deferred callback creates, registers, and configures the container.</summary>
     /// <returns>A task representing the asynchronous test operation.</returns>
@@ -94,7 +83,9 @@ public class UseReactiveUIWithDIContainerTests
         var configCalled = false;
         var reactiveConfigured = false;
 
-        var builder = AppBuilder.Configure<Application>().UseReactiveUIWithDIContainer(
+        AppBuilderExtensions.ConfigureReactiveUI(_ => reactiveConfigured = true);
+        AppBuilderExtensions.ConfigureReactiveUIDIContainer(
+            resolver,
             containerFactory: () =>
             {
                 factoryCalled = true;
@@ -105,10 +96,7 @@ public class UseReactiveUIWithDIContainerTests
             {
                 resolverFactoryCalled = ReferenceEquals(value, container);
                 return (IDependencyResolver)resolver;
-            },
-            _ => reactiveConfigured = true);
-
-        InvokeAfterPlatformServicesSetup(builder);
+            });
 
         await Assert.That(factoryCalled).IsTrue();
         await Assert.That(resolverFactoryCalled).IsTrue();
@@ -125,58 +113,17 @@ public class UseReactiveUIWithDIContainerTests
     {
         var factoryCalled = false;
 
-        InvokeConfigureReactiveUIDIContainer(
+        AppBuilderExtensions.ConfigureReactiveUIDIContainer(
             resolver: null,
             containerFactory: () =>
             {
                 factoryCalled = true;
                 return new object();
             },
-            containerConfig: _ => { },
-            dependencyResolverFactory: _ => new DummyResolver());
+            containerConfig: static _ => { },
+            dependencyResolverFactory: static _ => new DummyResolver());
 
         await Assert.That(factoryCalled).IsFalse();
-    }
-
-    /// <summary>Invokes the AppBuilder platform setup callback registered by extension methods.</summary>
-    /// <param name="builder">The application builder.</param>
-    private static void InvokeAfterPlatformServicesSetup(AppBuilder builder)
-    {
-        var property = typeof(AppBuilder).GetProperty(
-            "AfterPlatformServicesSetupCallback",
-            System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
-
-        var callback = (Action<AppBuilder>?)property?.GetValue(builder);
-        callback?.Invoke(builder);
-    }
-
-    /// <summary>Invokes the private dependency injection container helper.</summary>
-    /// <typeparam name="TContainer">The container type.</typeparam>
-    /// <param name="resolver">The mutable dependency resolver.</param>
-    /// <param name="containerFactory">The container factory.</param>
-    /// <param name="containerConfig">The container configuration callback.</param>
-    /// <param name="dependencyResolverFactory">The dependency resolver factory.</param>
-    private static void InvokeConfigureReactiveUIDIContainer<TContainer>(
-        IMutableDependencyResolver? resolver,
-        Func<TContainer> containerFactory,
-        Action<TContainer> containerConfig,
-        Func<TContainer, IDependencyResolver> dependencyResolverFactory)
-        where TContainer : class
-    {
-        var method = typeof(AppBuilderExtensions).GetMethod(
-            "ConfigureReactiveUIDIContainer",
-            System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic);
-
-        try
-        {
-            _ = method!.MakeGenericMethod(typeof(TContainer)).Invoke(
-                null,
-                [resolver, containerFactory, containerConfig, dependencyResolverFactory]);
-        }
-        catch (System.Reflection.TargetInvocationException error) when (error.InnerException is not null)
-        {
-            System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(error.InnerException).Throw();
-        }
     }
 
     /// <summary>A dummy dependency resolver implementation for testing.</summary>
@@ -206,10 +153,28 @@ public class UseReactiveUIWithDIContainerTests
         public IEnumerable<object> GetServices(Type? serviceType, string? contract) => GetServices(serviceType);
 
         /// <inheritdoc/>
-        public IEnumerable<T> GetServices<T>() => GetServices(typeof(T)).OfType<T>();
+        public IEnumerable<T> GetServices<T>()
+        {
+            foreach (var service in GetServices(typeof(T)))
+            {
+                if (service is T typedService)
+                {
+                    yield return typedService;
+                }
+            }
+        }
 
         /// <inheritdoc/>
-        public IEnumerable<T> GetServices<T>(string? contract) => GetServices(typeof(T), contract).OfType<T>();
+        public IEnumerable<T> GetServices<T>(string? contract)
+        {
+            foreach (var service in GetServices(typeof(T), contract))
+            {
+                if (service is T typedService)
+                {
+                    yield return typedService;
+                }
+            }
+        }
 
         /// <inheritdoc/>
         public bool HasRegistration(Type? serviceType) => false;
@@ -243,13 +208,13 @@ public class UseReactiveUIWithDIContainerTests
         public void Register<TService, TImplementation>()
             where TService : class
             where TImplementation : class, TService, new() =>
-            Register(() => new TImplementation(), typeof(TService));
+            Register(static () => new TImplementation(), typeof(TService));
 
         /// <inheritdoc/>
         public void Register<TService, TImplementation>(string? contract)
             where TService : class
             where TImplementation : class, TService, new() =>
-            Register(() => new TImplementation(), typeof(TService), contract);
+            Register(static () => new TImplementation(), typeof(TService), contract);
 
         /// <inheritdoc/>
         public void UnregisterCurrent(Type? serviceType)
