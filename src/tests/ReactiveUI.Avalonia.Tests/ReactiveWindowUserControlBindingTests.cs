@@ -134,7 +134,7 @@ public class ReactiveWindowUserControlBindingTests
 
         control.DataContext = vm;
 
-        await Assert.That(control.ViewModel).IsSameReferenceAs(vm);
+        await Assert.That(((IViewFor)control).ViewModel).IsSameReferenceAs(vm);
     }
 
     /// <summary>Verifies that the non-generic ReactiveWindowBase synchronizes arbitrary view model values.</summary>
@@ -147,7 +147,7 @@ public class ReactiveWindowUserControlBindingTests
 
         window.DataContext = vm;
 
-        await Assert.That(window.ViewModel).IsSameReferenceAs(vm);
+        await Assert.That(((IViewFor)window).ViewModel).IsSameReferenceAs(vm);
     }
 
     /// <summary>A test view model with a Name property.</summary>
