@@ -6,7 +6,7 @@
     <SplatVersion>20.2.0</SplatVersion>
     <!-- StyleSharp.Analyzers, PerformanceSharp.Analyzers and SecuritySharp.Analyzers ship from the
          same release pipeline and always share a version. -->
-    <RoslynCommonAnalyzersVersion>3.40.0</RoslynCommonAnalyzersVersion>
+    <RoslynCommonAnalyzersVersion>3.40.1</RoslynCommonAnalyzersVersion>
   </PropertyGroup>
 
   <ItemGroup Label="Core packages">
