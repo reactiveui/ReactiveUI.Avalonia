@@ -505,16 +505,16 @@ public class ReactiveCoverageTests
     private static async Task<TestableWindowBase> VerifyBaseControlsAsync(TestViewModel viewModel, TestViewModel secondViewModel)
     {
         var directControlBase = new TestableUserControlBase { DataContext = viewModel };
-        await Assert.That(directControlBase.ViewModel).IsSameReferenceAs(viewModel);
-        directControlBase.ViewModel = secondViewModel;
+        await Assert.That(((IViewFor)directControlBase).ViewModel).IsSameReferenceAs(viewModel);
+        ((IViewFor)directControlBase).ViewModel = secondViewModel;
         await Assert.That(directControlBase.DataContext).IsSameReferenceAs(secondViewModel);
         await Assert.That(directControlBase.IsValidViewModel(new())).IsTrue();
 
         var baseWindow = new TestableWindowBase { DataContext = viewModel };
-        await Assert.That(baseWindow.ViewModel).IsSameReferenceAs(viewModel);
+        await Assert.That(((IViewFor)baseWindow).ViewModel).IsSameReferenceAs(viewModel);
         baseWindow.DataContext = new();
-        await Assert.That(baseWindow.ViewModel).IsSameReferenceAs(baseWindow.DataContext);
-        baseWindow.ViewModel = secondViewModel;
+        await Assert.That(((IViewFor)baseWindow).ViewModel).IsSameReferenceAs(baseWindow.DataContext);
+        ((IViewFor)baseWindow).ViewModel = secondViewModel;
         await Assert.That(baseWindow.DataContext).IsSameReferenceAs(secondViewModel);
         return baseWindow;
     }
@@ -695,8 +695,8 @@ public class ReactiveCoverageTests
         var controlInvalidThrows = ThrowsExactly<InvalidCastException>(() => SetInvalidViewModel(control));
 
         var baseControl = new TestableUserControlBase { DataContext = viewModel };
-        var baseControlInitial = ReferenceEquals(baseControl.ViewModel, viewModel);
-        baseControl.ViewModel = secondViewModel;
+        var baseControlInitial = ReferenceEquals(((IViewFor)baseControl).ViewModel, viewModel);
+        ((IViewFor)baseControl).ViewModel = secondViewModel;
         var baseControlUpdatesDataContext = ReferenceEquals(baseControl.DataContext, secondViewModel);
         var baseControlValidatesAnyValue = baseControl.IsValidViewModel(CreateObject());
 
@@ -734,8 +734,8 @@ public class ReactiveCoverageTests
         var windowInvalidThrows = ThrowsExactly<InvalidCastException>(() => SetInvalidViewModel(window));
 
         var baseWindow = new TestableWindowBase { DataContext = viewModel };
-        var baseWindowInitial = ReferenceEquals(baseWindow.ViewModel, viewModel);
-        baseWindow.ViewModel = secondViewModel;
+        var baseWindowInitial = ReferenceEquals(((IViewFor)baseWindow).ViewModel, viewModel);
+        ((IViewFor)baseWindow).ViewModel = secondViewModel;
         var baseWindowUpdatesDataContext = ReferenceEquals(baseWindow.DataContext, secondViewModel);
         var baseWindowAcceptsAnyValue = baseWindow.IsValidViewModel(CreateObject());
 

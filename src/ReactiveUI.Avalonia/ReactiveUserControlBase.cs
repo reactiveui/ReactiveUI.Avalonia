@@ -15,7 +15,7 @@ public class ReactiveUserControlBase : UserControl, IViewFor
     /// Avalonia applications. It is typically used to associate a view model with the control for reactive UI
     /// scenarios.</remarks>
     public static readonly StyledProperty<object?> ViewModelProperty = AvaloniaProperty
-        .Register<ReactiveUserControlBase, object?>(nameof(ViewModel));
+        .Register<ReactiveUserControlBase, object?>(nameof(IViewFor.ViewModel));
 
     /// <summary>Initializes a new instance of the <see cref="ReactiveUserControlBase"/> class.</summary>
     /// <remarks>When the control is activated, this constructor ensures that any activation logic defined in
@@ -30,8 +30,13 @@ public class ReactiveUserControlBase : UserControl, IViewFor
         _ = this.WhenActivated(static (ActivationDisposables disposables) => { });
     }
 
-    /// <inheritdoc cref="IViewFor.ViewModel"/>
-    public virtual object? ViewModel
+    /// <inheritdoc/>
+    /// <remarks>This member is implemented explicitly so that a strongly typed derived class (such as
+    /// <c>ReactiveUserControl&lt;TViewModel&gt;</c>) can expose the single public <c>ViewModel</c> property. Exposing a
+    /// public <c>object?</c> property here as well would result in two public <c>ViewModel</c> properties of differing
+    /// types in the hierarchy, causing <see cref="System.Reflection.AmbiguousMatchException"/> when ReactiveUI resolves
+    /// the property by name during view model activation.</remarks>
+    object? IViewFor.ViewModel
     {
         get => GetValue(ViewModelProperty);
         set => SetValue(ViewModelProperty, value);
@@ -44,7 +49,7 @@ public class ReactiveUserControlBase : UserControl, IViewFor
         base.OnPropertyChanged(change);
 
         if (change.Property == DataContextProperty
-            && ReferenceEquals(change.OldValue, ViewModel)
+            && ReferenceEquals(change.OldValue, GetValue(ViewModelProperty))
             && IsValidViewModelValue(change.NewValue))
         {
             SetCurrentValue(ViewModelProperty, change.NewValue);
@@ -58,6 +63,6 @@ public class ReactiveUserControlBase : UserControl, IViewFor
 
     /// <summary>Determines whether the specified value is valid for the view model property.</summary>
     /// <param name="value">The value to validate.</param>
-    /// <returns><see langword="true"/> when the value can be assigned to <see cref="ViewModel"/>; otherwise, <see langword="false"/>.</returns>
+    /// <returns><see langword="true"/> when the value can be assigned to <see cref="ViewModelProperty"/>; otherwise, <see langword="false"/>.</returns>
     protected virtual bool IsValidViewModelValue(object? value) => true;
 }

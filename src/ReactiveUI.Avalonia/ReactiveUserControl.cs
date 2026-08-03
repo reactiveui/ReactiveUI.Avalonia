@@ -19,10 +19,10 @@ public class ReactiveUserControl<TViewModel> : ReactiveUserControlBase, IViewFor
     }
 
     /// <inheritdoc cref="IViewFor{TViewModel}.ViewModel"/>
-    public new TViewModel? ViewModel
+    public TViewModel? ViewModel
     {
-        get => (TViewModel?)base.ViewModel;
-        set => base.ViewModel = value;
+        get => (TViewModel?)GetValue(ViewModelProperty);
+        set => SetValue(ViewModelProperty, value);
     }
 
     /// <inheritdoc/>

@@ -551,10 +551,10 @@ public partial class ReactiveShimFullCoverageTests
         var baseControl = new ReactiveBaseControl();
         var arbitrary = new object();
         baseControl.DataContext = arbitrary;
-        await Assert.That(baseControl.ViewModel).IsSameReferenceAs(arbitrary);
+        await Assert.That(((IViewFor)baseControl).ViewModel).IsSameReferenceAs(arbitrary);
 
         var baseWindow = new ReactiveBaseWindow { DataContext = arbitrary };
-        await Assert.That(baseWindow.ViewModel).IsSameReferenceAs(arbitrary);
+        await Assert.That(((IViewFor)baseWindow).ViewModel).IsSameReferenceAs(arbitrary);
 
         var activationWindow = new Window { Content = control };
         try
