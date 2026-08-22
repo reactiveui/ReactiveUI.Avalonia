@@ -18,10 +18,10 @@
     <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="10.0.400" />
     <PackageVersion Include="MinVer" Version="7.0.0" />
     <PackageVersion Include="ReactiveUI" Version="24.1.0" />
-    <PackageVersion Include="ReactiveUI.Primitives" Version="7.1.1" />
-    <PackageVersion Include="ReactiveUI.Primitives.Reactive" Version="7.1.1" />
-    <PackageVersion Include="ReactiveUI.Primitives.Avalonia" Version="7.1.1" />
-    <PackageVersion Include="ReactiveUI.Primitives.Avalonia.Reactive" Version="7.1.1" />
+    <PackageVersion Include="ReactiveUI.Primitives" Version="7.2.0" />
+    <PackageVersion Include="ReactiveUI.Primitives.Reactive" Version="7.2.0" />
+    <PackageVersion Include="ReactiveUI.Primitives.Avalonia" Version="7.2.0" />
+    <PackageVersion Include="ReactiveUI.Primitives.Avalonia.Reactive" Version="7.2.0" />
     <PackageVersion Include="ReactiveUI.Reactive" Version="24.1.0" />
     <PackageVersion Include="Splat" Version="$(SplatVersion)" />
     <PackageVersion Include="Splat.Autofac" Version="$(SplatVersion)" />
