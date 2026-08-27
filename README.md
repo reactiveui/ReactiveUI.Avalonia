@@ -416,9 +416,12 @@ public class AppViewModel : ReactiveObject, IScreen
 {
     public RoutingState Router { get; } = new RoutingState();
 
-    public AppViewModel() => Router.Navigate.Execute(new MyViewModel());
+    public AppViewModel() => _ = Router.Navigate.Execute(new MyViewModel()).Subscribe();
 }
 ```
+
+`ReactiveCommand.Execute` returns a cold observable. Subscribe to or await the result; discarding it does not perform
+the navigation.
 
 ```xml
 <!-- MainWindow.axaml -->

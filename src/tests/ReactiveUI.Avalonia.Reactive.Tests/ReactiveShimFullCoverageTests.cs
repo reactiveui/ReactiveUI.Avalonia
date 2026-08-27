@@ -708,7 +708,7 @@ public partial class ReactiveShimFullCoverageTests
         try
         {
             routedWindow.Show();
-            _ = screen.Router.Navigate.Execute(new VmA(screen));
+            _ = screen.Router.Navigate.Execute(new VmA(screen)).Subscribe();
             await Assert.That(routedHost.Content).IsTypeOf<ViewA>();
 
             routedHost.Router = null;

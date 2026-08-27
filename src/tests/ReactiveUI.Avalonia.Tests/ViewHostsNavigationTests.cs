@@ -263,7 +263,7 @@ public class ViewHostsNavigationTests
         try
         {
             window.Show();
-            _ = screen.Router.Navigate.Execute(vm);
+            _ = screen.Router.Navigate.Execute(vm).Subscribe();
 
             await Assert.That(host.Content).IsTypeOf<ViewA>();
             await Assert.That(((IViewFor)host.Content!).ViewModel).IsSameReferenceAs(vm);
