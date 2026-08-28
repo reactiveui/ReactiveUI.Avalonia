@@ -219,7 +219,7 @@ public class ReactiveCoverageTests
 
         routedHost.Attach(source);
         routedHost.Attach(source);
-        _ = screen.Router.Navigate.Execute(new VmA(screen));
+        _ = screen.Router.Navigate.Execute(new VmA(screen)).Subscribe();
         routedHost.Router = null;
         routedHost.Detach(source);
 

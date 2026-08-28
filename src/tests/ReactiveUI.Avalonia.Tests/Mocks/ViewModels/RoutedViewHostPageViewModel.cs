@@ -8,6 +8,9 @@ namespace ReactiveUIDemo.ViewModels;
 /// <summary>View model for the routed view host page in the demo application.</summary>
 internal sealed class RoutedViewHostPageViewModel : ReactiveObject, IScreen
 {
+    /// <summary>Observes navigation results without requiring System.Reactive convenience overloads.</summary>
+    private static readonly NavigationObserver Observer = new();
+
     /// <summary>Initializes a new instance of the <see cref="RoutedViewHostPageViewModel"/> class.</summary>
     private RoutedViewHostPageViewModel()
     {
@@ -32,16 +35,33 @@ internal sealed class RoutedViewHostPageViewModel : ReactiveObject, IScreen
     }
 
     /// <summary>Navigates to the Foo view.</summary>
-    internal void ShowFoo() => Router.Navigate.Execute(Foo);
+    internal void ShowFoo() => _ = Router.Navigate.Execute(Foo).Subscribe(Observer);
 
     /// <summary>Navigates to the Bar view.</summary>
-    internal void ShowBar() => Router.Navigate.Execute(Bar);
+    internal void ShowBar() => _ = Router.Navigate.Execute(Bar).Subscribe(Observer);
 
     /// <summary>Initializes routing after construction has completed.</summary>
     private void Initialize()
     {
         Foo = new(this);
         Bar = new(this);
-        _ = Router.Navigate.Execute(Foo);
+        _ = Router.Navigate.Execute(Foo).Subscribe(Observer);
+    }
+
+    /// <summary>Forwards navigation errors while otherwise observing command completion.</summary>
+    private sealed class NavigationObserver : IObserver<IRoutableViewModel>
+    {
+        /// <inheritdoc/>
+        public void OnCompleted()
+        {
+        }
+
+        /// <inheritdoc/>
+        public void OnError(Exception error) => System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(error).Throw();
+
+        /// <inheritdoc/>
+        public void OnNext(IRoutableViewModel value)
+        {
+        }
     }
 }
