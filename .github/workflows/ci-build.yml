@@ -92,4 +92,4 @@ jobs:
             echo 'No Cobertura reports were produced.' >&2
             exit 1
           fi
-            codecov-cli upload-coverage --git-service github-actions $files
+            codecov-cli upload-coverage --git-service github $files
