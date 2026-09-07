@@ -3,93 +3,20 @@ name: Build
 on:
   push:
     branches:
-      - main
-  pull_request:
-
+      - main          # ✅ run on main
+  pull_request:        # (optional) run on PRs targeting any branch
+  
+# Needed so the reusable workflow can optionally delete the temp per-OS artifacts it creates.
 permissions:
   contents: read
+  actions: write
 
 jobs:
-  build-and-test:
-    name: build / ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    timeout-minutes: 30
-    strategy:
-      fail-fast: false
-      matrix:
-        os:
-          - windows-latest
-          - ubuntu-latest
-          - macos-latest
-    env:
-      DOTNET_CLI_WORKLOAD_UPDATE_NOTIFY_DISABLE: 1
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
-          lfs: true
-
-      - name: Setup .NET environment
-        uses: reactiveui/actions-common/.github/actions/dotnet-environment@main
-        with:
-          dotnet-versions: |
-            8.0.x
-            9.0.x
-            10.0.x
-            11.0.x
-          src-folder: src
-          solution-file: ReactiveUI.Avalonia.slnx
-          minver-tag-prefix: v
-          minver-minimum-major-minor: 12.1
-          minver-auto-increment: minor
-          minver-default-pre-release-identifiers: alpha.0
-
-      - name: Build
-        working-directory: src
-        run: dotnet build ReactiveUI.Avalonia.slnx -c Release -warnaserror
-
-      - name: Test with serialized coverage collection
-        working-directory: src
-        run: >
-          dotnet test --solution ReactiveUI.Avalonia.slnx -c Release
-          --max-parallel-test-modules 1
-          --coverage --coverage-output-format cobertura
-          --report-trx --progress off --disable-logo
-
-      - name: Upload coverage
-        uses: actions/upload-artifact@v7
-        with:
-          name: coverage-${{ runner.os }}
-          path: |
-            src/**/TestResults/**/*.cobertura.xml
-          if-no-files-found: error
-          retention-days: 30
-
-  collect-coverage:
-    name: collect coverage
-    needs: build-and-test
-    if: success()
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Download coverage reports
-        uses: actions/download-artifact@v8
-        with:
-          pattern: coverage-*
-          path: .collect
-          merge-multiple: true
-
-      - name: Upload coverage to Codecov
-        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-        run: |
-          python -m pip install codecov-cli
-          files=$(find .collect -name '*.cobertura.xml' -type f | sed 's/^/--file /' | tr '\n' ' ')
-          if [ -z "$files" ]; then
-            echo 'No Cobertura reports were produced.' >&2
-            exit 1
-          fi
-            codecov-cli upload-coverage --git-service github $files
+  build:
+    uses: reactiveui/actions-common/.github/workflows/workflow-common-setup-and-build.yml@main
+    with:
+      configuration: Release
+      productNamespacePrefix: "ReactiveUI"
+      solutionFile: "ReactiveUI.Avalonia.slnx"
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
