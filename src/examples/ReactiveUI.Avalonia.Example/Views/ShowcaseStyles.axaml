@@ -1,0 +1,58 @@
+<Styles xmlns="https://github.com/avaloniaui">
+    <Design.PreviewWith>
+        <Border Padding="24" />
+    </Design.PreviewWith>
+
+    <Style Selector="Window.showcase">
+        <Setter Property="Background" Value="#F4F6F8" />
+        <Setter Property="FontFamily" Value="Inter, Segoe UI" />
+    </Style>
+
+    <Style Selector="Button.nav">
+        <Setter Property="Foreground" Value="#F9FAFB" />
+        <Setter Property="Background" Value="#334155" />
+        <Setter Property="HorizontalContentAlignment" Value="Left" />
+        <Setter Property="Padding" Value="14,10" />
+        <Setter Property="Margin" Value="0,0,0,8" />
+        <Setter Property="CornerRadius" Value="8" />
+    </Style>
+
+    <Style Selector="Button.primary">
+        <Setter Property="Padding" Value="16,10" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="Background" Value="#1F6FEB" />
+        <Setter Property="Foreground" Value="White" />
+    </Style>
+
+    <Style Selector="Border.panel">
+        <Setter Property="Background" Value="White" />
+        <Setter Property="BorderBrush" Value="#D8DEE6" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="Padding" Value="20" />
+    </Style>
+
+    <Style Selector="TextBlock.eyebrow">
+        <Setter Property="Foreground" Value="#586069" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+
+    <Style Selector="TextBlock.title">
+        <Setter Property="FontSize" Value="28" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Foreground" Value="#111827" />
+    </Style>
+
+    <Style Selector="TextBlock.subtitle">
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="Foreground" Value="#4B5563" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+
+    <Style Selector="TextBlock.metricValue">
+        <Setter Property="FontSize" Value="26" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Foreground" Value="#111827" />
+    </Style>
+</Styles>

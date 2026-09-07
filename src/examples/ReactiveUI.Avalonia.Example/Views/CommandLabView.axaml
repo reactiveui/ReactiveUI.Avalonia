@@ -1,0 +1,49 @@
+<rxui:ReactiveUserControl
+    x:Class="ReactiveUI.Avalonia.Example.Views.CommandLabView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:rxui="using:ReactiveUI.Avalonia"
+    xmlns:vm="using:ReactiveUI.Avalonia.Example.ViewModels"
+    x:DataType="vm:CommandLabViewModel">
+    <ScrollViewer>
+        <StackPanel Margin="40" Spacing="20">
+            <StackPanel Spacing="8">
+                <TextBlock Classes="eyebrow" Text="COMMANDS AND INTERACTIONS" />
+                <TextBlock Classes="title" Text="{Binding Title}" />
+                <TextBlock Classes="subtitle" Text="{Binding Summary}" />
+            </StackPanel>
+
+            <Border Classes="panel">
+                <StackPanel Spacing="14">
+                    <TextBlock FontWeight="SemiBold" Text="Async command input" />
+                    <TextBox
+                        x:Name="WorkItemTextBox"
+                        PlaceholderText="Type a small work item"
+                        Text="" />
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <Button
+                            x:Name="RunWorkButton"
+                            Classes="primary"
+                            Content="Run async command" />
+                        <Button
+                            x:Name="FailWorkButton"
+                            Content="Trigger failure" />
+                    </StackPanel>
+                    <TextBlock x:Name="LastResultText" Classes="subtitle" />
+                    <Border
+                        Background="#FEF2F2"
+                        BorderBrush="#FECACA"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="12">
+                        <TextBlock
+                            x:Name="LastErrorText"
+                            Foreground="#991B1B"
+                            TextWrapping="Wrap" />
+                    </Border>
+                    <TextBlock x:Name="InteractionStatusText" Classes="subtitle" />
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</rxui:ReactiveUserControl>

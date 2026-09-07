@@ -61,11 +61,11 @@ internal class AvaloniaCreatesCommandBinding : ICreatesCommandBinding
     /// command parameter. This method is typically used to enable dynamic command parameter updates in UI elements such
     /// as buttons or menu items.</remarks>
     /// <typeparam name="T">The type of the target object. Must be a class that is both an InputElement and implements ICommandSource.</typeparam>
-    /// <param name="command">The command to bind, or null when no binding should be created.</param>
+    /// <param name="command">The command to bind, or null to clear the command on a valid command source.</param>
     /// <param name="target">The command target, or null when no binding should be created.</param>
     /// <param name="commandParameter">An observable sequence that provides values for the command parameter. The command parameter will be updated
     /// whenever the observable emits a new value.</param>
-    /// <returns>An IDisposable that, when disposed, unbinds the command and command parameter from the target object.</returns>
+    /// <returns>A disposable binding, an empty disposable when clearing a valid command source, or null when no target can be bound.</returns>
     /// <exception cref="InvalidOperationException">Thrown if the target object does not implement both InputElement and ICommandSource.</exception>
     [RequiresUnreferencedCode("String/reflection-based event binding may require members removed by trimming.")]
     public IDisposable? BindCommandToObject<
@@ -75,9 +75,20 @@ internal class AvaloniaCreatesCommandBinding : ICreatesCommandBinding
         IObservable<object?> commandParameter)
         where T : class
     {
-        if (command is null || target is null)
+        if (target is null)
         {
             return null;
+        }
+
+        if (command is null)
+        {
+            if (target is not (InputElement inputElement and ICommandSource))
+            {
+                return null;
+            }
+
+            inputElement.SetCurrentValue(Button.CommandProperty, null);
+            return Disposable.Empty;
         }
 
         if (target is not (InputElement element and ICommandSource))
@@ -88,9 +99,14 @@ internal class AvaloniaCreatesCommandBinding : ICreatesCommandBinding
         // Button.CommandProperty is reused for all button-like controls and menu item
         element.SetCurrentValue(Button.CommandProperty, command);
         var paramDisposable = element.Bind(Button.CommandParameterProperty, commandParameter);
-        return Disposable.Create((AvaloniaObject: element, ParamDisposable: paramDisposable), static t =>
+        return Disposable.Create((AvaloniaObject: element, Command: command, ParamDisposable: paramDisposable), static t =>
         {
             t.ParamDisposable.Dispose();
+            if (!ReferenceEquals(t.AvaloniaObject.GetValue(Button.CommandProperty), t.Command))
+            {
+                return;
+            }
+
             t.AvaloniaObject.ClearValue(Button.CommandProperty);
         });
     }

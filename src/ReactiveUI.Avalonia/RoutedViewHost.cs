@@ -150,6 +150,19 @@ public class RoutedViewHost : TransitioningContentControl, IActivatableView, IEn
         DisposeNavigationDisposables();
     }
 
+    /// <summary>Gets the current routed view model from the navigation stack.</summary>
+    /// <param name="router">The router to inspect.</param>
+    /// <returns>The current routed view model, or null when the stack is empty.</returns>
+    private static object? GetCurrentViewModel(RoutingState router) =>
+        router.NavigationStack.Count == 0 ? null : router.NavigationStack[router.NavigationStack.Count - 1];
+
+    /// <summary>Creates a stream that begins with the router's current view model and then follows future navigation.</summary>
+    /// <param name="router">The router to observe.</param>
+    /// <returns>The current and future routed view models.</returns>
+    private static IObservable<object?> CreateRouterViewModelObservable(RoutingState router) =>
+        Observable.Return(GetCurrentViewModel(router))
+            .Merge(router.CurrentViewModel.Select(static viewModel => (object?)viewModel));
+
     /// <summary>Creates the active navigation subscriptions for an attached host.</summary>
     /// <param name="e">The visual tree attachment event arguments.</param>
     /// <returns>The created navigation subscriptions.</returns>
@@ -158,16 +171,12 @@ public class RoutedViewHost : TransitioningContentControl, IActivatableView, IEn
         base.OnAttachedToVisualTree(e);
 
         var disposables = new CompositeDisposable();
-        IObservable<object?> routerChanges = this.GetObservable(RouterProperty);
-        var routerRemoved = routerChanges
-            .Where(static router => router is null);
-
+        IObservable<RoutingState?> routerChanges = this.GetObservable(RouterProperty);
         var viewContract = this.GetObservable(ViewContractProperty);
-
-        var navigation = this.GetObservable(RouterProperty)
-            .Where(static router => router is not null)
-            .SelectMany(static router => router!.CurrentViewModel)
-            .Merge(routerRemoved)
+        var viewModels = routerChanges
+            .Select(static router => router is null ? Observable.Return<object?>(null) : CreateRouterViewModelObservable(router))
+            .Switch();
+        var navigation = viewModels
             .CombineLatest(viewContract, static (viewModel, contract) => new NavigationTarget(viewModel, contract));
 
         var subscription = PrimitivesLinqExtensions.SubscribeSafe(

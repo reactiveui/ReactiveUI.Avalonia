@@ -159,7 +159,7 @@ public partial class ReactiveShimFullCoverageTests
         var assemblyName = new AssemblyName("ReactiveUI.Avalonia.Tests.ReactiveDynamicLifetime");
         var assembly = AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
         var module = assembly.DefineDynamicModule("Main");
-        var type = module.DefineType("ReactiveUnsupportedLifetime", TypeAttributes.NotPublic | TypeAttributes.Sealed);
+        var type = module.DefineType("ReactiveUnsupportedLifetime", TypeAttributes.Sealed);
         type.AddInterfaceImplementation(typeof(IApplicationLifetime));
 
         var lifetimeType = type.CreateType();
@@ -167,23 +167,15 @@ public partial class ReactiveShimFullCoverageTests
     }
 
     /// <summary>Gets a real presentation source from a headless window.</summary>
-    /// <returns>The presentation source.</returns>
-    private static IPresentationSource GetPresentationSource()
+    /// <returns>The owner window and presentation source.</returns>
+    private static (Window Window, IPresentationSource Source) GetPresentationSource()
     {
         IPresentationSource? source = null;
         var control = new Control();
         control.AttachedToVisualTree += (_, args) => source = args.PresentationSource;
         var window = new Window { Content = control };
-
-        try
-        {
-            window.Show();
-            return source!;
-        }
-        finally
-        {
-            window.Close();
-        }
+        window.Show();
+        return (window, source!);
     }
 
     /// <summary>Executes an action and returns the expected invalid-operation exception.</summary>
@@ -530,18 +522,19 @@ public partial class ReactiveShimFullCoverageTests
 
         /// <inheritdoc/>
         public object? GetService(Type? serviceType) =>
-            throw new InvalidOperationException($"Cannot resolve {serviceType}.");
+            serviceType == typeof(ILogManager)
+                ? new FuncLogManager(static _ => new WrappingFullLogger(new NullLogger()))
+                : throw new InvalidOperationException($"Cannot resolve {serviceType}.");
 
         /// <inheritdoc/>
         public object? GetService(Type? serviceType, string? contract) =>
             throw new InvalidOperationException($"Cannot resolve {serviceType} for {contract}.");
 
         /// <inheritdoc/>
-        public T? GetService<T>()
-        {
-            _ = typeof(T);
-            return default;
-        }
+        public T? GetService<T>() =>
+            typeof(T) == typeof(ILogManager)
+                ? (T)(object)new FuncLogManager(static _ => new WrappingFullLogger(new NullLogger()))
+                : default;
 
         /// <inheritdoc/>
         public T? GetService<T>(string? contract) =>

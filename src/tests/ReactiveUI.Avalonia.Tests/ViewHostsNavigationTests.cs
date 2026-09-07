@@ -104,12 +104,19 @@ public class ViewHostsNavigationTests
     [Test]
     public async Task ViewModelViewHost_DetachBeforeAttach_DoesNotThrow()
     {
-        var source = GetPresentationSource();
+        var (window, source) = GetPresentationSource();
         var host = new TestableViewModelViewHost { DefaultContent = DefaultContentValue };
 
-        host.Detach(source);
+        try
+        {
+            host.Detach(source);
 
-        await Assert.That(host.Content).IsNull();
+            await Assert.That(host.Content).IsNull();
+        }
+        finally
+        {
+            window.Close();
+        }
     }
 
     /// <summary>Verifies that ViewModelViewHost manual detach disposes an existing navigation subscription and tolerates a second detach.</summary>
@@ -117,14 +124,21 @@ public class ViewHostsNavigationTests
     [Test]
     public async Task ViewModelViewHost_AttachThenManualDetach_DisposesNavigationSubscription()
     {
-        var source = GetPresentationSource();
+        var (window, source) = GetPresentationSource();
         var host = new TestableViewModelViewHost { DefaultContent = DefaultContentValue };
 
-        host.Attach(source);
-        host.Detach(source);
-        host.Detach(source);
+        try
+        {
+            host.Attach(source);
+            host.Detach(source);
+            host.Detach(source);
 
-        await Assert.That(host.Content).IsEqualTo(DefaultContentValue);
+            await Assert.That(host.Content).IsEqualTo(DefaultContentValue);
+        }
+        finally
+        {
+            window.Close();
+        }
     }
 
     /// <summary>Verifies that ViewModelViewHost tolerates disposal when no navigation subscription exists.</summary>
@@ -274,6 +288,152 @@ public class ViewHostsNavigationTests
         }
     }
 
+    /// <summary>Verifies that RoutedViewHost displays navigation that happened before the host was attached.</summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
+    [Test]
+    public async Task RoutedViewHost_AttachedSubscription_Navigates_WhenRouterAlreadyHasCurrentViewModel()
+    {
+        RegisterViews();
+        var screen = new ScreenImpl();
+        var vm = new VmA(screen);
+        _ = screen.Router.Navigate.Execute(vm).Subscribe();
+        var host = new TestableRoutedViewHost { DefaultContent = "def", Router = screen.Router };
+        var window = new Window { Content = host };
+
+        try
+        {
+            await Assert.That(screen.Router.NavigationStack.Count).IsEqualTo(1);
+
+            window.Show();
+
+            await Assert.That(host.Content).IsTypeOf<ViewA>();
+            await Assert.That(((IViewFor)host.Content!).ViewModel).IsSameReferenceAs(vm);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    /// <summary>Verifies that RoutedViewHost displays an already-current view model when the router is assigned after attachment.</summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
+    [Test]
+    public async Task RoutedViewHost_AttachedSubscription_Navigates_WhenAlreadyNavigatedRouterIsAssigned()
+    {
+        RegisterViews();
+        var screen = new ScreenImpl();
+        var vm = new VmA(screen);
+        _ = screen.Router.Navigate.Execute(vm).Subscribe();
+        var host = new TestableRoutedViewHost { DefaultContent = "def" };
+        var window = new Window { Content = host };
+
+        try
+        {
+            window.Show();
+            host.Router = screen.Router;
+
+            await Assert.That(screen.Router.NavigationStack.Count).IsEqualTo(1);
+            await Assert.That(host.Content).IsTypeOf<ViewA>();
+            await Assert.That(((IViewFor)host.Content!).ViewModel).IsSameReferenceAs(vm);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    /// <summary>Verifies that RoutedViewHost ignores navigation from a router after another router is assigned.</summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
+    [Test]
+    public async Task RoutedViewHost_AttachedSubscription_IgnoresPreviousRouterAfterReplacement()
+    {
+        var firstScreen = new ScreenImpl();
+        var secondScreen = new ScreenImpl();
+        var firstVm = new VmA(firstScreen);
+        var secondVm = new VmA(secondScreen);
+        var view = new ViewA();
+        var host = new TestableRoutedViewHost { DefaultContent = "def", Router = firstScreen.Router, ViewLocator = new StaticViewLocator(view) };
+        var window = new Window { Content = host };
+
+        try
+        {
+            window.Show();
+            _ = firstScreen.Router.Navigate.Execute(firstVm).Subscribe();
+            await Assert.That(view.ViewModel).IsSameReferenceAs(firstVm);
+
+            host.Router = secondScreen.Router;
+            _ = secondScreen.Router.Navigate.Execute(secondVm).Subscribe();
+            await Assert.That(view.ViewModel).IsSameReferenceAs(secondVm);
+
+            _ = firstScreen.Router.Navigate.Execute(new VmA(firstScreen)).Subscribe();
+            await Assert.That(view.ViewModel).IsSameReferenceAs(secondVm);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    /// <summary>Verifies that RoutedViewHost ignores router navigation after the router is cleared.</summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
+    [Test]
+    public async Task RoutedViewHost_AttachedSubscription_IgnoresPreviousRouterAfterRouterCleared()
+    {
+        var screen = new ScreenImpl();
+        var vm = new VmA(screen);
+        var view = new ViewA();
+        var host = new TestableRoutedViewHost { DefaultContent = "def", Router = screen.Router, ViewLocator = new StaticViewLocator(view) };
+        var window = new Window { Content = host };
+
+        try
+        {
+            window.Show();
+            _ = screen.Router.Navigate.Execute(vm).Subscribe();
+            await Assert.That(view.ViewModel).IsSameReferenceAs(vm);
+
+            host.Router = null;
+            _ = screen.Router.Navigate.Execute(new VmA(screen)).Subscribe();
+
+            await Assert.That(host.Content).IsEqualTo("def");
+            await Assert.That(view.ViewModel).IsSameReferenceAs(vm);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    /// <summary>Verifies that RoutedViewHost ignores navigation while detached and catches up when reattached.</summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
+    [Test]
+    public async Task RoutedViewHost_AttachedSubscription_CatchesUpToCurrentViewModelAfterReattach()
+    {
+        var screen = new ScreenImpl();
+        var firstVm = new VmA(screen);
+        var secondVm = new VmA(screen);
+        var view = new ViewA();
+        var host = new TestableRoutedViewHost { DefaultContent = "def", Router = screen.Router, ViewLocator = new StaticViewLocator(view) };
+        var window = new Window { Content = host };
+
+        try
+        {
+            window.Show();
+            _ = screen.Router.Navigate.Execute(firstVm).Subscribe();
+            await Assert.That(view.ViewModel).IsSameReferenceAs(firstVm);
+
+            window.Content = null;
+            _ = screen.Router.Navigate.Execute(secondVm).Subscribe();
+            await Assert.That(view.ViewModel).IsSameReferenceAs(firstVm);
+
+            window.Content = host;
+            await Assert.That(view.ViewModel).IsSameReferenceAs(secondVm);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
     /// <summary>Verifies that RoutedViewHost falls back when the router is removed after attachment.</summary>
     /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
@@ -301,12 +461,19 @@ public class ViewHostsNavigationTests
     [Test]
     public async Task RoutedViewHost_DetachBeforeAttach_DoesNotThrow()
     {
-        var source = GetPresentationSource();
+        var (window, source) = GetPresentationSource();
         var host = new TestableRoutedViewHost { DefaultContent = "def" };
 
-        host.Detach(source);
+        try
+        {
+            host.Detach(source);
 
-        await Assert.That(host.Content).IsNull();
+            await Assert.That(host.Content).IsNull();
+        }
+        finally
+        {
+            window.Close();
+        }
     }
 
     /// <summary>Verifies that RoutedViewHost manual detach disposes an existing navigation subscription and tolerates a second detach.</summary>
@@ -314,14 +481,21 @@ public class ViewHostsNavigationTests
     [Test]
     public async Task RoutedViewHost_AttachThenManualDetach_DisposesNavigationSubscription()
     {
-        var source = GetPresentationSource();
+        var (window, source) = GetPresentationSource();
         var host = new TestableRoutedViewHost { DefaultContent = "def", Router = new() };
 
-        host.Attach(source);
-        host.Detach(source);
-        host.Detach(source);
+        try
+        {
+            host.Attach(source);
+            host.Detach(source);
+            host.Detach(source);
 
-        await Assert.That(host.Content).IsEqualTo("def");
+            await Assert.That(host.Content).IsEqualTo("def");
+        }
+        finally
+        {
+            window.Close();
+        }
     }
 
     /// <summary>Verifies that RoutedViewHost tolerates disposal when no navigation subscription exists.</summary>
@@ -410,22 +584,15 @@ public class ViewHostsNavigationTests
 
     /// <summary>Gets a real presentation source from a headless window.</summary>
     /// <returns>The presentation source.</returns>
-    private static IPresentationSource GetPresentationSource()
+    private static (Window Window, IPresentationSource Source) GetPresentationSource()
     {
         IPresentationSource? source = null;
         var control = new Control();
         control.AttachedToVisualTree += (_, args) => source = args.PresentationSource;
         var window = new Window { Content = control };
 
-        try
-        {
-            window.Show();
-            return source!;
-        }
-        finally
-        {
-            window.Close();
-        }
+        window.Show();
+        return (window, source!);
     }
 
     /// <summary>A testable ViewModelViewHost that exposes protected members.</summary>

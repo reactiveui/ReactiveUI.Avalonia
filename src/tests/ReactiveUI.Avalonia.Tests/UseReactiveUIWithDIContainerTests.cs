@@ -4,6 +4,7 @@
 using Avalonia;
 using ReactiveUI.Builder;
 using Splat;
+using TUnit.Core.Executors;
 
 namespace ReactiveUI.Avalonia.Tests;
 
@@ -37,6 +38,64 @@ public class UseReactiveUIWithDIContainerTests
             static _ => { });
 
         await Assert.That(result).IsSameReferenceAs(builder);
+    }
+
+    /// <summary>Verifies that deferred view registration executes through the platform setup callback.</summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
+    [Test]
+    public async Task RegisterReactiveUIViews_AfterPlatformCallback_RegistersViews()
+    {
+        _ = new TestViewModel();
+        _ = new TestView();
+        var builder = AppBuilder.Configure<Application>()
+            .RegisterReactiveUIViews(typeof(UseReactiveUIWithDIContainerTests).Assembly);
+
+        builder.AfterPlatformServicesSetupCallback!(builder);
+
+        await Assert.That(AppLocator.Current.GetService<IViewFor<TestViewModel>>()).IsNotNull();
+    }
+
+    /// <summary>Verifies that the deferred DI-container callback executes the supplied factories.</summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
+    [Test]
+    [TestExecutor<AutofacIsolatedTestExecutor>]
+    public async Task UseReactiveUIWithDIContainer_AfterPlatformSetupCallback_ConfiguresContainer()
+    {
+        ReactiveUIBuilder.ResetBuilderStateForTests();
+        var builder = AppBuilder.Configure<Application>();
+        var container = new object();
+        var factoryCalled = false;
+        var resolverFactoryCalled = false;
+        var configCalled = false;
+        var originalLocator = Locator.GetLocator();
+
+        try
+        {
+            _ = builder.UseReactiveUIWithDIContainer(
+                containerFactory: () =>
+                {
+                    factoryCalled = true;
+                    return container;
+                },
+                containerConfig: value => configCalled = ReferenceEquals(value, container),
+                dependencyResolverFactory: value =>
+                {
+                    resolverFactoryCalled = ReferenceEquals(value, container);
+                    return (IDependencyResolver)AppLocator.CurrentMutable;
+                },
+                static _ => { });
+
+            builder.AfterPlatformServicesSetupCallback!(builder);
+
+            await Assert.That(factoryCalled).IsTrue();
+            await Assert.That(resolverFactoryCalled).IsTrue();
+            await Assert.That(configCalled).IsTrue();
+        }
+        finally
+        {
+            Locator.SetLocator(originalLocator);
+            ReactiveUIBuilder.ResetBuilderStateForTests();
+        }
     }
 
     /// <summary>Verifies that the deferred callback validates a null container factory.</summary>
@@ -279,5 +338,22 @@ public class UseReactiveUIWithDIContainerTests
         public void RegisterLazySingleton<T>(Func<T?> valueFactory, string? contract)
             where T : class =>
             Register(() => valueFactory(), typeof(T), contract);
+    }
+
+    /// <summary>A view model used by deferred view registration tests.</summary>
+    private sealed class TestViewModel : ReactiveObject;
+
+    /// <summary>A view used by deferred view registration tests.</summary>
+    private sealed class TestView : IViewFor<TestViewModel>
+    {
+        /// <summary>Gets or sets the view model.</summary>
+        public TestViewModel? ViewModel { get; set; }
+
+        /// <inheritdoc/>
+        object? IViewFor.ViewModel
+        {
+            get => ViewModel;
+            set => ViewModel = (TestViewModel?)value;
+        }
     }
 }

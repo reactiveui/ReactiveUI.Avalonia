@@ -2,6 +2,7 @@
 // ReactiveUI Association Incorporated licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for full license information.
 using System.Diagnostics;
+using Avalonia.Threading;
 using ReactiveUI.Primitives.Concurrency;
 
 namespace ReactiveUI.Avalonia.Tests;
@@ -68,11 +69,13 @@ public class AvaloniaUIThreadTestsMain
     public async Task AvaloniaScheduler_ScheduleWorkItem_Executes()
     {
         var scheduler = AvaloniaScheduler.Instance;
-        var executed = false;
+        var completion = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
 
-        scheduler.Schedule(new WorkItem(() => executed = true));
+        scheduler.Schedule(new WorkItem(() => completion.SetResult()));
+        Dispatcher.UIThread.RunJobs();
 
-        await Assert.That(executed).IsTrue();
+        await completion.Task.WaitAsync(TimeSpan.FromSeconds(ScheduleTimeoutSeconds));
+        await Assert.That(completion.Task.IsCompletedSuccessfully).IsTrue();
     }
 
     /// <summary>Verifies that Schedule with a timestamp throws ArgumentNullException for a null work item.</summary>
@@ -91,11 +94,13 @@ public class AvaloniaUIThreadTestsMain
     public async Task AvaloniaScheduler_ScheduleWorkItemWithPastTimestamp_Executes()
     {
         var scheduler = AvaloniaScheduler.Instance;
-        var executed = false;
+        var completion = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
 
-        scheduler.Schedule(new WorkItem(() => executed = true), scheduler.Timestamp - 1);
+        scheduler.Schedule(new WorkItem(() => completion.SetResult()), scheduler.Timestamp - 1);
+        Dispatcher.UIThread.RunJobs();
 
-        await Assert.That(executed).IsTrue();
+        await completion.Task.WaitAsync(TimeSpan.FromSeconds(ScheduleTimeoutSeconds));
+        await Assert.That(completion.Task.IsCompletedSuccessfully).IsTrue();
     }
 
     /// <summary>Verifies that Schedule with a future timestamp executes after the delay.</summary>
@@ -107,6 +112,7 @@ public class AvaloniaUIThreadTestsMain
         var completion = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
 
         scheduler.Schedule(new WorkItem(() => completion.SetResult()), scheduler.Timestamp + StopwatchTicks(FutureScheduleDelayMilliseconds));
+        Dispatcher.UIThread.RunJobs();
 
         await completion.Task.WaitAsync(TimeSpan.FromSeconds(ScheduleTimeoutSeconds));
         await Assert.That(completion.Task.IsCompletedSuccessfully).IsTrue();

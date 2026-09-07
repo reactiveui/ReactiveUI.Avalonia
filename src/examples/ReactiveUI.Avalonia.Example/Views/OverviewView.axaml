@@ -1,0 +1,21 @@
+<rxui:ReactiveUserControl
+    x:Class="ReactiveUI.Avalonia.Example.Views.OverviewView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:rxui="using:ReactiveUI.Avalonia"
+    xmlns:vm="using:ReactiveUI.Avalonia.Example.ViewModels"
+    x:DataType="vm:OverviewViewModel">
+    <ScrollViewer>
+        <StackPanel Margin="40" Spacing="20">
+            <StackPanel Spacing="8">
+                <TextBlock Classes="eyebrow" Text="OVERVIEW" />
+                <TextBlock Classes="title" Text="{Binding Title}" />
+                <TextBlock Classes="subtitle" Text="{Binding Summary}" />
+            </StackPanel>
+
+            <Border Classes="panel">
+                <ItemsControl x:Name="FeatureItems" />
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</rxui:ReactiveUserControl>

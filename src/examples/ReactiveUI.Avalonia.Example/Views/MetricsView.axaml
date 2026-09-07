@@ -1,0 +1,84 @@
+<rxui:ReactiveUserControl
+    x:Class="ReactiveUI.Avalonia.Example.Views.MetricsView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:rxui="using:ReactiveUI.Avalonia"
+    xmlns:vm="using:ReactiveUI.Avalonia.Example.ViewModels"
+    x:DataType="vm:MetricsViewModel">
+    <ScrollViewer>
+        <StackPanel Margin="40" Spacing="20">
+            <StackPanel Spacing="8">
+                <TextBlock Classes="eyebrow" Text="LIVE LOCAL DATA" />
+                <TextBlock Classes="title" Text="{Binding Title}" />
+                <TextBlock Classes="subtitle" Text="{Binding Summary}" />
+            </StackPanel>
+
+            <Grid ColumnDefinitions="*,*,*" ColumnSpacing="16">
+                <rxui:ViewModelViewHost
+                    Grid.Column="0"
+                    ViewContract="performance"
+                    ViewModel="{Binding ProcessorCard}" />
+                <rxui:ViewModelViewHost
+                    Grid.Column="1"
+                    ViewContract="memory"
+                    ViewModel="{Binding MemoryCard}" />
+                <rxui:ViewModelViewHost
+                    Grid.Column="2"
+                    ViewContract="memory"
+                    ViewModel="{Binding ManagedCard}" />
+            </Grid>
+
+            <Border Classes="panel">
+                <Grid ColumnDefinitions="2*,*" ColumnSpacing="24">
+                    <StackPanel Spacing="12">
+                        <TextBlock FontWeight="SemiBold" Text="CPU warning threshold" />
+                        <Slider
+                            x:Name="ThresholdSlider"
+                            Minimum="1"
+                            Maximum="100"
+                            Value="{Binding CpuWarningThreshold, Mode=TwoWay}" />
+                        <TextBlock Classes="subtitle" Text="{Binding LoadLabel}" />
+                    </StackPanel>
+
+                    <Border
+                        x:Name="ThresholdPreview"
+                        Grid.Column="1"
+                        Background="#1F6FEB"
+                        CornerRadius="8"
+                        MinHeight="92">
+                        <StackPanel
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Spacing="4">
+                            <TextBlock
+                                HorizontalAlignment="Center"
+                                FontSize="26"
+                                FontWeight="SemiBold"
+                                Foreground="White"
+                                Text="{Binding CpuWarningThreshold, StringFormat='{}{0:0}%'}" />
+                            <TextBlock
+                                HorizontalAlignment="Center"
+                                Foreground="#E5E7EB"
+                                Text="GetSubject preview" />
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Border>
+
+            <Border Classes="panel">
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+                    <StackPanel Spacing="4">
+                        <TextBlock FontWeight="SemiBold" Text="{Binding Latest.Status}" />
+                        <TextBlock Classes="subtitle" Text="{Binding Latest.CapturedAt, StringFormat='Last sample: {0:T}'}" />
+                        <TextBlock Classes="subtitle" Text="{Binding SampleCount, StringFormat='Samples observed while active: {0}'}" />
+                    </StackPanel>
+                    <Button
+                        Grid.Column="1"
+                        Classes="primary"
+                        Command="{Binding SampleOnce}"
+                        Content="Sample now" />
+                </Grid>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</rxui:ReactiveUserControl>

@@ -150,6 +150,42 @@ public class ReactiveWindowUserControlBindingTests
         await Assert.That(((IViewFor)window).ViewModel).IsSameReferenceAs(vm);
     }
 
+    /// <summary>Verifies that the non-generic control propagates replacements and clearing through IViewFor.</summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
+    [Test]
+    public async Task ReactiveUserControlBase_IViewFor_Replaces_And_Clears_DataContext()
+    {
+        var control = new BaseC();
+        var view = (IViewFor)control;
+        var first = new object();
+        var second = new object();
+
+        view.ViewModel = first;
+        await Assert.That(control.DataContext).IsSameReferenceAs(first);
+        view.ViewModel = second;
+        await Assert.That(control.DataContext).IsSameReferenceAs(second);
+        control.DataContext = null;
+        await Assert.That(view.ViewModel).IsNull();
+    }
+
+    /// <summary>Verifies that the non-generic window propagates replacements and clearing through IViewFor.</summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
+    [Test]
+    public async Task ReactiveWindowBase_IViewFor_Replaces_And_Clears_DataContext()
+    {
+        var window = new BaseW();
+        var view = (IViewFor)window;
+        var first = new object();
+        var second = new object();
+
+        view.ViewModel = first;
+        await Assert.That(window.DataContext).IsSameReferenceAs(first);
+        view.ViewModel = second;
+        await Assert.That(window.DataContext).IsSameReferenceAs(second);
+        window.DataContext = null;
+        await Assert.That(view.ViewModel).IsNull();
+    }
+
     /// <summary>A test view model with a Name property.</summary>
     private sealed class VM : ReactiveObject;
 

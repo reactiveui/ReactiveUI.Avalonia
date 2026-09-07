@@ -20,7 +20,7 @@ public class AutofacIsolatedTestExecutor : ITestExecutor
         ArgumentNullException.ThrowIfNull(action);
 
         // Run on the shared headless UI thread for consistency with AvaloniaTestExecutor.
-        await AvaloniaTestSession.Instance.Dispatch(
+        _ = await AvaloniaTestSession.Instance.Dispatch(
             async () =>
             {
                 var originalLocator = Locator.GetLocator();
@@ -39,6 +39,8 @@ public class AutofacIsolatedTestExecutor : ITestExecutor
                         .WithCoreServices()
                         .BuildApp();
                 }
+
+                return true;
             },
             CancellationToken.None);
     }

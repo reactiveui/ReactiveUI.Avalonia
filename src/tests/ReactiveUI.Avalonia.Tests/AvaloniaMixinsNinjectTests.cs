@@ -4,6 +4,8 @@
 extern alias ninject;
 
 using Avalonia;
+using ReactiveUI.Builder;
+using TUnit.Core.Executors;
 using AvaloniaMixins = ninject::ReactiveUI.Avalonia.Splat.AvaloniaMixins;
 
 namespace ReactiveUI.Avalonia.Tests;
@@ -52,5 +54,66 @@ public class AvaloniaMixinsNinjectTests
             static _ => { },
             static rx => _ = rx is not null);
         await Assert.That(result).IsSameReferenceAs(builder);
+    }
+
+    /// <summary>Verifies that null container configuration is validated by the deferred callback.</summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
+    [Test]
+    [TestExecutor<AutofacIsolatedTestExecutor>]
+    public async Task UseReactiveUIWithNinject_AfterPlatformCallback_ThrowsOnNullContainerConfig()
+    {
+        var builder = AppBuilder.Configure<Application>();
+        _ = AvaloniaMixins.UseReactiveUIWithNinject(builder, null!, null);
+
+        await Assert.That(() => builder.AfterPlatformServicesSetupCallback!(builder))
+            .ThrowsExactly<ArgumentNullException>();
+    }
+
+    /// <summary>Verifies that Ninject registration executes through the deferred platform setup callback.</summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
+    [Test]
+    [TestExecutor<AutofacIsolatedTestExecutor>]
+    public async Task UseReactiveUIWithNinject_AfterPlatformCallback_ConfiguresContainer()
+    {
+        ReactiveUIBuilder.ResetBuilderStateForTests();
+        var builder = AppBuilder.Configure<Application>();
+        var configCalled = false;
+        var reactiveBuilderCalled = false;
+
+        try
+        {
+            _ = AvaloniaMixins.UseReactiveUIWithNinject(
+                builder,
+                containerConfig: kernel => configCalled = kernel is not null,
+                withReactiveUIBuilder: _ => reactiveBuilderCalled = true);
+
+            builder.AfterPlatformServicesSetupCallback!(builder);
+
+            await Assert.That(configCalled).IsTrue();
+            await Assert.That(reactiveBuilderCalled).IsTrue();
+        }
+        finally
+        {
+            ReactiveUIBuilder.ResetBuilderStateForTests();
+        }
+    }
+
+    /// <summary>Verifies that the deferred callback handles an already-built app and a null ReactiveUI callback.</summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
+    [Test]
+    [TestExecutor<AutofacIsolatedTestExecutor>]
+    public async Task UseReactiveUIWithNinject_AfterPlatformCallback_WhenAlreadyBuilt_AllowsNullCallback()
+    {
+        var builder = AppBuilder.Configure<Application>();
+        var configCalled = false;
+
+        _ = AvaloniaMixins.UseReactiveUIWithNinject(
+            builder,
+            containerConfig: kernel => configCalled = kernel is not null,
+            withReactiveUIBuilder: null);
+
+        builder.AfterPlatformServicesSetupCallback!(builder);
+
+        await Assert.That(configCalled).IsTrue();
     }
 }

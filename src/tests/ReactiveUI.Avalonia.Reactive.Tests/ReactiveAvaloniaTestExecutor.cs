@@ -15,14 +15,14 @@ public class ReactiveAvaloniaTestExecutor : ITestExecutor
 {
     /// <summary>The lazily-created headless Avalonia session.</summary>
     private static readonly Lazy<HeadlessUnitTestSession> Session =
-        new(static () => HeadlessUnitTestSession.StartNew(typeof(Application)), LazyThreadSafetyMode.ExecutionAndPublication);
+        new(static () => HeadlessUnitTestSession.StartNew(typeof(Application), AvaloniaTestIsolationLevel.PerAssembly), LazyThreadSafetyMode.ExecutionAndPublication);
 
     /// <inheritdoc/>
     public async ValueTask ExecuteTest(TestContext context, Func<ValueTask> action)
     {
         ArgumentNullException.ThrowIfNull(action);
 
-        await Session.Value.Dispatch(
+        _ = await Session.Value.Dispatch(
             async () =>
             {
                 ReactiveUIBuilder.ResetBuilderStateForTests();
@@ -42,6 +42,8 @@ public class ReactiveAvaloniaTestExecutor : ITestExecutor
                         .WithCoreServices()
                         .BuildApp();
                 }
+
+                return true;
             },
             CancellationToken.None);
     }

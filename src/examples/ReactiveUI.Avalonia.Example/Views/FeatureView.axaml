@@ -1,0 +1,11 @@
+<rxui:ReactiveUserControl
+    x:Class="ReactiveUI.Avalonia.Example.Views.FeatureView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:rxui="using:ReactiveUI.Avalonia"
+    xmlns:vm="using:ReactiveUI.Avalonia.Example.ViewModels"
+    x:DataType="vm:FeatureViewModel">
+    <Border BorderBrush="#E5E7EB" BorderThickness="0,0,0,1" Padding="0,12">
+        <TextBlock FontSize="15" Foreground="#111827" TextWrapping="Wrap" Text="{Binding Name}" />
+    </Border>
+</rxui:ReactiveUserControl>

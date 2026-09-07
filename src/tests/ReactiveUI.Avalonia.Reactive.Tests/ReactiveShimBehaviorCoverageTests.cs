@@ -39,7 +39,7 @@ public class ReactiveShimBehaviorCoverageTests
         untyped.OnNext(UntypedSubjectValue);
         typed.OnNext(TypedSubjectValue);
 
-        await Assert.That(untypedObserved).IsEqualTo(UntypedSubjectValue);
+        await Assert.That(untypedObserved).IsEqualTo(TypedSubjectValue);
         await Assert.That(typedObserved).IsEqualTo(TypedSubjectValue);
         await Assert.That(control.IntProp).IsEqualTo(TypedSubjectValue);
     }
@@ -66,7 +66,7 @@ public class ReactiveShimBehaviorCoverageTests
         untyped.OnNext(new(UntypedBindingValue));
         typed.OnNext(new(TypedBindingValue));
 
-        await Assert.That(untypedObserved!.Value.Value).IsEqualTo(UntypedBindingValue);
+        await Assert.That(untypedObserved!.Value.Value).IsEqualTo(TypedBindingValue);
         await Assert.That(typedObserved!.Value.Value).IsEqualTo(TypedBindingValue);
         await Assert.That(control.IntProp).IsEqualTo(TypedBindingValue);
     }

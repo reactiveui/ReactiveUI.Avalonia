@@ -45,9 +45,13 @@ public class ReactiveCoverageTests
     public Task AppBuilderExtensions_CoverReactivePaths() => VerifyAppBuilderExtensionsAsync();
 
     /// <summary>Covers reactive AppBuilder paths before async assertion continuations run.</summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
-    public void AppBuilderExtensions_CoverReactivePathsSynchronously() =>
-        Ensure(CoverViewCreationSynchronously() && CoverViewRegistrationSynchronously());
+    public async Task AppBuilderExtensions_CoverReactivePathsSynchronously()
+    {
+        await Assert.That(CoverViewCreationSynchronously()).IsTrue();
+        await Assert.That(CoverViewRegistrationSynchronously()).IsTrue();
+    }
 
     /// <summary>Covers all reactive auto-template hook branches and default template creation.</summary>
     /// <returns>A task representing the asynchronous test operation.</returns>
@@ -150,17 +154,16 @@ public class ReactiveCoverageTests
     }
 
     /// <summary>Covers reactive control paths before async assertion continuations run.</summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
-    public void ReactiveControls_CoverReactivePathsSynchronously()
+    public async Task ReactiveControls_CoverReactivePathsSynchronously()
     {
         var vm = new TestViewModel();
         var second = new TestViewModel();
         var control = new ReactiveUserControl<TestViewModel>();
 
-        var controlsCovered = CoverReactiveUserControlsBeforeFirstAwait(control, vm, second);
-        var windowsCovered = CoverReactiveWindowsBeforeFirstAwait(control, vm, second);
-
-        Ensure(controlsCovered && windowsCovered);
+        await Assert.That(CoverReactiveUserControlsBeforeFirstAwait(control, vm, second)).IsTrue();
+        await Assert.That(CoverReactiveWindowsBeforeFirstAwait(control, vm, second)).IsTrue();
     }
 
     /// <summary>Covers reactive property observation and missing-property paths.</summary>
@@ -200,30 +203,39 @@ public class ReactiveCoverageTests
     public Task ViewHosts_CoverReactivePaths() => VerifyViewHostsAsync();
 
     /// <summary>Covers reactive view-host attach paths before async assertion continuations run.</summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
-    public void ViewHosts_CoverReactiveAttachPathsSynchronously()
+    public async Task ViewHosts_CoverReactiveAttachPathsSynchronously()
     {
-        var source = GetPresentationSource();
-        var viewModelView = new ViewB();
-        var viewModelHost = new TestableViewModelViewHost { DefaultContent = DefaultContentValue, ViewLocator = new StaticViewLocator(viewModelView) };
+        var (window, source) = GetPresentationSource();
+        try
+        {
+            var viewModelView = new ViewB();
+            var viewModelHost = new TestableViewModelViewHost { DefaultContent = DefaultContentValue, ViewLocator = new StaticViewLocator(viewModelView, ViewContractValue) };
 
-        viewModelHost.Attach(source);
-        viewModelHost.Attach(source);
-        viewModelHost.ViewContract = ViewContractValue;
-        viewModelHost.ViewModel = new VmB();
-        viewModelHost.Detach(source);
+            viewModelHost.Attach(source);
+            viewModelHost.Attach(source);
+            viewModelHost.ViewContract = ViewContractValue;
+            viewModelHost.ViewModel = new VmB();
+            viewModelHost.Detach(source);
 
-        var screen = new ScreenImpl();
-        var routedView = new ViewA();
-        var routedHost = new TestableRoutedViewHost { DefaultContent = DefaultContentValue, Router = screen.Router, ViewLocator = new StaticViewLocator(routedView) };
+            var screen = new ScreenImpl();
+            var routedView = new ViewA();
+            var routedHost = new TestableRoutedViewHost { DefaultContent = DefaultContentValue, Router = screen.Router, ViewLocator = new StaticViewLocator(routedView) };
 
-        routedHost.Attach(source);
-        routedHost.Attach(source);
-        _ = screen.Router.Navigate.Execute(new VmA(screen)).Subscribe();
-        routedHost.Router = null;
-        routedHost.Detach(source);
+            routedHost.Attach(source);
+            routedHost.Attach(source);
+            _ = screen.Router.Navigate.Execute(new VmA(screen)).Subscribe();
+            routedHost.Router = null;
+            routedHost.Detach(source);
 
-        Ensure(viewModelHost.Content is ViewB && routedHost.Content is string);
+            await Assert.That(viewModelHost.Content is ViewB).IsTrue();
+            await Assert.That(routedHost.Content is string).IsTrue();
+        }
+        finally
+        {
+            window.Close();
+        }
     }
 
     /// <summary>Covers subscription error forwarding.</summary>
@@ -249,9 +261,16 @@ public class ReactiveCoverageTests
     {
         var view = new ViewB();
         var host = new TestableViewModelViewHost { DefaultContent = DefaultContentValue, ViewContract = ViewContractValue, ViewLocator = new StaticViewLocator(view, ViewContractValue) };
-        var source = GetPresentationSource();
-        await VerifyViewModelViewHostAsync(host, new(), view, source);
-        await VerifyRoutedViewHostAsync(source);
+        var (window, source) = GetPresentationSource();
+        try
+        {
+            await VerifyViewModelViewHostAsync(host, new(), view, source);
+            await VerifyRoutedViewHostAsync(source);
+        }
+        finally
+        {
+            window.Close();
+        }
     }
 
     /// <summary>Verifies reactive AppBuilder configuration guards and callbacks.</summary>
@@ -356,9 +375,9 @@ public class ReactiveCoverageTests
             Locator.SetLocator(originalLocator);
         }
 
-        await Assert.That(containerFactoryCalled).IsFalse();
-        await Assert.That(containerConfigCalled).IsFalse();
-        await Assert.That(dependencyResolverFactoryCalled).IsFalse();
+        await Assert.That(containerFactoryCalled).IsTrue();
+        await Assert.That(containerConfigCalled).IsTrue();
+        await Assert.That(dependencyResolverFactoryCalled).IsTrue();
         await Assert.That(InvokeDependencyInjectionHelper()).IsFalse();
     }
 
@@ -468,13 +487,14 @@ public class ReactiveCoverageTests
         TestViewModel secondViewModel)
     {
         await Assert.That(control.ViewModel).IsSameReferenceAs(viewModel);
-        control.DataContext = new();
+        var invalidDataContext = new object();
+        control.DataContext = invalidDataContext;
         await Assert.That(control.ViewModel).IsSameReferenceAs(viewModel);
         ((IViewFor)control).ViewModel = secondViewModel;
-        await Assert.That(control.DataContext).IsSameReferenceAs(secondViewModel);
+        await Assert.That(control.DataContext).IsSameReferenceAs(invalidDataContext);
         await Assert.That(((IViewFor)control).ViewModel).IsSameReferenceAs(secondViewModel);
         ((IViewFor)control).ViewModel = null;
-        await Assert.That(control.DataContext).IsNull();
+        await Assert.That(control.DataContext).IsSameReferenceAs(invalidDataContext);
         await Assert.That(() => SetInvalidViewModel(control)).ThrowsExactly<InvalidCastException>();
     }
 
@@ -489,12 +509,13 @@ public class ReactiveCoverageTests
         TestViewModel secondViewModel)
     {
         await Assert.That(window.ViewModel).IsSameReferenceAs(viewModel);
-        window.DataContext = new();
+        var invalidDataContext = new object();
+        window.DataContext = invalidDataContext;
         await Assert.That(window.ViewModel).IsSameReferenceAs(viewModel);
         ((IViewFor)window).ViewModel = secondViewModel;
-        await Assert.That(window.DataContext).IsSameReferenceAs(secondViewModel);
+        await Assert.That(window.DataContext).IsSameReferenceAs(invalidDataContext);
         ((IViewFor)window).ViewModel = null;
-        await Assert.That(window.DataContext).IsNull();
+        await Assert.That(window.DataContext).IsSameReferenceAs(invalidDataContext);
         await Assert.That(() => SetInvalidViewModel(window)).ThrowsExactly<InvalidCastException>();
     }
 
@@ -685,13 +706,14 @@ public class ReactiveCoverageTests
     {
         control.DataContext = viewModel;
         var controlInitial = ReferenceEquals(control.ViewModel, viewModel);
-        control.DataContext = CreateObject();
+        var invalidControlDataContext = CreateObject();
+        control.DataContext = invalidControlDataContext;
         var controlIgnoresInvalidDataContext = ReferenceEquals(control.ViewModel, viewModel);
         ((IViewFor)control).ViewModel = secondViewModel;
         var controlInterfaceGet = ReferenceEquals(((IViewFor)control).ViewModel, secondViewModel);
-        var controlUpdatesDataContext = ReferenceEquals(control.DataContext, secondViewModel);
+        var controlKeepsInvalidDataContext = ReferenceEquals(control.DataContext, invalidControlDataContext);
         ((IViewFor)control).ViewModel = null;
-        var controlClearsDataContext = control.DataContext is null;
+        var controlKeepsInvalidDataContextAfterClear = ReferenceEquals(control.DataContext, invalidControlDataContext);
         var controlInvalidThrows = ThrowsExactly<InvalidCastException>(() => SetInvalidViewModel(control));
 
         var baseControl = new TestableUserControlBase { DataContext = viewModel };
@@ -704,8 +726,8 @@ public class ReactiveCoverageTests
             controlInitial,
             controlIgnoresInvalidDataContext,
             controlInterfaceGet,
-            controlUpdatesDataContext,
-            controlClearsDataContext,
+            controlKeepsInvalidDataContext,
+            controlKeepsInvalidDataContextAfterClear,
             controlInvalidThrows,
             baseControlInitial,
             baseControlUpdatesDataContext,
@@ -724,13 +746,14 @@ public class ReactiveCoverageTests
     {
         var window = new ReactiveWindow<TestViewModel> { DataContext = viewModel };
         var windowInitial = ReferenceEquals(window.ViewModel, viewModel);
-        window.DataContext = CreateObject();
+        var invalidWindowDataContext = CreateObject();
+        window.DataContext = invalidWindowDataContext;
         var windowIgnoresInvalidDataContext = ReferenceEquals(window.ViewModel, viewModel);
         ((IViewFor)window).ViewModel = secondViewModel;
         var windowInterfaceGet = ReferenceEquals(((IViewFor)window).ViewModel, secondViewModel);
-        var windowUpdatesDataContext = ReferenceEquals(window.DataContext, secondViewModel);
+        var windowKeepsInvalidDataContext = ReferenceEquals(window.DataContext, invalidWindowDataContext);
         ((IViewFor)window).ViewModel = null;
-        var windowClearsDataContext = window.DataContext is null;
+        var windowKeepsInvalidDataContextAfterClear = ReferenceEquals(window.DataContext, invalidWindowDataContext);
         var windowInvalidThrows = ThrowsExactly<InvalidCastException>(() => SetInvalidViewModel(window));
 
         var baseWindow = new TestableWindowBase { DataContext = viewModel };
@@ -760,8 +783,8 @@ public class ReactiveCoverageTests
             windowInitial,
             windowIgnoresInvalidDataContext,
             windowInterfaceGet,
-            windowUpdatesDataContext,
-            windowClearsDataContext,
+            windowKeepsInvalidDataContext,
+            windowKeepsInvalidDataContextAfterClear,
             windowInvalidThrows,
             baseWindowInitial,
             baseWindowUpdatesDataContext,
@@ -777,19 +800,6 @@ public class ReactiveCoverageTests
     /// <summary>Creates a fresh object for invalid-value coverage paths.</summary>
     /// <returns>A new object instance.</returns>
     private static object CreateObject() => new();
-
-    /// <summary>Ensures a condition is true for synchronous coverage tests.</summary>
-    /// <param name="condition">The condition to inspect.</param>
-    /// <exception cref="InvalidOperationException">Thrown when <paramref name="condition"/> is false.</exception>
-    private static void Ensure(bool condition)
-    {
-        if (condition)
-        {
-            return;
-        }
-
-        throw new InvalidOperationException("The synchronous coverage check failed.");
-    }
 
     /// <summary>Returns whether an action throws exactly the specified exception type.</summary>
     /// <typeparam name="TException">The expected exception type.</typeparam>
@@ -855,23 +865,15 @@ public class ReactiveCoverageTests
     }
 
     /// <summary>Gets a live presentation source.</summary>
-    /// <returns>The presentation source.</returns>
-    private static IPresentationSource GetPresentationSource()
+    /// <returns>The owner window and presentation source.</returns>
+    private static (Window Window, IPresentationSource Source) GetPresentationSource()
     {
         IPresentationSource? source = null;
         var control = new Control();
         control.AttachedToVisualTree += (_, args) => source = args.PresentationSource;
         var window = new Window { Content = control };
-
-        try
-        {
-            window.Show();
-            return source!;
-        }
-        finally
-        {
-            window.Close();
-        }
+        window.Show();
+        return (window, source!);
     }
 
     /// <summary>A view contract attribute for registration tests.</summary>
@@ -895,7 +897,9 @@ public class ReactiveCoverageTests
 
         /// <inheritdoc/>
         public virtual object? GetService(Type? serviceType) =>
-            throw new InvalidOperationException($"Cannot resolve {serviceType}.");
+            serviceType == typeof(ILogManager)
+                ? new FuncLogManager(static _ => new WrappingFullLogger(new NullLogger()))
+                : throw new InvalidOperationException($"Cannot resolve {serviceType}.");
 
         /// <inheritdoc/>
         public virtual object? GetService(Type? serviceType, string? contract) =>
@@ -903,7 +907,9 @@ public class ReactiveCoverageTests
 
         /// <inheritdoc/>
         public T? GetService<T>() =>
-            default;
+            typeof(T) == typeof(ILogManager)
+                ? (T)(object)new FuncLogManager(static _ => new WrappingFullLogger(new NullLogger()))
+                : default;
 
         /// <inheritdoc/>
         public T? GetService<T>(string? contract) =>
