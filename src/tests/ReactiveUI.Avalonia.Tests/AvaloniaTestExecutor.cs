@@ -17,7 +17,7 @@ public class AvaloniaTestExecutor : ITestExecutor
 
         // Run the test body on the shared headless UI thread so dispatcher-dependent code
         // (e.g. AvaloniaScheduler) behaves deterministically. See AvaloniaTestSession.
-        await AvaloniaTestSession.Instance.Dispatch(
+        _ = await AvaloniaTestSession.Instance.Dispatch(
             async () =>
             {
                 ReactiveUIBuilder.ResetBuilderStateForTests();
@@ -46,6 +46,8 @@ public class AvaloniaTestExecutor : ITestExecutor
                         .WithCoreServices()
                         .BuildApp();
                 }
+
+                return true;
             },
             CancellationToken.None);
     }

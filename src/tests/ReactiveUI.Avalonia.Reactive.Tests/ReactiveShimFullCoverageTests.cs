@@ -4,12 +4,10 @@
 using System.Linq.Expressions;
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Controls.Templates;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
-using Avalonia.Rendering;
 using Splat;
 
 using ReactiveRxAppBuilder = global::ReactiveUI.Reactive.Builder.RxAppBuilder;
@@ -332,8 +330,8 @@ public partial class ReactiveShimFullCoverageTests
         await Assert.That(static () => new AutoSuspendHelper(null!)).ThrowsExactly<ArgumentNullException>();
         await Assert.That(static () => new AutoSuspendHelper(CreateUnsupportedLifetime())).ThrowsExactly<NotSupportedException>();
 
-        var lifetime = new ClassicDesktopStyleApplicationLifetime();
-        using var helper = new AutoSuspendHelper(lifetime);
+        var fixture = new ControlledLifetimeFixture();
+        using var helper = new AutoSuspendHelper(fixture.Lifetime);
         var persisted = false;
         using var persistSubscription = ReactiveRxSuspension.SuspensionHost.ShouldPersistState.Subscribe(
             new RecordingObserver<IDisposable>(value =>
@@ -342,7 +340,7 @@ public partial class ReactiveShimFullCoverageTests
                 value.Dispose();
             }));
 
-        lifetime.Shutdown();
+        fixture.RaiseExit();
         await Assert.That(persisted).IsTrue();
 
         var launches = 0;
@@ -428,7 +426,7 @@ public partial class ReactiveShimFullCoverageTests
         }
 
         await Assert.That(button.Command).IsNull();
-        await Assert.That(sut.BindCommandToObject(null, button, parameter)).IsNull();
+        await Assert.That(sut.BindCommandToObject(null, button, parameter)).IsNotNull();
         await Assert.That(sut.BindCommandToObject<Button>(command, null, parameter)).IsNull();
         await Assert.That(CaptureInvalidOperation(() => sut.BindCommandToObject<object>(command, new(), parameter))).IsNotNull();
         await Assert.That(CaptureInvalidOperation(() => sut.BindCommandToObject(command, new TextBox(), parameter))).IsNotNull();
@@ -513,16 +511,17 @@ public partial class ReactiveShimFullCoverageTests
         await Assert.That(control.ViewModel).IsSameReferenceAs(vm);
         await Assert.That(((IViewFor<ShimVm>)control).ViewModel).IsSameReferenceAs(vm);
 
-        control.DataContext = new();
+        var invalidDataContext = new object();
+        control.DataContext = invalidDataContext;
         await Assert.That(control.ViewModel).IsSameReferenceAs(vm);
 
         var secondVm = new ShimVm();
         control.ViewModel = secondVm;
-        await Assert.That(control.DataContext).IsSameReferenceAs(secondVm);
+        await Assert.That(control.DataContext).IsSameReferenceAs(invalidDataContext);
 
         ((IViewFor)control).ViewModel = null;
         await Assert.That(control.ViewModel).IsNull();
-        await Assert.That(control.DataContext).IsNull();
+        await Assert.That(control.DataContext).IsSameReferenceAs(invalidDataContext);
 
         var directControl = new ReactiveUserControl<ShimVm> { DataContext = vm };
         await Assert.That(directControl.ViewModel).IsSameReferenceAs(vm);
@@ -533,15 +532,16 @@ public partial class ReactiveShimFullCoverageTests
         await Assert.That(window.ViewModel).IsSameReferenceAs(vm);
         await Assert.That(((IViewFor<ShimVm>)window).ViewModel).IsSameReferenceAs(vm);
 
-        window.DataContext = new();
+        var invalidWindowDataContext = new object();
+        window.DataContext = invalidWindowDataContext;
         await Assert.That(window.ViewModel).IsSameReferenceAs(vm);
 
         window.ViewModel = secondVm;
-        await Assert.That(window.DataContext).IsSameReferenceAs(secondVm);
+        await Assert.That(window.DataContext).IsSameReferenceAs(invalidWindowDataContext);
 
         ((IViewFor)window).ViewModel = null;
         await Assert.That(window.ViewModel).IsNull();
-        await Assert.That(window.DataContext).IsNull();
+        await Assert.That(window.DataContext).IsSameReferenceAs(invalidWindowDataContext);
 
         var directWindow = new ReactiveWindow<ShimVm> { DataContext = vm };
         await Assert.That(directWindow.ViewModel).IsSameReferenceAs(vm);
@@ -617,10 +617,17 @@ public partial class ReactiveShimFullCoverageTests
 
         host.DisposeNavigationDisposables();
 
-        var source = GetPresentationSource();
-        host.Attach(source);
-        host.Attach(source);
-        host.Detach(source);
+        var (window, source) = GetPresentationSource();
+        try
+        {
+            host.Attach(source);
+            host.Attach(source);
+            host.Detach(source);
+        }
+        finally
+        {
+            window.Close();
+        }
     }
 
     /// <summary>Verifies reactive routed view-host navigation behavior.</summary>
@@ -675,10 +682,17 @@ public partial class ReactiveShimFullCoverageTests
 
         host.DisposeNavigationDisposables();
 
-        var source = GetPresentationSource();
-        host.Attach(source);
-        host.Attach(source);
-        host.Detach(source);
+        var (window, source) = GetPresentationSource();
+        try
+        {
+            host.Attach(source);
+            host.Attach(source);
+            host.Detach(source);
+        }
+        finally
+        {
+            window.Close();
+        }
     }
 
     /// <summary>Verifies reactive view hosts navigate through visual-tree subscriptions.</summary>
@@ -717,6 +731,150 @@ public partial class ReactiveShimFullCoverageTests
         finally
         {
             routedWindow.Close();
+        }
+    }
+
+    /// <summary>Verifies reactive RoutedViewHost displays navigation that happened before the host was attached.</summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
+    [Test]
+    public async Task ReactiveRoutedViewHost_Navigates_WhenRouterAlreadyHasCurrentViewModel()
+    {
+        var screen = new ScreenImpl();
+        var vm = new VmA(screen);
+        _ = screen.Router.Navigate.Execute(vm).Subscribe();
+        var host = new TestableReactiveRoutedViewHost { DefaultContent = DefaultContentValue, Router = screen.Router, ViewLocator = new StaticViewLocator(new ViewA()) };
+        var window = new Window { Content = host };
+
+        try
+        {
+            await Assert.That(screen.Router.NavigationStack.Count).IsEqualTo(1);
+
+            window.Show();
+
+            await Assert.That(host.Content).IsTypeOf<ViewA>();
+            await Assert.That(((IViewFor)host.Content!).ViewModel).IsSameReferenceAs(vm);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    /// <summary>Verifies reactive RoutedViewHost displays an already-current view model when the router is assigned after attachment.</summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
+    [Test]
+    public async Task ReactiveRoutedViewHost_Navigates_WhenAlreadyNavigatedRouterIsAssigned()
+    {
+        var screen = new ScreenImpl();
+        var vm = new VmA(screen);
+        _ = screen.Router.Navigate.Execute(vm).Subscribe();
+        var host = new TestableReactiveRoutedViewHost { DefaultContent = DefaultContentValue, ViewLocator = new StaticViewLocator(new ViewA()) };
+        var window = new Window { Content = host };
+
+        try
+        {
+            window.Show();
+            host.Router = screen.Router;
+
+            await Assert.That(screen.Router.NavigationStack.Count).IsEqualTo(1);
+            await Assert.That(host.Content).IsTypeOf<ViewA>();
+            await Assert.That(((IViewFor)host.Content!).ViewModel).IsSameReferenceAs(vm);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    /// <summary>Verifies reactive RoutedViewHost ignores navigation from a router after another router is assigned.</summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
+    [Test]
+    public async Task ReactiveRoutedViewHost_IgnoresPreviousRouterAfterReplacement()
+    {
+        var firstScreen = new ScreenImpl();
+        var secondScreen = new ScreenImpl();
+        var firstVm = new VmA(firstScreen);
+        var secondVm = new VmA(secondScreen);
+        var view = new ViewA();
+        var host = new TestableReactiveRoutedViewHost { DefaultContent = DefaultContentValue, Router = firstScreen.Router, ViewLocator = new StaticViewLocator(view) };
+        var window = new Window { Content = host };
+
+        try
+        {
+            window.Show();
+            _ = firstScreen.Router.Navigate.Execute(firstVm).Subscribe();
+            await Assert.That(view.ViewModel).IsSameReferenceAs(firstVm);
+
+            host.Router = secondScreen.Router;
+            _ = secondScreen.Router.Navigate.Execute(secondVm).Subscribe();
+            await Assert.That(view.ViewModel).IsSameReferenceAs(secondVm);
+
+            _ = firstScreen.Router.Navigate.Execute(new VmA(firstScreen)).Subscribe();
+            await Assert.That(view.ViewModel).IsSameReferenceAs(secondVm);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    /// <summary>Verifies reactive RoutedViewHost ignores router navigation after the router is cleared.</summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
+    [Test]
+    public async Task ReactiveRoutedViewHost_IgnoresPreviousRouterAfterRouterCleared()
+    {
+        var screen = new ScreenImpl();
+        var vm = new VmA(screen);
+        var view = new ViewA();
+        var host = new TestableReactiveRoutedViewHost { DefaultContent = DefaultContentValue, Router = screen.Router, ViewLocator = new StaticViewLocator(view) };
+        var window = new Window { Content = host };
+
+        try
+        {
+            window.Show();
+            _ = screen.Router.Navigate.Execute(vm).Subscribe();
+            await Assert.That(view.ViewModel).IsSameReferenceAs(vm);
+
+            host.Router = null;
+            _ = screen.Router.Navigate.Execute(new VmA(screen)).Subscribe();
+
+            await Assert.That(host.Content).IsEqualTo(DefaultContentValue);
+            await Assert.That(view.ViewModel).IsSameReferenceAs(vm);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    /// <summary>Verifies reactive RoutedViewHost ignores navigation while detached and catches up when reattached.</summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
+    [Test]
+    public async Task ReactiveRoutedViewHost_CatchesUpToCurrentViewModelAfterReattach()
+    {
+        var screen = new ScreenImpl();
+        var firstVm = new VmA(screen);
+        var secondVm = new VmA(screen);
+        var view = new ViewA();
+        var host = new TestableReactiveRoutedViewHost { DefaultContent = DefaultContentValue, Router = screen.Router, ViewLocator = new StaticViewLocator(view) };
+        var window = new Window { Content = host };
+
+        try
+        {
+            window.Show();
+            _ = screen.Router.Navigate.Execute(firstVm).Subscribe();
+            await Assert.That(view.ViewModel).IsSameReferenceAs(firstVm);
+
+            window.Content = null;
+            _ = screen.Router.Navigate.Execute(secondVm).Subscribe();
+            await Assert.That(view.ViewModel).IsSameReferenceAs(firstVm);
+
+            window.Content = host;
+            await Assert.That(view.ViewModel).IsSameReferenceAs(secondVm);
+        }
+        finally
+        {
+            window.Close();
         }
     }
 

@@ -5,6 +5,9 @@
     <Product>$(AssemblyName) ($(TargetFramework))</Product>
     <AndroidUseIntermediateDesignerFile>False</AndroidUseIntermediateDesignerFile>
     <EnableVSTestReferences>false</EnableVSTestReferences>
+    <!-- Evaluate deployment capabilities after each project declares its application/package mode. -->
+    <EnableAotAnalyzer Condition="'$(IsAotCompatible)' == 'true' or '$(PublishAot)' == 'true'">true</EnableAotAnalyzer>
+    <EnableTrimAnalyzer Condition="'$(IsAotCompatible)' == 'true' or '$(IsTrimmable)' == 'true' or '$(PublishTrimmed)' == 'true'">true</EnableTrimAnalyzer>
   </PropertyGroup>
 
   <!-- Keep ReactiveUI.Primitives bridge generation disabled when SDK analyzer resolution ignores ExcludeAssets. -->

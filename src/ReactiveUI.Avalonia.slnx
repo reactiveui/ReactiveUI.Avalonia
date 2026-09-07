@@ -22,10 +22,14 @@
     <File Path="Directory.Packages.props" />
   </Folder>
   <Folder Name="/Tests/">
+    <Project Path="examples/ReactiveUI.Avalonia.Example.Tests/ReactiveUI.Avalonia.Example.Tests.csproj" />
     <Project Path="tests/ReactiveUI.Avalonia.DryIoc1.Tests/ReactiveUI.Avalonia.DryIoc.Tests.csproj" />
     <Project Path="tests/ReactiveUI.Avalonia.Microsoft1.Tests/ReactiveUI.Avalonia.Microsoft.Tests.csproj" />
     <Project Path="tests/ReactiveUI.Avalonia.Reactive.Tests/ReactiveUI.Avalonia.Reactive.Tests.csproj" />
     <Project Path="tests/ReactiveUI.Avalonia.Tests/ReactiveUI.Avalonia.Tests.csproj" />
+  </Folder>
+  <Folder Name="/Examples/">
+    <Project Path="examples/ReactiveUI.Avalonia.Example/ReactiveUI.Avalonia.Example.csproj" />
   </Folder>
   <Project Path="ReactiveUI.Avalonia.Autofac/ReactiveUI.Avalonia.Autofac.csproj" />
   <Project Path="ReactiveUI.Avalonia.DryIoc/ReactiveUI.Avalonia.DryIoc.csproj" />

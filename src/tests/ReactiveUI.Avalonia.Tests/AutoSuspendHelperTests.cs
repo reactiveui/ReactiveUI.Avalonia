@@ -25,8 +25,8 @@ public class AutoSuspendHelperTests
     [Test]
     public async Task Ctor_With_DesktopLifetime_Sets_ShouldPersistState()
     {
-        var lifetime = new ClassicDesktopStyleApplicationLifetime();
-        using var helper = new AutoSuspendHelper(lifetime);
+        var fixture = new ControlledLifetimeFixture();
+        using var helper = new AutoSuspendHelper(fixture.Lifetime);
 
         var notified = false;
         var sub = RxSuspension.SuspensionHost.ShouldPersistState.SubscribeSafe(
@@ -35,9 +35,9 @@ public class AutoSuspendHelperTests
                 notified = true;
                 d.Dispose();
             },
-            static error => throw error);
+                static error => throw error);
 
-        lifetime.Shutdown();
+        fixture.RaiseExit();
 
         await Assert.That(notified).IsTrue();
         sub.Dispose();
@@ -85,7 +85,7 @@ public class AutoSuspendHelperTests
         var assemblyName = new AssemblyName("ReactiveUI.Avalonia.Tests.DynamicLifetime");
         var assembly = AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
         var module = assembly.DefineDynamicModule("Main");
-        var type = module.DefineType("UnsupportedLifetime", TypeAttributes.NotPublic | TypeAttributes.Sealed);
+        var type = module.DefineType("UnsupportedLifetime", TypeAttributes.Sealed);
         type.AddInterfaceImplementation(typeof(IApplicationLifetime));
 
         var lifetimeType = type.CreateType();

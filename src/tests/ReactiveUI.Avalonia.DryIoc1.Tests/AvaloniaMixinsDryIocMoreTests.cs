@@ -4,6 +4,8 @@
 using Avalonia;
 using DryIoc;
 using ReactiveUI.Avalonia.Splat;
+using ReactiveUI.Builder;
+using Splat;
 using Splat.DryIoc;
 
 namespace ReactiveUI.Avalonia.DryIoc.Tests;
@@ -39,5 +41,77 @@ public class AvaloniaMixinsDryIocMoreTests
             static _ => { });
 
         await Assert.That(result).IsSameReferenceAs(builder);
+    }
+
+    /// <summary>Verifies that null container configuration is validated by the deferred callback.</summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
+    [Test]
+    public async Task UseReactiveUIWithDryIoc_AfterPlatformCallback_ThrowsOnNullContainerConfig()
+    {
+        var builder = AppBuilder.Configure<Application>();
+        _ = AvaloniaMixins.UseReactiveUIWithDryIoc(builder, null!, null);
+
+        await Assert.That(() => builder.AfterPlatformServicesSetupCallback!(builder))
+            .ThrowsExactly<ArgumentNullException>();
+    }
+
+    /// <summary>Verifies that DryIoc registration executes through the deferred platform setup callback.</summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
+    [Test]
+    public async Task UseReactiveUIWithDryIoc_AfterPlatformCallback_ConfiguresContainer()
+    {
+        ReactiveUIBuilder.ResetBuilderStateForTests();
+        var builder = AppBuilder.Configure<Application>();
+        var configCalled = false;
+        var reactiveBuilderCalled = false;
+        var originalLocator = Locator.GetLocator();
+
+        try
+        {
+            _ = AvaloniaMixins.UseReactiveUIWithDryIoc(
+                builder,
+                containerConfig: container => configCalled = container is not null,
+                withReactiveUIBuilder: _ => reactiveBuilderCalled = true);
+
+            builder.AfterPlatformServicesSetupCallback!(builder);
+
+            await Assert.That(configCalled).IsTrue();
+            await Assert.That(reactiveBuilderCalled).IsTrue();
+        }
+        finally
+        {
+            Locator.SetLocator(originalLocator);
+            ReactiveUIBuilder.ResetBuilderStateForTests();
+        }
+    }
+
+    /// <summary>Verifies that the deferred callback handles an already-built app and a null ReactiveUI callback.</summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
+    [Test]
+    public async Task UseReactiveUIWithDryIoc_AfterPlatformCallback_WhenAlreadyBuilt_AllowsNullCallback()
+    {
+        _ = AppLocator.CurrentMutable.CreateReactiveUIBuilder()
+            .WithCoreServices()
+            .BuildApp();
+        var builder = AppBuilder.Configure<Application>();
+        var configCalled = false;
+        var originalLocator = Locator.GetLocator();
+
+        try
+        {
+            _ = AvaloniaMixins.UseReactiveUIWithDryIoc(
+                builder,
+                containerConfig: container => configCalled = container is not null,
+                withReactiveUIBuilder: null);
+
+            builder.AfterPlatformServicesSetupCallback!(builder);
+
+            await Assert.That(configCalled).IsTrue();
+        }
+        finally
+        {
+            Locator.SetLocator(originalLocator);
+            ReactiveUIBuilder.ResetBuilderStateForTests();
+        }
     }
 }

@@ -49,7 +49,7 @@
     <Using Include="ReactiveUI.Reactive.Builder.ReactiveUIBuilder" Alias="ReactiveUIBuilder" />
     <Using Include="ReactiveUI.Reactive.Builder.IReactiveUIBuilder" Alias="IReactiveUIBuilder" />
     <Using Include="ReactiveUI.Reactive.Builder.RxAppBuilder" Alias="RxAppBuilder" />
-    <Using Include="ReactiveUI.Primitives.Disposables.MultipleDisposable" Alias="ActivationDisposables" />
+    <Using Include="ReactiveUI.Primitives.Reactive.Disposables.ContainerDisposable" Alias="ActivationDisposables" />
     <Using Include="ReactiveUI.Reactive.RoutingState" Alias="RoutingState" />
     <Using Include="ReactiveUI.Reactive.RxSchedulers" Alias="RxSchedulers" />
     <Using Include="ReactiveUI.Reactive.RxSuspension" Alias="RxSuspension" />

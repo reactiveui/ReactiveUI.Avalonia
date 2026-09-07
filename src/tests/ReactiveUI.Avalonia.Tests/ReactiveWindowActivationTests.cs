@@ -2,6 +2,7 @@
 // ReactiveUI Association Incorporated licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for full license information.
 using System.Reflection;
+using Avalonia.Threading;
 
 namespace ReactiveUI.Avalonia.Tests;
 
@@ -41,6 +42,7 @@ public class ReactiveWindowActivationTests
         try
         {
             window.Show();
+            Dispatcher.UIThread.RunJobs();
 
             await Assert.That(activationCount).IsGreaterThan(0);
         }

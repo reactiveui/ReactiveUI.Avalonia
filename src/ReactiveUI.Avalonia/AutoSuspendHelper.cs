@@ -24,6 +24,9 @@ public sealed class AutoSuspendHelper : IEnableLogger, IDisposable
     /// <summary>Signals when process state should be invalidated after an unhandled exception.</summary>
     private readonly Signal<Unit> _shouldInvalidateState = new();
 
+    /// <summary>The controlled lifetime whose exit event is observed.</summary>
+    private readonly IControlledApplicationLifetime? _controlledLifetime;
+
     /// <summary>Initializes a new instance of the <see cref="AutoSuspendHelper"/> class.</summary>
     /// <remarks>If the application is running in design mode, state persistence is disabled. For supported
     /// lifetimes, application exit events are wired to enable state persistence. This constructor should be called
@@ -45,7 +48,8 @@ public sealed class AutoSuspendHelper : IEnableLogger, IDisposable
         else if (lifetime is IControlledApplicationLifetime controlled)
         {
             this.Log().Debug("Using IControlledApplicationLifetime events to handle app exit.");
-            controlled.Exit += (sender, args) => OnControlledApplicationLifetimeExit();
+            _controlledLifetime = controlled;
+            controlled.Exit += OnControlledApplicationLifetimeExit;
             RxSuspension.SuspensionHost.ShouldPersistState = _shouldPersistState;
         }
         else if (lifetime is not null)
@@ -77,6 +81,11 @@ public sealed class AutoSuspendHelper : IEnableLogger, IDisposable
     /// managed resources are properly released. After calling Dispose, the instance should not be used.</remarks>
     public void Dispose()
     {
+        if (_controlledLifetime is not null)
+        {
+            _controlledLifetime.Exit -= OnControlledApplicationLifetimeExit;
+        }
+
         AppDomain.CurrentDomain.UnhandledException -= OnUnhandledException;
         _shouldPersistState.Dispose();
         _isLaunchingNew.Dispose();
@@ -93,10 +102,17 @@ public sealed class AutoSuspendHelper : IEnableLogger, IDisposable
     /// <remarks>This method blocks until all registered state persistence actions have finished executing. It
     /// should be called during application shutdown to guarantee that state is saved reliably. Calling this method from
     /// a non-shutdown context may result in the application waiting indefinitely.</remarks>
-    private void OnControlledApplicationLifetimeExit()
+    /// <param name="sender">The lifetime raising the exit event.</param>
+    /// <param name="args">The application exit arguments.</param>
+    private void OnControlledApplicationLifetimeExit(object? sender, ControlledApplicationLifetimeExitEventArgs args)
     {
         this.Log().Debug("Received IControlledApplicationLifetime exit event.");
-        var manual = new ManualResetEvent(false);
+        if (!_shouldPersistState.HasObservers)
+        {
+            return;
+        }
+
+        using var manual = new ManualResetEvent(false);
         _shouldPersistState.OnNext(Disposable.Create(manual, static state => _ = state.Set()));
 
         _ = manual.WaitOne();

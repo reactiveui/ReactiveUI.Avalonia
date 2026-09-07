@@ -1,0 +1,68 @@
+<rxui:ReactiveWindow
+    x:Class="ReactiveUI.Avalonia.Example.Views.MainWindow"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:rxui="using:ReactiveUI.Avalonia"
+    xmlns:vm="using:ReactiveUI.Avalonia.Example.ViewModels"
+    Width="1180"
+    Height="760"
+    MinWidth="940"
+    MinHeight="620"
+    Classes="showcase"
+    Title="ReactiveUI.Avalonia Example"
+    x:DataType="vm:MainViewModel">
+    <Grid ColumnDefinitions="280,*">
+        <ThemeVariantScope Grid.Column="0" RequestedThemeVariant="Dark">
+            <Border
+                Background="#111827"
+                Padding="24">
+                <DockPanel LastChildFill="True">
+                    <StackPanel DockPanel.Dock="Top" Spacing="8">
+                        <TextBlock
+                            Foreground="#F9FAFB"
+                            FontSize="22"
+                            FontWeight="SemiBold"
+                            Text="ReactiveUI.Avalonia" />
+                        <TextBlock
+                            Foreground="#CBD5E1"
+                            TextWrapping="Wrap"
+                            Text="Lean package showcase with routing, live data, and activation." />
+                    </StackPanel>
+
+                    <StackPanel DockPanel.Dock="Bottom">
+                        <TextBlock
+                            Margin="0,0,0,18"
+                            Foreground="#CBD5E1"
+                            Text="{Binding SessionStatus}"
+                            TextWrapping="Wrap" />
+                        <TextBlock
+                            Margin="0,0,0,12"
+                            Foreground="#CBD5E1"
+                            Text="{Binding NavigationStatus}"
+                            TextWrapping="Wrap" />
+                        <Button Classes="nav" Command="{Binding GoBack}" Content="Back" />
+                        <Button Classes="nav" Command="{Binding Reset}" Content="Reset" />
+                    </StackPanel>
+
+                    <StackPanel Margin="0,116,0,0">
+                        <Button Classes="nav" Command="{Binding ShowOverview}" Content="Overview" />
+                        <Button Classes="nav" Command="{Binding ShowMetrics}" Content="Live metrics" />
+                        <Button Classes="nav" Command="{Binding ShowCommands}" Content="Command lab" />
+                    </StackPanel>
+                </DockPanel>
+            </Border>
+            </ThemeVariantScope>
+
+        <rxui:RoutedViewHost
+            x:Name="RouterHost"
+            Grid.Column="1"
+            Margin="0"
+            Router="{Binding Router}">
+            <rxui:RoutedViewHost.DefaultContent>
+                <Border Classes="panel" Margin="32">
+                    <TextBlock Text="Select a route to begin." />
+                </Border>
+            </rxui:RoutedViewHost.DefaultContent>
+        </rxui:RoutedViewHost>
+    </Grid>
+</rxui:ReactiveWindow>

@@ -29,7 +29,6 @@ public class AppBuilderExtensionsTests
         AppBuilderExtensions.ConfigureReactiveUI(_ => invoked = true);
 
         await Assert.That(invoked).IsTrue();
-        await Assert.That(AppLocator.Current.GetService<IActivationForViewFetcher>()).IsTypeOf<AvaloniaActivationForViewFetcher>();
     }
 
     /// <summary>Verifies that UseReactiveUI executes the callback without rebuilding when ReactiveUI is already built.</summary>

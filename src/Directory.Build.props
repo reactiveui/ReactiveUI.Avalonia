@@ -33,8 +33,6 @@
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <AvaloniaTargetFrameworks>net8.0;net9.0;net10.0;net11.0</AvaloniaTargetFrameworks>
     <IsAotCompatible Condition="'$(IsTestProject)' != 'true'">true</IsAotCompatible>
-    <EnableAotAnalyzer Condition="'$(IsTestProject)' != 'true'">true</EnableAotAnalyzer>
-    <EnableTrimAnalyzer Condition="'$(IsTestProject)' != 'true'">true</EnableTrimAnalyzer>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">

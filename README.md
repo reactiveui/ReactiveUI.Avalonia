@@ -27,7 +27,19 @@ Install the packages that match your preferred dependency injection container. T
   - [![ReactiveUI.Avalonia.Microsoft.Extensions.DependencyInjection](https://img.shields.io/nuget/v/ReactiveUI.Avalonia.Microsoft.Extensions.DependencyInjection.svg)](https://www.nuget.org/packages/ReactiveUI.Avalonia.Microsoft.Extensions.DependencyInjection)
   - [![ReactiveUI.Avalonia.Ninject](https://img.shields.io/nuget/v/ReactiveUI.Avalonia.Ninject.svg)](https://www.nuget.org/packages/ReactiveUI.Avalonia.Ninject)
 
-All libraries target multiple frameworks including .NET Standard 2.0 and modern .NET (.NET 8/9/10) for broad compatibility.
+All libraries target .NET 8, 9, 10, and 11. The core and DI packages also have `.Reactive` variants for applications using System.Reactive; new applications can use the lean packages backed by ReactiveUI.Primitives.
+
+## Runnable showcase
+
+The [example application](src/examples/ReactiveUI.Avalonia.Example/README.md) demonstrates navigation, reactive bindings, commands, activation, interactions, reusable metric cards, and live local process measurements using the lean packages.
+
+From `src`, run:
+
+```powershell
+dotnet run --project examples/ReactiveUI.Avalonia.Example/ReactiveUI.Avalonia.Example.csproj -c Release
+```
+
+The example includes headless TUnit tests so its behavior can be checked alongside the package tests.
 
 ---
 ## Recommended setup (ReactiveUIBuilder)
