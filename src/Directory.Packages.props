@@ -41,7 +41,7 @@
   <ItemGroup Label="Test packages">
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.9.0" />
     <PackageVersion Include="Microsoft.Testing.Extensions.CodeCoverage" Version="18.11.0" />
-    <PackageVersion Include="TUnit" Version="1.66.0" />
+    <PackageVersion Include="TUnit" Version="1.66.8" />
     <PackageVersion Include="Verify.TUnit" Version="32.0.0" />
   </ItemGroup>
 </Project>
