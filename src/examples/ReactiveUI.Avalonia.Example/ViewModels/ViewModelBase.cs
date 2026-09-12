@@ -8,13 +8,14 @@ using ReactiveUI.Primitives.Disposables;
 namespace ReactiveUI.Avalonia.Example.ViewModels;
 
 /// <summary>Base view model with ReactiveUI activation support.</summary>
+[System.Diagnostics.DebuggerDisplay("ViewModelBase: {Activator}")]
 public class ViewModelBase : ReactiveObject, IActivatableViewModel, IDisposable
 {
     /// <summary>The disposables owned by the view model.</summary>
     private readonly MultipleDisposable _disposables = new();
 
-    /// <summary>A value indicating whether this instance has been disposed.</summary>
-    private bool _disposed;
+    /// <summary>A latch raised to 1 by the first caller to dispose this instance.</summary>
+    private int _disposed;
 
     /// <summary>Initializes a new instance of the <see cref="ViewModelBase"/> class.</summary>
     protected ViewModelBase() => _disposables.Add(Activator);
@@ -25,12 +26,11 @@ public class ViewModelBase : ReactiveObject, IActivatableViewModel, IDisposable
     /// <inheritdoc/>
     public void Dispose()
     {
-        if (_disposed)
+        if (Interlocked.Exchange(ref _disposed, 1) != 0)
         {
             return;
         }
 
-        _disposed = true;
         Dispose(true);
         GC.SuppressFinalize(this);
     }

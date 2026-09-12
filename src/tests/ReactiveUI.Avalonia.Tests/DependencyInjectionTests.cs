@@ -61,14 +61,9 @@ public class DependencyInjectionTests
     [Test]
     public async Task ReactiveUIAvaloniaNamespace_IsCorrect()
     {
-        var scheduler = typeof(AvaloniaScheduler);
-        await Assert.That(scheduler.Namespace).IsEqualTo("ReactiveUI.Primitives.Concurrency");
-
-        var userControl = typeof(ReactiveUserControl<>);
-        await Assert.That(userControl.Namespace).IsEqualTo("ReactiveUI.Avalonia");
-
-        var window = typeof(ReactiveWindow<>);
-        await Assert.That(window.Namespace).IsEqualTo("ReactiveUI.Avalonia");
+        await Assert.That(typeof(AvaloniaScheduler).Namespace).IsEqualTo("ReactiveUI.Primitives.Concurrency");
+        await Assert.That(typeof(ReactiveUserControl<>).Namespace).IsEqualTo("ReactiveUI.Avalonia");
+        await Assert.That(typeof(ReactiveWindow<>).Namespace).IsEqualTo("ReactiveUI.Avalonia");
     }
 
     /// <summary>Verifies that the assembly has expected metadata.</summary>
@@ -88,17 +83,10 @@ public class DependencyInjectionTests
     [Test]
     public async Task PublicTypes_ArePublic()
     {
-        var scheduler = typeof(AvaloniaScheduler);
-        await Assert.That(scheduler.IsPublic).IsTrue();
-
-        var userControl = typeof(ReactiveUserControl<>);
-        await Assert.That(userControl.IsPublic).IsTrue();
-
-        var window = typeof(ReactiveWindow<>);
-        await Assert.That(window.IsPublic).IsTrue();
-
-        var viewHost = typeof(ViewModelViewHost);
-        await Assert.That(viewHost.IsPublic).IsTrue();
+        await Assert.That(typeof(AvaloniaScheduler).IsPublic).IsTrue();
+        await Assert.That(typeof(ReactiveUserControl<>).IsPublic).IsTrue();
+        await Assert.That(typeof(ReactiveWindow<>).IsPublic).IsTrue();
+        await Assert.That(typeof(ViewModelViewHost).IsPublic).IsTrue();
     }
 
     /// <summary>Verifies that extension method types are public, sealed, and abstract (static).</summary>

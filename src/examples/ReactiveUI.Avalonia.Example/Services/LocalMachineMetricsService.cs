@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for full license information.
 
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using ReactiveUI.Avalonia.Example.Models;
 using ReactiveUI.Primitives;
 using ReactiveUI.Primitives.Signals;
@@ -10,6 +11,7 @@ using ReactiveUI.Primitives.Signals;
 namespace ReactiveUI.Avalonia.Example.Services;
 
 /// <summary>Samples process-local measurements from the current machine.</summary>
+[System.Diagnostics.DebuggerDisplay("LocalMachineMetricsService: {_gate}")]
 public sealed class LocalMachineMetricsService : ILocalMachineMetricsService
 {
     /// <summary>The number of bytes in one megabyte.</summary>
@@ -38,10 +40,7 @@ public sealed class LocalMachineMetricsService : ILocalMachineMetricsService
 
     /// <summary>Initializes a new instance of the <see cref="LocalMachineMetricsService"/> class.</summary>
     /// <param name="timeProvider">The time provider.</param>
-    public LocalMachineMetricsService(TimeProvider timeProvider)
-    {
-        _timeProvider = timeProvider;
-    }
+    public LocalMachineMetricsService(TimeProvider timeProvider) => _timeProvider = timeProvider;
 
     /// <inheritdoc/>
     public MachineSnapshot ReadSnapshot()
@@ -60,6 +59,7 @@ public sealed class LocalMachineMetricsService : ILocalMachineMetricsService
     }
 
     /// <inheritdoc/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public IObservable<MachineSnapshot> Watch(TimeSpan interval) =>
         Signal.Interval(interval)
             .StartWith(0L)

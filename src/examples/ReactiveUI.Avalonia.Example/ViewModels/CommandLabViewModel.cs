@@ -10,6 +10,7 @@ using Unit = ReactiveUI.Primitives.RxVoid;
 namespace ReactiveUI.Avalonia.Example.ViewModels;
 
 /// <summary>Demonstrates command can-execute, async execution, failure handling, and interactions.</summary>
+[System.Diagnostics.DebuggerDisplay("CommandLabViewModel: {RunWork}")]
 public sealed class CommandLabViewModel : PageViewModel
 {
     /// <summary>The simulated command work delay.</summary>
@@ -100,6 +101,7 @@ public sealed class CommandLabViewModel : PageViewModel
 
     /// <summary>Intentionally fails to demonstrate command error flow.</summary>
     /// <returns>A task representing the failing work.</returns>
+    /// <exception cref="InvalidOperationException">Always thrown, after the simulated delay.</exception>
     private static async Task FailWorkAsync()
     {
         await Task.Delay(FailureDelay).ConfigureAwait(false);

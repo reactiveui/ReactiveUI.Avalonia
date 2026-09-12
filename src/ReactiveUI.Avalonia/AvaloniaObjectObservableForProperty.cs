@@ -1,6 +1,8 @@
 // Copyright (c) 2019-2026 ReactiveUI Association Incorporated. All rights reserved.
 // ReactiveUI Association Incorporated licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for full license information.
+using System.Runtime.CompilerServices;
+
 #if REACTIVE_SHIM
 namespace ReactiveUI.Avalonia.Reactive;
 #else
@@ -18,6 +20,7 @@ internal class AvaloniaObjectObservableForProperty : ICreatesObservableForProper
     private const int AvaloniaPropertyAffinity = 4;
 
     /// <inheritdoc/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     [RequiresUnreferencedCode("Uses reflection over runtime types which is not trim- or AOT-safe.")]
     public int GetAffinityForObject(Type type, string propertyName) =>
         GetAffinityForObject(type, propertyName, beforeChanged: false);
@@ -40,6 +43,7 @@ internal class AvaloniaObjectObservableForProperty : ICreatesObservableForProper
     }
 
     /// <inheritdoc/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     [RequiresUnreferencedCode("Uses reflection over runtime types which is not trim- or AOT-safe.")]
     public IObservable<IObservedChange<object?, object?>> GetNotificationForProperty(
         object sender,
@@ -48,6 +52,7 @@ internal class AvaloniaObjectObservableForProperty : ICreatesObservableForProper
         GetNotificationForProperty(sender, expression, propertyName, beforeChanged: false, suppressWarnings: false);
 
     /// <inheritdoc/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     [RequiresUnreferencedCode("Uses reflection over runtime types which is not trim- or AOT-safe.")]
     public IObservable<IObservedChange<object?, object?>> GetNotificationForProperty(
         object sender,

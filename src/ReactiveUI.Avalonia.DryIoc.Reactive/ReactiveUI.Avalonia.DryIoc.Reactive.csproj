@@ -8,6 +8,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\ReactiveUI.Avalonia.DryIoc\*.cs" Exclude="..\ReactiveUI.Avalonia.DryIoc\bin\**;..\ReactiveUI.Avalonia.DryIoc\obj\**" Link="%(Filename)%(Extension)" />
+    <Compile Include="..\Shared\SplatApp.cs" Link="Shared\SplatApp.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Splat.DryIoc" />

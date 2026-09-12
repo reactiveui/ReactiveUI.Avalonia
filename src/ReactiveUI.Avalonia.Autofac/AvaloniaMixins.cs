@@ -1,6 +1,8 @@
 // Copyright (c) 2019-2026 ReactiveUI Association Incorporated. All rights reserved.
 // ReactiveUI Association Incorporated licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for full license information.
+using System.Runtime.CompilerServices;
+
 #if REACTIVE_SHIM
 namespace ReactiveUI.Avalonia.Reactive.Splat;
 #else
@@ -14,30 +16,19 @@ namespace ReactiveUI.Avalonia.Splat;
 /// </remarks>
 public static class AvaloniaMixins
 {
-    /// <summary>Builds the ReactiveUI Splat application when it has not already been built.</summary>
-    /// <param name="rxuiBuilder">The ReactiveUI builder.</param>
-    private static void BuildAppIfNeeded(IReactiveUIBuilder rxuiBuilder)
-    {
-        if (SplatBuilder.HasBeenBuilt)
-        {
-            return;
-        }
-
-        _ = rxuiBuilder.BuildApp();
-    }
-
     /// <summary>Extends Avalonia application builders with Autofac ReactiveUI registration.</summary>
     /// <param name="builder">The Avalonia application builder to extend.</param>
     extension(AppBuilder builder)
     {
         /// <summary>Configures the application to use ReactiveUI with Autofac as the dependency injection container.</summary>
+        /// <param name="containerConfig">Configures the Autofac container.</param>
+        /// <returns>The application builder instance, enabling further configuration or chaining.</returns>
+        /// <exception cref="ArgumentNullException">Thrown if the builder or <paramref name="containerConfig"/> is null.</exception>
         /// <remarks>
         /// This method registers the Autofac resolver and allows the container, resolver, and ReactiveUI builder to be
         /// configured.
         /// </remarks>
-        /// <param name="containerConfig">Configures the Autofac container.</param>
-        /// <returns>The application builder instance, enabling further configuration or chaining.</returns>
-        /// <exception cref="ArgumentNullException">Thrown if the builder or <paramref name="containerConfig"/> is null.</exception>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public AppBuilder UseReactiveUIWithAutofac(Action<ContainerBuilder> containerConfig) =>
             builder.UseReactiveUIWithAutofac(containerConfig, null, null);
 
@@ -45,6 +36,7 @@ public static class AvaloniaMixins
         /// <param name="containerConfig">Configures the Autofac container.</param>
         /// <param name="withResolver">Customizes the Autofac resolver.</param>
         /// <returns>The application builder instance.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public AppBuilder UseReactiveUIWithAutofac(
             Action<ContainerBuilder> containerConfig,
             Action<AutofacDependencyResolver> withResolver) =>
@@ -73,7 +65,7 @@ public static class AvaloniaMixins
                 var rxuiBuilder = AppLocator.CurrentMutable.CreateReactiveUIBuilder();
                 _ = rxuiBuilder.WithAvalonia();
                 withReactiveUIBuilder?.Invoke(rxuiBuilder);
-                BuildAppIfNeeded(rxuiBuilder);
+                SplatApp.BuildIfNeeded(rxuiBuilder);
 
                 var container = containerBuilder.Build();
                 var autofacResolver = container.Resolve<AutofacDependencyResolver>();

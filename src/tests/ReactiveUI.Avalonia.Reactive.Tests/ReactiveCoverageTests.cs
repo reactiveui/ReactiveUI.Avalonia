@@ -284,7 +284,7 @@ public class ReactiveCoverageTests
 
         var configured = false;
         builder = AppBuilder.Configure<Application>().UseReactiveUI(_ => configured = true);
-        AppBuilderExtensions.ConfigureReactiveUI(_ => configured = true);
+        StartupConfiguration.ConfigureReactiveUI(_ => configured = true);
         await Assert.That(configured).IsTrue();
     }
 
@@ -318,7 +318,7 @@ public class ReactiveCoverageTests
     {
         _ = AppBuilder.Configure<Application>()
             .RegisterReactiveUIViews(typeof(RegistrationViewModel).Assembly, typeof(RegistrationViewModel).Assembly);
-        AppBuilderExtensions.RegisterReactiveUIViews(
+        ViewRegistrar.RegisterViews(
             AppLocator.CurrentMutable,
             [typeof(RegistrationViewModel).Assembly, typeof(RegistrationViewModel).Assembly]);
 
@@ -360,7 +360,7 @@ public class ReactiveCoverageTests
                     return new ThrowingResolver();
                 },
                 static _ => { });
-            AppBuilderExtensions.ConfigureReactiveUIDIContainer(
+            StartupConfiguration.ConfigureReactiveUIDIContainer(
                 AppLocator.CurrentMutable,
                 () => MarkFactoryCalled(ref containerFactoryCalled),
                 _ => containerConfigCalled = true,
@@ -386,8 +386,8 @@ public class ReactiveCoverageTests
     {
         _ = AppBuilder.Configure<Application>().RegisterReactiveUIViews((Assembly[]?)null!);
         _ = AppBuilder.Configure<Application>().RegisterReactiveUIViews();
-        AppBuilderExtensions.RegisterReactiveUIViews(AppLocator.CurrentMutable, null);
-        AppBuilderExtensions.RegisterReactiveUIViews(AppLocator.CurrentMutable, []);
+        ViewRegistrar.RegisterViews(AppLocator.CurrentMutable, null);
+        ViewRegistrar.RegisterViews(AppLocator.CurrentMutable, []);
         InvokeRegisterReactiveUIViews(null, [typeof(RegistrationViewModel).Assembly]);
         InvokeRegisterReactiveUIViews(AppLocator.CurrentMutable!, null);
         InvokeRegisterReactiveUIViews(AppLocator.CurrentMutable!, []);
@@ -398,7 +398,7 @@ public class ReactiveCoverageTests
     {
         _ = AppBuilder.Configure<Application>().RegisterReactiveUIViewsFromAssemblyOf<RegistrationViewModel>();
         _ = InvokeRegisterReactiveUIViewsFromAssemblyOf<RegistrationViewModel>(AppBuilder.Configure<Application>());
-        AppBuilderExtensions.RegisterReactiveUIViews(
+        ViewRegistrar.RegisterViews(
             AppLocator.CurrentMutable,
             [typeof(RegistrationViewModel).Assembly]);
     }
@@ -411,7 +411,7 @@ public class ReactiveCoverageTests
         _ = InvokeRegisterReactiveUIViewsFromEntryAssembly(
             AppBuilder.Configure<Application>(),
             typeof(RegistrationViewModel).Assembly);
-        AppBuilderExtensions.RegisterReactiveUIViews(
+        ViewRegistrar.RegisterViews(
             AppLocator.CurrentMutable,
             [typeof(RegistrationViewModel).Assembly]);
     }
@@ -439,7 +439,7 @@ public class ReactiveCoverageTests
     {
         _ = AppBuilder.Configure<Application>()
             .RegisterReactiveUIViews(typeof(RegistrationViewModel).Assembly, typeof(RegistrationViewModel).Assembly);
-        AppBuilderExtensions.RegisterReactiveUIViews(
+        ViewRegistrar.RegisterViews(
             AppLocator.CurrentMutable,
             [typeof(RegistrationViewModel).Assembly, typeof(RegistrationViewModel).Assembly]);
         var serviceType = typeof(IViewFor<>).MakeGenericType(typeof(RegistrationViewModel));
@@ -654,13 +654,13 @@ public class ReactiveCoverageTests
     /// <summary>Invokes the private CreateView fallback path.</summary>
     /// <param name="viewType">The view type.</param>
     /// <returns>The created view.</returns>
-    private static object InvokeCreateView(Type viewType) => AppBuilderExtensions.CreateView(viewType);
+    private static object InvokeCreateView(Type viewType) => ViewRegistrar.CreateView(viewType);
 
     /// <summary>Invokes the private guarded view registration helper.</summary>
     /// <param name="resolver">The resolver to register with.</param>
     /// <param name="assemblies">The assemblies to scan.</param>
     private static void InvokeRegisterReactiveUIViews(IMutableDependencyResolver? resolver, Assembly[]? assemblies) =>
-        AppBuilderExtensions.RegisterReactiveUIViews(resolver, assemblies);
+        ViewRegistrar.RegisterViews(resolver, assemblies);
 
     /// <summary>Invokes the public generic assembly marker registration method through reflection.</summary>
     /// <typeparam name="TMarker">The marker type.</typeparam>
@@ -688,7 +688,7 @@ public class ReactiveCoverageTests
         Action<TContainer> containerConfig,
         Func<TContainer, IDependencyResolver> dependencyResolverFactory)
         where TContainer : class =>
-        AppBuilderExtensions.ConfigureReactiveUIDIContainer(
+        StartupConfiguration.ConfigureReactiveUIDIContainer(
             resolver,
             containerFactory,
             containerConfig,
@@ -1132,10 +1132,7 @@ public class ReactiveCoverageTests
     {
         /// <summary>Initializes a new instance of the <see cref="VmA"/> class.</summary>
         /// <param name="screen">The host screen.</param>
-        public VmA(IScreen screen)
-        {
-            HostScreen = screen;
-        }
+        public VmA(IScreen screen) => HostScreen = screen;
 
         /// <summary>Gets the route path.</summary>
         public string? UrlPathSegment => "a";

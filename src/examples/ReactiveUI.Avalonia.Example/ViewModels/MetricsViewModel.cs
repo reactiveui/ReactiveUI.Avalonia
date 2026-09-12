@@ -12,6 +12,7 @@ using Unit = ReactiveUI.Primitives.RxVoid;
 namespace ReactiveUI.Avalonia.Example.ViewModels;
 
 /// <summary>Shows live local process measurements.</summary>
+[System.Diagnostics.DebuggerDisplay("MetricsViewModel: {ProcessorCard}")]
 public sealed class MetricsViewModel : PageViewModel
 {
     /// <summary>The maximum percentage value.</summary>

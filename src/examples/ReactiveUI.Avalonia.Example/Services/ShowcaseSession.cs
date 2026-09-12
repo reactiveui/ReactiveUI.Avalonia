@@ -1,6 +1,7 @@
 // Copyright (c) 2019-2026 ReactiveUI Association Incorporated. All rights reserved.
 // ReactiveUI Association Incorporated licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for full license information.
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using Avalonia.Controls.ApplicationLifetimes;
 using ReactiveUI;
@@ -12,6 +13,7 @@ using ReactiveUI.Primitives.Disposables;
 namespace ReactiveUI.Avalonia.Example.Services;
 
 /// <summary>Composes Avalonia suspension notifications with a small local JSON settings store.</summary>
+[System.Diagnostics.DebuggerDisplay("ShowcaseSession: {_shell}")]
 public sealed class ShowcaseSession : IDisposable
 {
     /// <summary>The view model whose settings are persisted.</summary>
@@ -41,6 +43,7 @@ public sealed class ShowcaseSession : IDisposable
     }
 
     /// <summary>Signals startup after the shell and its services have been composed.</summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Start() => _suspension.OnFrameworkInitializationCompleted();
 
     /// <inheritdoc/>
@@ -73,6 +76,7 @@ public sealed class ShowcaseSession : IDisposable
     }
 
     /// <summary>Restores the last session or reports a recoverable storage error.</summary>
+    /// <exception cref="JsonException">Thrown when <c>JsonSerializer.Deserialize(File.ReadAllText(_path), ShowcaseJsonContext.Default.ShowcaseState)</c> is <see langword="null"/>.</exception>
     private void Restore()
     {
         try

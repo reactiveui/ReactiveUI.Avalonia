@@ -12,8 +12,5 @@ public sealed partial class PerformanceMetricCardView : ReactiveUserControl<Metr
 {
     /// <summary>Initializes a new instance of the <see cref="PerformanceMetricCardView"/> class.</summary>
     [RequiresUnreferencedCode("ReactiveUserControl activation evaluates expression-based member chains via reflection.")]
-    public PerformanceMetricCardView()
-    {
-        InitializeComponent();
-    }
+    public PerformanceMetricCardView() => InitializeComponent();
 }

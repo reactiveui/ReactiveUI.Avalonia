@@ -12,6 +12,7 @@ using ReactiveUI.Primitives;
 namespace ReactiveUI.Avalonia.Example.Views;
 
 /// <summary>The routed metrics view.</summary>
+[System.Diagnostics.DebuggerDisplay("MetricsView: {ToString(),nq}")]
 public sealed partial class MetricsView : ReactiveUserControl<MetricsViewModel>
 {
     /// <summary>The minimum preview opacity.</summary>

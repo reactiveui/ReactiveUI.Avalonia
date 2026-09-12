@@ -74,7 +74,6 @@
     <PackageReference Include="TUnit" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
     <PackageReference Include="Microsoft.Testing.Extensions.CodeCoverage" />
-    <PackageReference Include="Verify.TUnit" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(IsTestProject)' != 'true'">
@@ -92,6 +91,17 @@
     <PackageReference Include="StyleSharp.Analyzers" PrivateAssets="all"/>
     <PackageReference Include="PerformanceSharp.Analyzers" PrivateAssets="all"/>
     <PackageReference Include="SecuritySharp.Analyzers" PrivateAssets="all"/>
-    <PackageReference Include="Roslynator.Analyzers" PrivateAssets="All" />
+  </ItemGroup>
+
+  <!-- Baselines live in <Project>/PublicAPI/<tfm>/PublicAPI.txt; the analyzer resolves the per-TFM
+       path itself per inner build, so multi-targeting needs no AdditionalFiles wiring here. -->
+  <PropertyGroup>
+    <TrackPublicApi Condition="'$(TrackPublicApi)' == ''">true</TrackPublicApi>
+    <TrackPublicApi Condition="'$(IsTestProject)' == 'true'">false</TrackPublicApi>
+    <TrackPublicApi Condition="$(MSBuildProjectDirectory.Contains('examples'))">false</TrackPublicApi>
+    <EnablePublicApiBaseline>$(TrackPublicApi)</EnablePublicApiBaseline>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(TrackPublicApi)' == 'true'">
+    <PackageReference Include="PublicApiSharp.Analyzers" PrivateAssets="all" />
   </ItemGroup>
 </Project>

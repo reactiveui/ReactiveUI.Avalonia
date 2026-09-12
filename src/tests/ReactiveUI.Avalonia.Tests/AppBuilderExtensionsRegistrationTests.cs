@@ -25,7 +25,7 @@ public class AppBuilderExtensionsRegistrationTests
     {
         var resolver = AppLocator.CurrentMutable!;
         Assembly[] assemblies = [typeof(AppBuilderExtensionsRegistrationTests).Assembly];
-        AppBuilderExtensions.RegisterViewsInternal(resolver, assemblies);
+        ViewRegistrar.RegisterViewsInternal(resolver, assemblies);
 
         var serviceType = typeof(IViewFor<>).MakeGenericType(typeof(TestVm));
         var resolved = AppLocator.Current.GetService(serviceType);
@@ -41,7 +41,7 @@ public class AppBuilderExtensionsRegistrationTests
     {
         var resolver = AppLocator.CurrentMutable!;
         Assembly[] assemblies = [typeof(AppBuilderExtensionsRegistrationTests).Assembly];
-        AppBuilderExtensions.RegisterViewsInternal(resolver, assemblies);
+        ViewRegistrar.RegisterViewsInternal(resolver, assemblies);
 
         var serviceType = typeof(IViewFor<>).MakeGenericType(typeof(TestVm));
         var resolvedDefault = AppLocator.Current.GetService(serviceType);
@@ -59,7 +59,7 @@ public class AppBuilderExtensionsRegistrationTests
     {
         var resolver = AppLocator.CurrentMutable!;
         Assembly[] assemblies = [typeof(AppBuilderExtensionsRegistrationTests).Assembly];
-        AppBuilderExtensions.RegisterViewsInternal(resolver, assemblies);
+        ViewRegistrar.RegisterViewsInternal(resolver, assemblies);
 
         var serviceType = typeof(IViewFor<>).MakeGenericType(typeof(NoContractVm));
         var resolved = AppLocator.Current.GetService(serviceType);
@@ -78,7 +78,7 @@ public class AppBuilderExtensionsRegistrationTests
         resolver.RegisterConstant(resolverBackedView);
 
         Assembly[] assemblies = [typeof(AppBuilderExtensionsRegistrationTests).Assembly];
-        AppBuilderExtensions.RegisterViewsInternal(resolver, assemblies);
+        ViewRegistrar.RegisterViewsInternal(resolver, assemblies);
 
         var serviceType = typeof(IViewFor<>).MakeGenericType(typeof(TestVm));
         var resolved = AppLocator.Current.GetService(serviceType);
@@ -95,7 +95,7 @@ public class AppBuilderExtensionsRegistrationTests
             static () => throw new InvalidOperationException("expected"),
             typeof(FallbackView));
 
-        var resolved = AppBuilderExtensions.CreateView(typeof(FallbackView));
+        var resolved = ViewRegistrar.CreateView(typeof(FallbackView));
 
         await Assert.That(resolved).IsTypeOf<FallbackView>();
     }
@@ -155,7 +155,7 @@ public class AppBuilderExtensionsRegistrationTests
         var builder = AppBuilder.Configure<Application>();
 
         var result = AppBuilderExtensions.RegisterReactiveUIViewsFromEntryAssembly(builder, typeof(AppBuilderExtensionsRegistrationTests).Assembly);
-        AppBuilderExtensions.RegisterReactiveUIViews(AppLocator.CurrentMutable, [typeof(AppBuilderExtensionsRegistrationTests).Assembly]);
+        ViewRegistrar.RegisterViews(AppLocator.CurrentMutable, [typeof(AppBuilderExtensionsRegistrationTests).Assembly]);
 
         var serviceType = typeof(IViewFor<>).MakeGenericType(typeof(DistinctRegistrationVm));
         var resolved = AppLocator.Current.GetService(serviceType);
@@ -171,7 +171,7 @@ public class AppBuilderExtensionsRegistrationTests
     {
         var builder = AppBuilder.Configure<Application>().RegisterReactiveUIViews();
 
-        AppBuilderExtensions.RegisterReactiveUIViews(AppLocator.CurrentMutable, []);
+        ViewRegistrar.RegisterViews(AppLocator.CurrentMutable, []);
 
         await Assert.That(builder).IsNotNull();
     }
@@ -184,9 +184,9 @@ public class AppBuilderExtensionsRegistrationTests
         var resolver = AppLocator.CurrentMutable!;
         var assembly = typeof(AppBuilderExtensionsRegistrationTests).Assembly;
 
-        AppBuilderExtensions.RegisterReactiveUIViews((IMutableDependencyResolver?)null, [assembly]);
-        AppBuilderExtensions.RegisterReactiveUIViews(resolver, null);
-        AppBuilderExtensions.RegisterReactiveUIViews(resolver, []);
+        ViewRegistrar.RegisterViews((IMutableDependencyResolver?)null, [assembly]);
+        ViewRegistrar.RegisterViews(resolver, null);
+        ViewRegistrar.RegisterViews(resolver, []);
 
         await Assert.That(AppLocator.CurrentMutable).IsSameReferenceAs(resolver);
     }
@@ -199,7 +199,7 @@ public class AppBuilderExtensionsRegistrationTests
         _ = AppBuilder.Configure<Application>()
             .RegisterReactiveUIViews(typeof(AppBuilderExtensionsRegistrationTests).Assembly);
 
-        AppBuilderExtensions.RegisterReactiveUIViews(
+        ViewRegistrar.RegisterViews(
             AppLocator.CurrentMutable,
             [typeof(AppBuilderExtensionsRegistrationTests).Assembly]);
 
@@ -220,7 +220,7 @@ public class AppBuilderExtensionsRegistrationTests
         var serviceType = typeof(IViewFor<>).MakeGenericType(typeof(DistinctRegistrationVm));
         var before = CountServices(serviceType);
 
-        AppBuilderExtensions.RegisterViewsInternal(resolver, assemblies);
+        ViewRegistrar.RegisterViewsInternal(resolver, assemblies);
 
         var after = CountServices(serviceType);
         var resolved = AppLocator.Current.GetService(serviceType);
@@ -232,7 +232,7 @@ public class AppBuilderExtensionsRegistrationTests
     /// <summary>Invokes the private CreateView method and preserves the thrown exception type.</summary>
     /// <param name="viewType">The type to create.</param>
     /// <returns>The created view instance.</returns>
-    private static object InvokeCreateView(Type viewType) => AppBuilderExtensions.CreateView(viewType);
+    private static object InvokeCreateView(Type viewType) => ViewRegistrar.CreateView(viewType);
 
     /// <summary>Counts the services registered for a type.</summary>
     /// <param name="serviceType">The registered service type.</param>

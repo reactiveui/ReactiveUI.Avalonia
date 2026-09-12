@@ -10,6 +10,7 @@ using Unit = ReactiveUI.Primitives.RxVoid;
 namespace ReactiveUI.Avalonia.Example.Views;
 
 /// <summary>The routed command lab view.</summary>
+[System.Diagnostics.DebuggerDisplay("CommandLabView: {ToString(),nq}")]
 public sealed partial class CommandLabView : ReactiveUserControl<CommandLabViewModel>
 {
     /// <summary>Initializes a new instance of the <see cref="CommandLabView"/> class.</summary>

@@ -6,6 +6,9 @@
     <PackageTags>mvvm;reactiveui;rx;reactive extensions;observable;LINQ;events;frp;avalonia;net;netcore</PackageTags>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="..\Shared\SplatApp.cs" Link="Shared\SplatApp.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="Splat.Microsoft.Extensions.DependencyInjection" />
     <ProjectReference Include="..\ReactiveUI.Avalonia\ReactiveUI.Avalonia.csproj" />
   </ItemGroup>

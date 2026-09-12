@@ -1,6 +1,8 @@
 // Copyright (c) 2019-2026 ReactiveUI Association Incorporated. All rights reserved.
 // ReactiveUI Association Incorporated licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for full license information.
+using System.Runtime.CompilerServices;
+
 #if REACTIVE_SHIM
 namespace ReactiveUI.Avalonia.Reactive;
 #else
@@ -13,6 +15,7 @@ namespace ReactiveUI.Avalonia;
 /// App.OnFrameworkInitializationCompleted method to signal application launch. This class integrates with ReactiveUI's
 /// RxSuspension system and handles application exit and unhandled exceptions to manage state persistence. It is not
 /// intended for use in design mode, where state persistence is disabled.</remarks>
+[System.Diagnostics.DebuggerDisplay("AutoSuspendHelper: {_shouldPersistState}")]
 public sealed class AutoSuspendHelper : IEnableLogger, IDisposable
 {
     /// <summary>Signals when application state should be persisted.</summary>
@@ -28,13 +31,13 @@ public sealed class AutoSuspendHelper : IEnableLogger, IDisposable
     private readonly IControlledApplicationLifetime? _controlledLifetime;
 
     /// <summary>Initializes a new instance of the <see cref="AutoSuspendHelper"/> class.</summary>
-    /// <remarks>If the application is running in design mode, state persistence is disabled. For supported
-    /// lifetimes, application exit events are wired to enable state persistence. This constructor should be called
-    /// after Avalonia application initialization is completed.</remarks>
     /// <param name="lifetime">The application lifetime object used to determine how application exit and state persistence events are handled.
     /// Must not be null.</param>
     /// <exception cref="NotSupportedException">Thrown if the specified application lifetime type is not supported for detecting application exit events.</exception>
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="lifetime"/> is null.</exception>
+    /// <remarks>If the application is running in design mode, state persistence is disabled. For supported
+    /// lifetimes, application exit events are wired to enable state persistence. This constructor should be called
+    /// after Avalonia application initialization is completed.</remarks>
     public AutoSuspendHelper(IApplicationLifetime lifetime)
     {
         RxSuspension.SuspensionHost.IsResuming = Observable.Never<Unit>();
@@ -74,6 +77,7 @@ public sealed class AutoSuspendHelper : IEnableLogger, IDisposable
     /// <remarks>This method should be called once all necessary framework setup is finished and the
     /// application is ready to proceed. It notifies observers that initialization is complete, which may trigger
     /// subsequent application logic. Typically used in application startup routines.</remarks>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void OnFrameworkInitializationCompleted() => _isLaunchingNew.OnNext(Unit.Default);
 
     /// <summary>Releases all resources used by the current instance.</summary>
@@ -95,15 +99,16 @@ public sealed class AutoSuspendHelper : IEnableLogger, IDisposable
     /// <summary>Handles unhandled process exceptions by invalidating persisted state.</summary>
     /// <param name="sender">The event sender.</param>
     /// <param name="args">The unhandled exception event data.</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal void OnUnhandledException(object? sender, UnhandledExceptionEventArgs args) =>
         _shouldInvalidateState.OnNext(Unit.Default);
 
     /// <summary>Handles the exit event for a controlled application lifetime, ensuring that any required state persistence actions are completed before shutdown.</summary>
+    /// <param name="sender">The lifetime raising the exit event.</param>
+    /// <param name="args">The application exit arguments.</param>
     /// <remarks>This method blocks until all registered state persistence actions have finished executing. It
     /// should be called during application shutdown to guarantee that state is saved reliably. Calling this method from
     /// a non-shutdown context may result in the application waiting indefinitely.</remarks>
-    /// <param name="sender">The lifetime raising the exit event.</param>
-    /// <param name="args">The application exit arguments.</param>
     private void OnControlledApplicationLifetimeExit(object? sender, ControlledApplicationLifetimeExitEventArgs args)
     {
         this.Log().Debug("Received IControlledApplicationLifetime exit event.");

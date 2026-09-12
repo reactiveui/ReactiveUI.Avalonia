@@ -24,17 +24,18 @@ public class ReactiveExtensionsTests
     [Test]
     public async Task AvaloniaObjectReactiveExtensions_HasGetSubjectMethod()
     {
-        var type = typeof(AvaloniaObjectReactiveExtensions);
-        var methods = type.GetMethods(BindingFlags.Public | BindingFlags.Static);
+        var methods = typeof(AvaloniaObjectReactiveExtensions).GetMethods(BindingFlags.Public | BindingFlags.Static);
 
         var hasGetSubjectMethod = false;
         foreach (var method in methods)
         {
-            if (method.Name == "GetSubject")
+            if (method.Name != "GetSubject")
             {
-                hasGetSubjectMethod = true;
-                break;
+                continue;
             }
+
+            hasGetSubjectMethod = true;
+            break;
         }
 
         await Assert.That(hasGetSubjectMethod).IsTrue();
@@ -45,17 +46,18 @@ public class ReactiveExtensionsTests
     [Test]
     public async Task AvaloniaObjectReactiveExtensions_HasGetBindingSubjectMethod()
     {
-        var type = typeof(AvaloniaObjectReactiveExtensions);
-        var methods = type.GetMethods(BindingFlags.Public | BindingFlags.Static);
+        var methods = typeof(AvaloniaObjectReactiveExtensions).GetMethods(BindingFlags.Public | BindingFlags.Static);
 
         var hasGetBindingSubjectMethod = false;
         foreach (var method in methods)
         {
-            if (method.Name == "GetBindingSubject")
+            if (method.Name != "GetBindingSubject")
             {
-                hasGetBindingSubjectMethod = true;
-                break;
+                continue;
             }
+
+            hasGetBindingSubjectMethod = true;
+            break;
         }
 
         await Assert.That(hasGetBindingSubjectMethod).IsTrue();
@@ -96,18 +98,19 @@ public class ReactiveExtensionsTests
     [Test]
     public async Task AutoDataTemplateBindingHook_HasExpectedMethods()
     {
-        var type = typeof(AutoDataTemplateBindingHook);
-        var methods = type.GetMethods(BindingFlags.Public | BindingFlags.Instance);
+        var methods = typeof(AutoDataTemplateBindingHook).GetMethods(BindingFlags.Public | BindingFlags.Instance);
 
         var hasExecuteHookMethod = false;
 
         foreach (var method in methods)
         {
-            if (method.Name == "ExecuteHook")
+            if (method.Name != "ExecuteHook")
             {
-                hasExecuteHookMethod = true;
-                break;
+                continue;
             }
+
+            hasExecuteHookMethod = true;
+            break;
         }
 
         await Assert.That(hasExecuteHookMethod).IsTrue();
@@ -118,8 +121,7 @@ public class ReactiveExtensionsTests
     [Test]
     public async Task AvaloniaActivationForViewFetcher_HasExpectedMethods()
     {
-        var type = typeof(AvaloniaActivationForViewFetcher);
-        var methods = type.GetMethods(BindingFlags.Public | BindingFlags.Instance);
+        var methods = typeof(AvaloniaActivationForViewFetcher).GetMethods(BindingFlags.Public | BindingFlags.Instance);
 
         var hasGetAffinityForViewMethod = false;
         var hasGetActivationForViewMethod = false;
@@ -145,8 +147,7 @@ public class ReactiveExtensionsTests
     [Test]
     public async Task ReactiveUIAvalonia_HasPublicExtensionMethods()
     {
-        var type = typeof(AvaloniaObjectReactiveExtensions);
-        var publicStaticMethods = type.GetMethods(BindingFlags.Public | BindingFlags.Static);
+        var publicStaticMethods = typeof(AvaloniaObjectReactiveExtensions).GetMethods(BindingFlags.Public | BindingFlags.Static);
 
         await Assert.That(publicStaticMethods.Length).IsGreaterThan(0);
 
@@ -154,11 +155,13 @@ public class ReactiveExtensionsTests
         foreach (var method in publicStaticMethods)
         {
             var extensionAttr = method.GetCustomAttribute<System.Runtime.CompilerServices.ExtensionAttribute>();
-            if (extensionAttr is null)
+            if (extensionAttr is not null)
             {
-                allAreExtensions = false;
-                break;
+                continue;
             }
+
+            allAreExtensions = false;
+            break;
         }
 
         await Assert.That(allAreExtensions).IsTrue();
@@ -184,12 +187,9 @@ public class ReactiveExtensionsTests
     [Test]
     public async Task PublicTypes_HaveParameterlessConstructors()
     {
-        var autoDataTemplateHookType = typeof(AutoDataTemplateBindingHook);
-        var constructors = autoDataTemplateHookType.GetConstructors();
+        var constructors = typeof(AutoDataTemplateBindingHook).GetConstructors();
         await Assert.That(constructors.Length).IsGreaterThan(0);
-
-        var activationFetcherType = typeof(AvaloniaActivationForViewFetcher);
-        var activationConstructors = activationFetcherType.GetConstructors();
+        var activationConstructors = typeof(AvaloniaActivationForViewFetcher).GetConstructors();
         await Assert.That(activationConstructors.Length).IsGreaterThan(0);
     }
 }

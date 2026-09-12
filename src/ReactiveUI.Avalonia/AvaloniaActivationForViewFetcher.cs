@@ -33,12 +33,12 @@ public class AvaloniaActivationForViewFetcher : IActivationForViewFetcher
     }
 
     /// <summary>Returns whether the specified control is currently loaded in the visual tree.</summary>
-    /// <remarks>This observable can be used to react to the control's activation and deactivation events,
-    /// such as initializing resources when the control is loaded and cleaning up when it is unloaded. The sequence
-    /// emits distinct values and does not repeat the same state consecutively.</remarks>
     /// <param name="control">The control to monitor for loaded and unloaded state changes. Cannot be null.</param>
     /// <returns>An observable sequence of Boolean values. Emits <see langword="true"/> when the control is loaded, and <see
     /// langword="false"/> when it is unloaded. The sequence only emits values when the state changes.</returns>
+    /// <remarks>This observable can be used to react to the control's activation and deactivation events,
+    /// such as initializing resources when the control is loaded and cleaning up when it is unloaded. The sequence
+    /// emits distinct values and does not repeat the same state consecutively.</remarks>
     private static IObservable<bool> GetActivationForControl(Control control)
     {
         var controlLoaded = Observable
@@ -57,13 +57,13 @@ public class AvaloniaActivationForViewFetcher : IActivationForViewFetcher
     }
 
     /// <summary>Creates an observable sequence that emits activation state changes for the specified visual based on its attachment to the visual tree.</summary>
-    /// <remarks>This method is useful for tracking when a visual becomes active or inactive within the visual
-    /// tree, such as for resource management or UI updates. The returned observable emits distinct state changes and
-    /// does not repeat the same value consecutively.</remarks>
     /// <param name="visual">The visual whose activation state will be monitored. Cannot be null.</param>
     /// <returns>An observable sequence of boolean values indicating the activation state of the visual. Emits <see
     /// langword="true"/> when the visual is attached to the visual tree, and <see langword="false"/> when it is
     /// detached. The sequence only emits when the state changes.</returns>
+    /// <remarks>This method is useful for tracking when a visual becomes active or inactive within the visual
+    /// tree, such as for resource management or UI updates. The returned observable emits distinct state changes and
+    /// does not repeat the same value consecutively.</remarks>
     private static IObservable<bool> GetActivationForVisual(Visual visual)
     {
         var visualLoaded = Observable

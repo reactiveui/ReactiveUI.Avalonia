@@ -5,4 +5,5 @@ namespace ReactiveUI.Avalonia.Example.ViewModels;
 
 /// <summary>An immutable feature description resolved through an automatic item template.</summary>
 /// <param name="Name">The feature description.</param>
+[System.Diagnostics.DebuggerDisplay("FeatureViewModel: {ToString(),nq}")]
 public sealed record FeatureViewModel(string Name);

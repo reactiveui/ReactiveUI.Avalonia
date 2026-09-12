@@ -1,6 +1,7 @@
 // Copyright (c) 2019-2026 ReactiveUI Association Incorporated. All rights reserved.
 // ReactiveUI Association Incorporated licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for full license information.
+using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using Avalonia.Threading;
 using ReactiveUI.Avalonia.Example.Models;
@@ -108,9 +109,11 @@ public sealed class ShowcaseViewModelTests
         internal static MachineSnapshot Snapshot => new(DateTimeOffset.UnixEpoch, ProcessorPercent, WorkingSet, ManagedHeap, ThreadCount, "fixed");
 
         /// <inheritdoc/>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public MachineSnapshot ReadSnapshot() => Snapshot;
 
         /// <inheritdoc/>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public IObservable<MachineSnapshot> Watch(TimeSpan interval) => Signal.Return(Snapshot);
     }
 }

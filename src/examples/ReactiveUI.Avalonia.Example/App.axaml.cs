@@ -16,6 +16,7 @@ using Splat;
 namespace ReactiveUI.Avalonia.Example;
 
 /// <summary>The example Avalonia application.</summary>
+[System.Diagnostics.DebuggerDisplay("App: {MainWindowFactory}")]
 public sealed class App : Application
 {
     /// <summary>Gets the window factory composed by the desktop entry point.</summary>

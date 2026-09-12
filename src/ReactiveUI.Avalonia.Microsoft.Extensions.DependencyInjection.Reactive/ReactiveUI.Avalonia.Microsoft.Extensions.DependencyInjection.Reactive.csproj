@@ -8,6 +8,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\ReactiveUI.Avalonia.Microsoft.Extensions.DependencyInjection\*.cs" Exclude="..\ReactiveUI.Avalonia.Microsoft.Extensions.DependencyInjection\bin\**;..\ReactiveUI.Avalonia.Microsoft.Extensions.DependencyInjection\obj\**" Link="%(Filename)%(Extension)" />
+    <Compile Include="..\Shared\SplatApp.cs" Link="Shared\SplatApp.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Splat.Microsoft.Extensions.DependencyInjection" />

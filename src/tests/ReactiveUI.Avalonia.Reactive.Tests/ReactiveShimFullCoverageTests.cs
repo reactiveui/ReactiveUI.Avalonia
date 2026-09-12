@@ -67,7 +67,7 @@ public partial class ReactiveShimFullCoverageTests
         var result = AppBuilderExtensions.UseReactiveUI(
             builder,
             _ => configured = true);
-        AppBuilderExtensions.ConfigureReactiveUI(_ => configured = true);
+        StartupConfiguration.ConfigureReactiveUI(_ => configured = true);
 
         await Assert.That(result).IsSameReferenceAs(builder);
         await Assert.That(configured).IsTrue();
@@ -86,7 +86,7 @@ public partial class ReactiveShimFullCoverageTests
             AppBuilder.Configure<Application>(),
             typeof(ShimRegistrationVm).Assembly,
             typeof(ShimRegistrationVm).Assembly);
-        AppBuilderExtensions.RegisterReactiveUIViews(
+        ViewRegistrar.RegisterViews(
             AppLocator.CurrentMutable,
             [typeof(ShimRegistrationVm).Assembly, typeof(ShimRegistrationVm).Assembly]);
 
@@ -140,7 +140,7 @@ public partial class ReactiveShimFullCoverageTests
         _ = InvokePrivateRegisterReactiveUIViewsFromEntryAssembly(
             AppBuilder.Configure<Application>(),
             typeof(ShimRegistrationVm).Assembly);
-        AppBuilderExtensions.RegisterReactiveUIViews(
+        ViewRegistrar.RegisterViews(
             AppLocator.CurrentMutable,
             [typeof(ShimRegistrationVm).Assembly]);
         GC.KeepAlive(typeof(NoContractAttributeContainer));
@@ -242,8 +242,8 @@ public partial class ReactiveShimFullCoverageTests
             value => configured = ReferenceEquals(value, container),
             value => ReferenceEquals(value, container) ? resolver : throw new InvalidOperationException(),
             _ => reactiveConfigured = true);
-        AppBuilderExtensions.ConfigureReactiveUI(_ => reactiveConfigured = true);
-        AppBuilderExtensions.ConfigureReactiveUIDIContainer(
+        StartupConfiguration.ConfigureReactiveUI(_ => reactiveConfigured = true);
+        StartupConfiguration.ConfigureReactiveUIDIContainer(
             AppLocator.CurrentMutable,
             () => container,
             value => configured = ReferenceEquals(value, container),
@@ -266,7 +266,7 @@ public partial class ReactiveShimFullCoverageTests
             static _ => { },
             _ => resolver,
             static _ => { });
-        await Assert.That(() => AppBuilderExtensions.ConfigureReactiveUIDIContainer<object>(
+        await Assert.That(() => StartupConfiguration.ConfigureReactiveUIDIContainer<object>(
             AppLocator.CurrentMutable,
             null!,
             static _ => { },
@@ -642,7 +642,7 @@ public partial class ReactiveShimFullCoverageTests
             DefaultContent = DefaultContentValue,
             Router = screen.Router,
             ViewContract = ViewContractValue,
-            ViewLocator = new StaticViewLocator(view, ViewContractValue)
+            ViewLocator = new StaticViewLocator(view, ViewContractValue),
         };
         var vm = new VmA(screen);
 

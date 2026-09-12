@@ -6,4 +6,5 @@ namespace ReactiveUI.Avalonia.Example.Models;
 /// <summary>The small, serializable state restored between desktop sessions.</summary>
 /// <param name="WorkItemText">The command input.</param>
 /// <param name="CpuWarningThreshold">The CPU warning threshold.</param>
+[System.Diagnostics.DebuggerDisplay("ShowcaseState: {ToString(),nq}")]
 public sealed record ShowcaseState(string WorkItemText, double CpuWarningThreshold);

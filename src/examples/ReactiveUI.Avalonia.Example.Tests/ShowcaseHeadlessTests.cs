@@ -1,6 +1,7 @@
 // Copyright (c) 2019-2026 ReactiveUI Association Incorporated. All rights reserved.
 // ReactiveUI Association Incorporated licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for full license information.
+using System.Runtime.CompilerServices;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless;
@@ -224,9 +225,11 @@ public sealed class ShowcaseHeadlessTests
         internal int ActiveSubscriptions { get; private set; }
 
         /// <inheritdoc/>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public MachineSnapshot ReadSnapshot() => MachineSnapshot.Empty;
 
         /// <inheritdoc/>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public IObservable<MachineSnapshot> Watch(TimeSpan interval) => Signal.Create<MachineSnapshot>(observer =>
         {
             ActiveSubscriptions++;
@@ -240,9 +243,11 @@ public sealed class ShowcaseHeadlessTests
         });
 
         /// <inheritdoc/>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Dispose() => _samples.Dispose();
 
         /// <summary>Pushes another measurement on the calling thread.</summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal void Publish() => _samples.OnNext(ReadSnapshot());
     }
 }

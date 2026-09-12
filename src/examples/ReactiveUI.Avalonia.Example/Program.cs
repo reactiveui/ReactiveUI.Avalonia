@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for full license information.
 
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using ReactiveUI.Avalonia.Example.Services;
@@ -23,6 +24,7 @@ public static class Program
 
     /// <summary>Builds the Avalonia app with ReactiveUI and Microsoft dependency resolver integration.</summary>
     /// <returns>The configured app builder.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     [RequiresUnreferencedCode("The desktop showcase uses expression-based ReactiveUI bindings.")]
     [RequiresDynamicCode("The desktop showcase uses dynamic ReactiveUI bindings.")]
     public static AppBuilder BuildAvaloniaApp() =>
@@ -38,6 +40,7 @@ public static class Program
     /// <summary>Creates the main window after application services have been registered.</summary>
     /// <param name="lifetime">The desktop lifetime.</param>
     /// <returns>The initialized desktop window.</returns>
+    /// <exception cref="InvalidOperationException">Thrown when <c>AppLocator.Current.GetService&lt;ILocalMachineMetricsService&gt;()</c> is <see langword="null"/>.</exception>
     [RequiresUnreferencedCode("The window demonstrates expression-based ReactiveUI bindings.")]
     [RequiresDynamicCode("The window demonstrates dynamic ReactiveUI bindings.")]
     private static MainWindow CreateMainWindow(IClassicDesktopStyleApplicationLifetime lifetime)

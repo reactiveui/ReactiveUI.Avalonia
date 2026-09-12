@@ -1,6 +1,7 @@
 // Copyright (c) 2019-2026 ReactiveUI Association Incorporated. All rights reserved.
 // ReactiveUI Association Incorporated licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for full license information.
+using System.Runtime.CompilerServices;
 using TUnit.Core.Interfaces;
 
 namespace ReactiveUI.Avalonia.Example.Tests;
@@ -9,5 +10,6 @@ namespace ReactiveUI.Avalonia.Example.Tests;
 public sealed class CallerTestExecutor : ITestExecutor
 {
     /// <inheritdoc/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public ValueTask ExecuteTest(TestContext context, Func<ValueTask> action) => action();
 }

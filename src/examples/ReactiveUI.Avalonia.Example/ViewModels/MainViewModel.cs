@@ -11,6 +11,7 @@ using Unit = ReactiveUI.Primitives.RxVoid;
 namespace ReactiveUI.Avalonia.Example.ViewModels;
 
 /// <summary>Application shell view model.</summary>
+[System.Diagnostics.DebuggerDisplay("MainViewModel: {Router}")]
 public sealed class MainViewModel : ViewModelBase, IScreen
 {
     /// <summary>The overview page.</summary>

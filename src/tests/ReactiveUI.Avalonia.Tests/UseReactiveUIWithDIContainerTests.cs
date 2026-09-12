@@ -102,7 +102,7 @@ public class UseReactiveUIWithDIContainerTests
     /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task UseReactiveUIWithDIContainer_AfterPlatformCallback_Throws_On_Null_ContainerFactory() =>
-        await Assert.That(static () => AppBuilderExtensions.ConfigureReactiveUIDIContainer<object>(
+        await Assert.That(static () => StartupConfiguration.ConfigureReactiveUIDIContainer<object>(
                 AppLocator.CurrentMutable,
                 containerFactory: null!,
                 containerConfig: static _ => { },
@@ -112,7 +112,7 @@ public class UseReactiveUIWithDIContainerTests
     /// <summary>Verifies that the deferred callback validates a null container config action.</summary>
     /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
-    public async Task UseReactiveUIWithDIContainer_AfterPlatformCallback_Throws_On_Null_ContainerConfig() => await Assert.That(static () => AppBuilderExtensions.ConfigureReactiveUIDIContainer(
+    public async Task UseReactiveUIWithDIContainer_AfterPlatformCallback_Throws_On_Null_ContainerConfig() => await Assert.That(static () => StartupConfiguration.ConfigureReactiveUIDIContainer(
             AppLocator.CurrentMutable,
             containerFactory: static () => new object(),
             containerConfig: null!,
@@ -122,7 +122,7 @@ public class UseReactiveUIWithDIContainerTests
     /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task UseReactiveUIWithDIContainer_AfterPlatformCallback_Throws_On_Null_DependencyResolverFactory() =>
-        await Assert.That(static () => AppBuilderExtensions.ConfigureReactiveUIDIContainer(
+        await Assert.That(static () => StartupConfiguration.ConfigureReactiveUIDIContainer(
                 AppLocator.CurrentMutable,
                 containerFactory: static () => new object(),
                 containerConfig: static _ => { },
@@ -142,8 +142,8 @@ public class UseReactiveUIWithDIContainerTests
         var configCalled = false;
         var reactiveConfigured = false;
 
-        AppBuilderExtensions.ConfigureReactiveUI(_ => reactiveConfigured = true);
-        AppBuilderExtensions.ConfigureReactiveUIDIContainer(
+        StartupConfiguration.ConfigureReactiveUI(_ => reactiveConfigured = true);
+        StartupConfiguration.ConfigureReactiveUIDIContainer(
             resolver,
             containerFactory: () =>
             {
@@ -172,7 +172,7 @@ public class UseReactiveUIWithDIContainerTests
     {
         var factoryCalled = false;
 
-        AppBuilderExtensions.ConfigureReactiveUIDIContainer(
+        StartupConfiguration.ConfigureReactiveUIDIContainer(
             resolver: null,
             containerFactory: () =>
             {
