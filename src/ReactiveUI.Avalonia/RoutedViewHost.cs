@@ -144,7 +144,6 @@ public class RoutedViewHost : TransitioningContentControl, IActivatableView, IEn
     {
         base.OnAttachedToVisualTree(e);
 
-        var disposables = new CompositeDisposable();
         var routerChanges = this.GetObservable(RouterProperty);
         var viewContract = this.GetObservable(ViewContractProperty);
         var viewModels = routerChanges
@@ -153,12 +152,6 @@ public class RoutedViewHost : TransitioningContentControl, IActivatableView, IEn
         var navigation = viewModels
             .CombineLatest(viewContract, static (viewModel, contract) => new NavigationTarget(viewModel, contract));
 
-        var subscription = PrimitivesLinqExtensions.SubscribeSafe(
-            navigation,
-            target => NavigateToViewModel(target.ViewModel, target.Contract),
-            SubscriptionErrors.Throw);
-
-        disposables.Add(subscription);
-        return disposables;
+        return ViewHostNavigation.Subscribe(navigation, NavigateToViewModel);
     }
 }

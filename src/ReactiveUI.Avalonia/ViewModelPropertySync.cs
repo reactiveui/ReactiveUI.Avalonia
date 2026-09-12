@@ -1,36 +1,65 @@
 // Copyright (c) 2019-2026 ReactiveUI Association Incorporated. All rights reserved.
 // ReactiveUI Association Incorporated licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for full license information.
+using System.Runtime.CompilerServices;
+
 #if REACTIVE_SHIM
 namespace ReactiveUI.Avalonia.Reactive;
 #else
 namespace ReactiveUI.Avalonia;
 #endif
 
-/// <summary>Decides which way a view model value travels when a view's property changes.</summary>
+/// <summary>Keeps a view's view model property and its data context in step.</summary>
 /// <remarks>
 /// A view model reaches a view either through the view model property or through the data context, and each has to
 /// follow the other. The two reactive bases cannot share this by inheritance because one extends
-/// <see cref="UserControl"/> and the other <see cref="Window"/>. The decision is returned rather than applied so the
-/// caller keeps its own value filter on the branch that needs it, without a delegate on a path that runs for every
-/// property change.
+/// <see cref="UserControl"/> and the other <see cref="Window"/>.
 /// </remarks>
 internal static class ViewModelPropertySync
 {
-    /// <summary>Determines which way the changed value has to travel.</summary>
+    /// <summary>Registers the Avalonia view model property for a view type.</summary>
+    /// <typeparam name="TOwner">The view type that owns the property.</typeparam>
+    /// <returns>The registered property.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    internal static StyledProperty<object?> Register<TOwner>()
+        where TOwner : AvaloniaObject =>
+        AvaloniaProperty.Register<TOwner, object?>(nameof(IViewFor.ViewModel));
+
+    /// <summary>Forwards the view's activation to its view model when the view model takes part in activation.</summary>
+    /// <typeparam name="TView">The view type.</typeparam>
+    /// <param name="view">The view to activate with.</param>
+    [RequiresUnreferencedCode("ReactiveUI activation evaluates expression-based member chains via reflection; members may be trimmed.")]
+    internal static void ForwardActivation<TView>(TView view)
+        where TView : IActivatableView
+    {
+        // The empty block is the point: WhenActivated runs the view model's own activation.
+        _ = view.WhenActivated(static (ActivationDisposables disposables) => { });
+    }
+
+    /// <summary>Propagates a change between the view model property and the data context.</summary>
     /// <param name="view">The view whose property changed.</param>
-    /// <param name="change">The property change to classify.</param>
+    /// <param name="change">The property change to propagate.</param>
     /// <param name="viewModelProperty">The view's view model property.</param>
-    /// <returns>The direction the value travels, or <see cref="ViewModelSyncStep.None"/> when it stays put.</returns>
-    internal static ViewModelSyncStep Classify(StyledElement view, AvaloniaPropertyChangedEventArgs change, StyledProperty<object?> viewModelProperty)
+    /// <param name="isValidViewModelValue">
+    /// Decides whether an incoming data context may become the view model. Callers pass a delegate held for the life of
+    /// the view, because this runs for every property change.
+    /// </param>
+    internal static void Apply(
+        StyledElement view,
+        AvaloniaPropertyChangedEventArgs change,
+        StyledProperty<object?> viewModelProperty,
+        Func<object?, bool> isValidViewModelValue)
     {
         if (change.Property == StyledElement.DataContextProperty
-            && ReferenceEquals(change.OldValue, view.GetValue(viewModelProperty)))
+            && ReferenceEquals(change.OldValue, view.GetValue(viewModelProperty))
+            && isValidViewModelValue(change.NewValue))
         {
-            return ViewModelSyncStep.AdoptDataContext;
+            view.SetCurrentValue(viewModelProperty, change.NewValue);
         }
-
-        return change.Property == viewModelProperty
-            && ReferenceEquals(change.OldValue, view.DataContext) ? ViewModelSyncStep.PushToDataContext : ViewModelSyncStep.None;
+        else if (change.Property == viewModelProperty
+                 && ReferenceEquals(change.OldValue, view.DataContext))
+        {
+            view.SetCurrentValue(StyledElement.DataContextProperty, change.NewValue);
+        }
     }
 }

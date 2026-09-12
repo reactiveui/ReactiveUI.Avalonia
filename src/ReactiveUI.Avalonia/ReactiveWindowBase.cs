@@ -15,8 +15,10 @@ public class ReactiveWindowBase : Window, IViewFor
     /// <remarks>This field is used to register and reference the ViewModel property within Avalonia's
     /// property system. It enables data binding and change notification for the ViewModel associated with the
     /// window.</remarks>
-    public static readonly StyledProperty<object?> ViewModelProperty = AvaloniaProperty
-        .Register<ReactiveWindowBase, object?>(nameof(IViewFor.ViewModel));
+    public static readonly StyledProperty<object?> ViewModelProperty = ViewModelPropertySync.Register<ReactiveWindowBase>();
+
+    /// <summary>Holds the view model value filter so the property-changed path allocates nothing.</summary>
+    private readonly Func<object?, bool> _isValidViewModelValue;
 
     /// <summary>Initializes a new instance of the <see cref="ReactiveWindowBase"/> class.</summary>
     /// <remarks>This constructor configures the window to participate in activation lifecycle management. If
@@ -26,9 +28,8 @@ public class ReactiveWindowBase : Window, IViewFor
     [RequiresUnreferencedCode("ReactiveUI activation evaluates expression-based member chains via reflection; members may be trimmed.")]
     protected ReactiveWindowBase()
     {
-        // This WhenActivated block calls ViewModel's WhenActivated
-        // block if the ViewModel implements IActivatableViewModel.
-        _ = this.WhenActivated(static (ActivationDisposables disposables) => { });
+        _isValidViewModelValue = IsValidViewModelValue;
+        ViewModelPropertySync.ForwardActivation(this);
     }
 
     /// <inheritdoc/>
@@ -47,15 +48,7 @@ public class ReactiveWindowBase : Window, IViewFor
         ArgumentNullException.ThrowIfNull(change);
         base.OnPropertyChanged(change);
 
-        var step = ViewModelPropertySync.Classify(this, change, ViewModelProperty);
-        if (step == ViewModelSyncStep.AdoptDataContext && IsValidViewModelValue(change.NewValue))
-        {
-            SetCurrentValue(ViewModelProperty, change.NewValue);
-        }
-        else if (step == ViewModelSyncStep.PushToDataContext)
-        {
-            SetCurrentValue(DataContextProperty, change.NewValue);
-        }
+        ViewModelPropertySync.Apply(this, change, ViewModelProperty, _isValidViewModelValue);
     }
 
     /// <summary>Determines whether the specified value is valid for the view model property.</summary>

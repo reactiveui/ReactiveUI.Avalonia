@@ -112,18 +112,11 @@ public class ViewModelViewHost : TransitioningContentControl, IViewFor, IEnableL
     {
         base.OnAttachedToVisualTree(e);
 
-        var disposables = new CompositeDisposable();
         var viewModel = this.GetObservable(ViewModelProperty)
             .CombineLatest(
                 this.GetObservable(ViewContractProperty),
                 static (viewModel, contract) => new NavigationTarget(viewModel, contract));
 
-        var subscription = PrimitivesLinqExtensions.SubscribeSafe(
-            viewModel,
-            target => NavigateToViewModel(target.ViewModel, target.Contract),
-            SubscriptionErrors.Throw);
-
-        disposables.Add(subscription);
-        return disposables;
+        return ViewHostNavigation.Subscribe(viewModel, NavigateToViewModel);
     }
 }

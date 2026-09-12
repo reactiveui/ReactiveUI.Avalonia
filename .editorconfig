@@ -850,7 +850,7 @@ stylesharp.max_cognitive_complexity = 15
 stylesharp.max_property_cognitive_complexity = 3
 stylesharp.SST1484.check_base_types = true # also report a field shadowed from a base type
 
-stylesharp.SST2403.allowed_escape_methods = WhenActivated, ToProperty # both hand this straight back, so nothing observes a half-built instance
+stylesharp.SST2403.allowed_escape_methods = WhenActivated, ToProperty, ForwardActivation # each hands this straight back, so nothing observes a half-built instance
 stylesharp.max_line_length = 200                           # SST1521 (characters; keeps the limit this repo has always enforced)
 stylesharp.max_file_lines = 1000                           # SST1522 (code lines; blank lines and comments do not count)
 # stylesharp.max_member_lines = 60                         # SST1523 (code lines)

@@ -47,6 +47,20 @@ internal static class ViewHostNavigation
         return viewInstance;
     }
 
+    /// <summary>Subscribes a host's navigation stream and returns the subscription it owns while attached.</summary>
+    /// <param name="navigation">The stream of navigation targets.</param>
+    /// <param name="navigate">Displays the view for a target.</param>
+    /// <returns>The subscription set for the host to hold.</returns>
+    internal static CompositeDisposable Subscribe(IObservable<NavigationTarget> navigation, Action<object?, string?> navigate)
+    {
+        var subscription = PrimitivesLinqExtensions.SubscribeSafe(
+            navigation,
+            target => navigate(target.ViewModel, target.Contract),
+            SubscriptionErrors.Throw);
+
+        return new() { subscription };
+    }
+
     /// <summary>Disposes the supplied subscriptions and clears the reference.</summary>
     /// <param name="disposables">The subscriptions to release.</param>
     /// <remarks>The reference is cleared before disposal so a re-entrant detach cannot dispose the same set twice.</remarks>
