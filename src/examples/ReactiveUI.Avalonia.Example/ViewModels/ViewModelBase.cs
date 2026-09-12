@@ -26,11 +26,6 @@ public class ViewModelBase : ReactiveObject, IActivatableViewModel, IDisposable
     /// <inheritdoc/>
     public void Dispose()
     {
-        if (Interlocked.Exchange(ref _disposed, 1) != 0)
-        {
-            return;
-        }
-
         Dispose(true);
         GC.SuppressFinalize(this);
     }
@@ -39,7 +34,7 @@ public class ViewModelBase : ReactiveObject, IActivatableViewModel, IDisposable
     /// <param name="disposing">A value indicating whether managed resources should be disposed.</param>
     protected virtual void Dispose(bool disposing)
     {
-        if (!disposing)
+        if (!disposing || Interlocked.Exchange(ref _disposed, 1) != 0)
         {
             return;
         }
