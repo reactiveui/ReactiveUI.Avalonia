@@ -28,7 +28,7 @@ dotnet restore ReactiveUI.Avalonia.slnx
 # Build the solution
 dotnet build ReactiveUI.Avalonia.slnx -c Release
 
-# Build with warnings as errors (includes StyleCop violations)
+# Build with warnings as errors (includes analyzer violations)
 dotnet build ReactiveUI.Avalonia.slnx -c Release -warnaserror
 
 # Clean the solution
@@ -145,11 +145,39 @@ cat /tmp/coverage-report/Summary.txt
 reportgenerator -reports:"tests/ReactiveUI.Avalonia.Tests/bin/Release/net10.0/TestResults/*.cobertura.xml" -targetdir:/tmp/coverage-report -reporttypes:Html
 ```
 
+### Public API Baselines
+
+Every shipping project checks in its public surface as `PublicAPI/{TargetFramework}/PublicAPI.txt`, one baseline per target framework, enforced by `PublicApiSharp.Analyzers`. The baseline is ordinary C# that reads like source, so a reviewer can tell from the diff alone whether an API change is additive.
+
+The build fails when the surface and the baseline disagree:
+
+- `PAS0001` - a public member is missing from the baseline (reported on the declaration)
+- `PAS0002` - a baseline entry no longer exists in source (reported on the baseline line)
+- `PAS0003` - a member's signature differs from the baseline (reported on the declaration)
+
+There is no shipped/unshipped split. An intentional API change is accepted by regenerating the baseline in the same commit that makes the change.
+
+```powershell
+# Regenerate a project's baseline. dotnet format writes ONE baseline per run
+# (it fixes a single inner build at a time), so on a multi-targeting project
+# repeat the command until the build is clean - once per target framework.
+dotnet format analyzers ReactiveUI.Avalonia/ReactiveUI.Avalonia.csproj --diagnostics PAS0001 PAS0003 --severity info
+
+# Adding a new target framework? Create the empty baseline first - the analyzer
+# stays silent until the file exists, so a missing one tracks nothing at all.
+mkdir -p ReactiveUI.Avalonia/PublicAPI/net12.0 && touch ReactiveUI.Avalonia/PublicAPI/net12.0/PublicAPI.txt
+```
+
+**Note:** `PAS0004` (no baseline for this target framework) is reported at `CSC` with no source location, so Roslyn only honours its severity from a *global* analyzer config. The `.editorconfig` entry under `[*.cs]` has no effect, which is why the empty-file step above is manual.
+
+Test projects are excluded via `TrackPublicApi` in `src/Directory.Build.props`.
+
 ### Key Configuration Files
 
 - `global.json` - Specifies `"Microsoft.Testing.Platform"` as the test runner
 - `testconfig.json` - Configures test execution (`"parallel": false`) and code coverage (Cobertura format)
-- `Directory.Build.props` - Enables `TestingPlatformDotnetTestSupport` for test projects
+- `Directory.Build.props` - Enables `TestingPlatformDotnetTestSupport` for test projects, and sets `TrackPublicApi` for public API baselines
+- `Directory.Packages.props` - Central package versions; `RoslynCommonAnalyzersVersion` pins StyleSharp, PerformanceSharp and SecuritySharp to a single shared version
 
 ## Architecture Overview
 
@@ -185,8 +213,7 @@ ReactiveUI.Avalonia provides platform-specific extensions that integrate Reactiv
 ### Style Enforcement
 
 - EditorConfig rules (`.editorconfig`) - comprehensive C# formatting and naming conventions
-- StyleCop Analyzers - builds fail on violations
-- Roslynator Analyzers - additional code quality rules
+- StyleSharp (SST), PerformanceSharp (PSH) and SecuritySharp (SES) analyzers - builds fail on violations
 - **All elements require XML documentation comments** (public, internal, and private)
 - **No `#pragma` directives** — use `[SuppressMessage]` attributes when suppression is truly needed
 

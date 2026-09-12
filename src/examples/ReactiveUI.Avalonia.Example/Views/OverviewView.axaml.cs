@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for full license information.
 
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 using ReactiveUI;
 using ReactiveUI.Avalonia.Example.ViewModels;
 using ReactiveUI.Primitives.Disposables;
@@ -10,6 +11,7 @@ using ReactiveUI.Primitives.Disposables;
 namespace ReactiveUI.Avalonia.Example.Views;
 
 /// <summary>The routed overview view.</summary>
+[System.Diagnostics.DebuggerDisplay("OverviewView: {ToString(),nq}")]
 public sealed partial class OverviewView : ReactiveUserControl<OverviewViewModel>
 {
     /// <summary>Initializes a new instance of the <see cref="OverviewView"/> class.</summary>
@@ -23,6 +25,7 @@ public sealed partial class OverviewView : ReactiveUserControl<OverviewViewModel
 
     /// <summary>Binds items while the overview is active, allowing the automatic template hook to resolve rows.</summary>
     /// <param name="disposables">The current activation lifetime.</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     [RequiresUnreferencedCode("The feature list uses reflection-based property binding.")]
     [RequiresDynamicCode("The feature list uses dynamic ReactiveUI binding.")]
     private void BindView(MultipleDisposable disposables) =>

@@ -8,6 +8,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\ReactiveUI.Avalonia.Autofac\*.cs" Exclude="..\ReactiveUI.Avalonia.Autofac\bin\**;..\ReactiveUI.Avalonia.Autofac\obj\**" Link="%(Filename)%(Extension)" />
+    <Compile Include="..\Shared\SplatApp.cs" Link="Shared\SplatApp.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Splat.Autofac" />

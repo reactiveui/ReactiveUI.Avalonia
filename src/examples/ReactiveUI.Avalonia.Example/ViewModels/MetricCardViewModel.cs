@@ -7,6 +7,7 @@ using ReactiveUI;
 namespace ReactiveUI.Avalonia.Example.ViewModels;
 
 /// <summary>View model for a reusable metric card resolved by contract.</summary>
+[System.Diagnostics.DebuggerDisplay("MetricCardViewModel: {Title}")]
 public sealed class MetricCardViewModel : ReactiveObject
 {
     /// <summary>The value text.</summary>

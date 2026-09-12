@@ -6,7 +6,10 @@
     <PackageTags>mvvm;reactiveui;rx;reactive extensions;observable;LINQ;events;frp;avalonia;net;netcore</PackageTags>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Splat.Autofac" />  
+    <Compile Include="..\Shared\SplatApp.cs" Link="Shared\SplatApp.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Splat.Autofac" />
     <ProjectReference Include="..\ReactiveUI.Avalonia\ReactiveUI.Avalonia.csproj" />
   </ItemGroup>
   <ItemGroup>

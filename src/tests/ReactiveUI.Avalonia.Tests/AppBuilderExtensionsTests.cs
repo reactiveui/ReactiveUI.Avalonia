@@ -26,7 +26,7 @@ public class AppBuilderExtensionsTests
     {
         ReactiveUIBuilder.ResetBuilderStateForTests();
         var invoked = false;
-        AppBuilderExtensions.ConfigureReactiveUI(_ => invoked = true);
+        StartupConfiguration.ConfigureReactiveUI(_ => invoked = true);
 
         await Assert.That(invoked).IsTrue();
     }
@@ -37,7 +37,7 @@ public class AppBuilderExtensionsTests
     public async Task UseReactiveUI_AfterPlatformCallback_WhenAlreadyBuilt_ReturnsAfterUserCallback()
     {
         var invoked = false;
-        AppBuilderExtensions.ConfigureReactiveUI(_ => invoked = true);
+        StartupConfiguration.ConfigureReactiveUI(_ => invoked = true);
 
         await Assert.That(invoked).IsTrue();
     }

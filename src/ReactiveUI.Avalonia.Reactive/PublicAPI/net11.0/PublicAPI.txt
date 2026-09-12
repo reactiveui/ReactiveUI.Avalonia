@@ -1,0 +1,142 @@
+[assembly: Avalonia.Metadata.XmlnsDefinition("http://reactiveui.net", "ReactiveUI.Avalonia")]
+[assembly: Avalonia.Metadata.XmlnsDefinition("http://reactiveui.net", "ReactiveUI.Avalonia.Reactive")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("ReactiveUI.Avalonia.Autofac")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("ReactiveUI.Avalonia.Autofac.Reactive")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("ReactiveUI.Avalonia.DryIoc")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("ReactiveUI.Avalonia.DryIoc.Reactive")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("ReactiveUI.Avalonia.DryIoc.Reactive.Tests")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("ReactiveUI.Avalonia.DryIoc.Tests")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("ReactiveUI.Avalonia.Microsoft.Extensions.DependencyInjection")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("ReactiveUI.Avalonia.Microsoft.Extensions.DependencyInjection.Reactive")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("ReactiveUI.Avalonia.Microsoft.Reactive.Tests")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("ReactiveUI.Avalonia.Microsoft.Tests")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("ReactiveUI.Avalonia.Ninject")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("ReactiveUI.Avalonia.Ninject.Reactive")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("ReactiveUI.Avalonia.Reactive.Tests")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("ReactiveUI.Avalonia.Tests")]
+namespace ReactiveUI.Avalonia.Reactive;
+
+public static class AppBuilderExtensions
+{
+    extension(Avalonia.AppBuilder builder)
+    {
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Creates closed generic view service types at runtime during ReactiveUI view registration.")]
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Scans assemblies and reflects over view types and attributes during ReactiveUI view registration.")]
+        public Avalonia.AppBuilder RegisterReactiveUIViews(params System.Reflection.Assembly[] assemblies) { }
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Creates closed generic view service types at runtime during ReactiveUI view registration.")]
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Scans assemblies and reflects over view types and attributes during ReactiveUI view registration.")]
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public Avalonia.AppBuilder RegisterReactiveUIViewsFromAssemblyOf<TMarker>(params TMarker[] markers) { }
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Creates closed generic view service types at runtime during ReactiveUI view registration.")]
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Scans assemblies and reflects over view types and attributes during ReactiveUI view registration.")]
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public Avalonia.AppBuilder RegisterReactiveUIViewsFromEntryAssembly() { }
+        public Avalonia.AppBuilder UseReactiveUI(System.Action<ReactiveUI.Reactive.Builder.ReactiveUIBuilder> withReactiveUIBuilder) { }
+        public Avalonia.AppBuilder UseReactiveUIWithDIContainer<TContainer>(System.Func<TContainer> containerFactory, System.Action<TContainer> containerConfig, System.Func<TContainer, Splat.IDependencyResolver> dependencyResolverFactory, System.Action<ReactiveUI.Reactive.Builder.ReactiveUIBuilder> configureReactiveUI) where TContainer : class { }
+    }
+    extension(ReactiveUI.Reactive.Builder.IReactiveUIBuilder builder)
+    {
+        public ReactiveUI.Reactive.Builder.IReactiveUIBuilder WithAvalonia() { }
+    }
+}
+public class AutoDataTemplateBindingHook : ReactiveUI.IPropertyBindingHook
+{
+    public AutoDataTemplateBindingHook() { }
+    public bool ExecuteHook(object? source, object target, System.Func<ReactiveUI.IObservedChange<object, object>[]> getCurrentViewModelProperties, System.Func<ReactiveUI.IObservedChange<object, object>[]> getCurrentViewProperties, ReactiveUI.BindingDirection direction) { }
+}
+[System.Diagnostics.DebuggerDisplay("AutoSuspendHelper: {_shouldPersistState}")]
+public sealed class AutoSuspendHelper : Splat.IEnableLogger, System.IDisposable
+{
+    public AutoSuspendHelper(Avalonia.Controls.ApplicationLifetimes.IApplicationLifetime lifetime) { }
+    public void Dispose() { }
+    [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+    public void OnFrameworkInitializationCompleted() { }
+}
+public class AvaloniaActivationForViewFetcher : ReactiveUI.IActivationForViewFetcher
+{
+    public AvaloniaActivationForViewFetcher() { }
+    public System.IObservable<bool> GetActivationForView(ReactiveUI.IActivatableView view) { }
+    public int GetAffinityForView(System.Type view) { }
+}
+public static class AvaloniaObjectReactiveExtensions
+{
+    extension(Avalonia.AvaloniaObject o)
+    {
+        public System.Reactive.Subjects.ISubject<Avalonia.Data.BindingValue<object?>> GetBindingSubject(Avalonia.AvaloniaProperty property) { }
+        public System.Reactive.Subjects.ISubject<Avalonia.Data.BindingValue<object?>> GetBindingSubject(Avalonia.AvaloniaProperty property, Avalonia.Data.BindingPriority priority) { }
+        public System.Reactive.Subjects.ISubject<Avalonia.Data.BindingValue<T>> GetBindingSubject<T>(Avalonia.AvaloniaProperty<T> property) { }
+        public System.Reactive.Subjects.ISubject<Avalonia.Data.BindingValue<T>> GetBindingSubject<T>(Avalonia.AvaloniaProperty<T> property, Avalonia.Data.BindingPriority priority) { }
+        public System.Reactive.Subjects.ISubject<object?> GetSubject(Avalonia.AvaloniaProperty property) { }
+        public System.Reactive.Subjects.ISubject<object?> GetSubject(Avalonia.AvaloniaProperty property, Avalonia.Data.BindingPriority priority) { }
+        public System.Reactive.Subjects.ISubject<T> GetSubject<T>(Avalonia.AvaloniaProperty<T> property) { }
+        public System.Reactive.Subjects.ISubject<T> GetSubject<T>(Avalonia.AvaloniaProperty<T> property, Avalonia.Data.BindingPriority priority) { }
+    }
+}
+[System.Diagnostics.DebuggerDisplay("ReactiveUserControl: {ViewModel}")]
+public class ReactiveUserControl<TViewModel> : ReactiveUI.Avalonia.Reactive.ReactiveUserControlBase, ReactiveUI.IViewFor<TViewModel> where TViewModel : class
+{
+    [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("ReactiveUI activation evaluates expression-based member chains via reflection; members may be trimmed.")]
+    public ReactiveUserControl() { }
+    object? ReactiveUI.IViewFor.ViewModel { get; set; }
+    public TViewModel? ViewModel { get; set; }
+    protected override bool IsValidViewModelValue(object? value) { }
+}
+[System.Diagnostics.DebuggerDisplay("ReactiveUserControlBase: {ToString(),nq}")]
+public class ReactiveUserControlBase : Avalonia.Controls.UserControl, ReactiveUI.IViewFor
+{
+    [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("ReactiveUI activation evaluates expression-based member chains via reflection; members may be trimmed.")]
+    protected ReactiveUserControlBase() { }
+    public static readonly Avalonia.StyledProperty<object?> ViewModelProperty;
+    object? ReactiveUI.IViewFor.ViewModel { get; set; }
+    protected virtual bool IsValidViewModelValue(object? value) { }
+    protected override void OnPropertyChanged(Avalonia.AvaloniaPropertyChangedEventArgs change) { }
+}
+[System.Diagnostics.DebuggerDisplay("ReactiveWindow: {ViewModel}")]
+public class ReactiveWindow<TViewModel> : ReactiveUI.Avalonia.Reactive.ReactiveWindowBase, ReactiveUI.IViewFor<TViewModel> where TViewModel : class
+{
+    [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("ReactiveUI activation evaluates expression-based member chains via reflection; members may be trimmed.")]
+    public ReactiveWindow() { }
+    object? ReactiveUI.IViewFor.ViewModel { get; set; }
+    public TViewModel? ViewModel { get; set; }
+    protected override bool IsValidViewModelValue(object? value) { }
+}
+[System.Diagnostics.DebuggerDisplay("ReactiveWindowBase: {ToString(),nq}")]
+public class ReactiveWindowBase : Avalonia.Controls.Window, ReactiveUI.IViewFor
+{
+    [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("ReactiveUI activation evaluates expression-based member chains via reflection; members may be trimmed.")]
+    protected ReactiveWindowBase() { }
+    public static readonly Avalonia.StyledProperty<object?> ViewModelProperty;
+    object? ReactiveUI.IViewFor.ViewModel { get; set; }
+    protected virtual bool IsValidViewModelValue(object? value) { }
+    protected override void OnPropertyChanged(Avalonia.AvaloniaPropertyChangedEventArgs change) { }
+}
+[System.Diagnostics.DebuggerDisplay("RoutedViewHost: {Router}")]
+public class RoutedViewHost : Avalonia.Controls.TransitioningContentControl, ReactiveUI.IActivatableView, Splat.IEnableLogger
+{
+    public RoutedViewHost() { }
+    public static readonly Avalonia.StyledProperty<object?> DefaultContentProperty;
+    public static readonly Avalonia.StyledProperty<ReactiveUI.Reactive.RoutingState?> RouterProperty;
+    public static readonly Avalonia.StyledProperty<string?> ViewContractProperty;
+    public object? DefaultContent { get; set; }
+    public ReactiveUI.Reactive.RoutingState? Router { get; set; }
+    protected override System.Type StyleKeyOverride { get; }
+    public string? ViewContract { get; set; }
+    public ReactiveUI.IViewLocator? ViewLocator { get; set; }
+    protected override void OnAttachedToVisualTree(Avalonia.VisualTreeAttachmentEventArgs e) { }
+    protected override void OnDetachedFromVisualTree(Avalonia.VisualTreeAttachmentEventArgs e) { }
+}
+[System.Diagnostics.DebuggerDisplay("ViewModelViewHost: {ViewModel}")]
+public class ViewModelViewHost : Avalonia.Controls.TransitioningContentControl, ReactiveUI.IViewFor, Splat.IEnableLogger
+{
+    public ViewModelViewHost() { }
+    public static readonly Avalonia.StyledProperty<object?> DefaultContentProperty;
+    public static readonly Avalonia.StyledProperty<string?> ViewContractProperty;
+    public static readonly Avalonia.AvaloniaProperty<object?> ViewModelProperty;
+    public object? DefaultContent { get; set; }
+    protected override System.Type StyleKeyOverride { get; }
+    public string? ViewContract { get; set; }
+    public ReactiveUI.IViewLocator? ViewLocator { get; set; }
+    public object? ViewModel { get; set; }
+    protected override void OnAttachedToVisualTree(Avalonia.VisualTreeAttachmentEventArgs e) { }
+    protected override void OnDetachedFromVisualTree(Avalonia.VisualTreeAttachmentEventArgs e) { }
+}

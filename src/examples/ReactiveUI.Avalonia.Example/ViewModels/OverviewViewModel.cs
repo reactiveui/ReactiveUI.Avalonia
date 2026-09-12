@@ -7,6 +7,7 @@ using ReactiveUI;
 namespace ReactiveUI.Avalonia.Example.ViewModels;
 
 /// <summary>Introduces the showcase features.</summary>
+[System.Diagnostics.DebuggerDisplay("OverviewViewModel: {Features}")]
 public sealed class OverviewViewModel : PageViewModel
 {
     /// <summary>Initializes a new instance of the <see cref="OverviewViewModel"/> class.</summary>

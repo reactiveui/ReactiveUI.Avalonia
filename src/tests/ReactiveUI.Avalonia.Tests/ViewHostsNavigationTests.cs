@@ -670,10 +670,7 @@ public class ViewHostsNavigationTests
     {
         /// <summary>Initializes a new instance of the <see cref="VmA"/> class.</summary>
         /// <param name="screen">The host screen.</param>
-        public VmA(IScreen screen)
-        {
-            HostScreen = screen;
-        }
+        public VmA(IScreen screen) => HostScreen = screen;
 
         /// <summary>Gets the URL path segment.</summary>
         public string? UrlPathSegment => "A";

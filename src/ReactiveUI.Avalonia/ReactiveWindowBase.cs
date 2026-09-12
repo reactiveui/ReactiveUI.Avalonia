@@ -8,6 +8,7 @@ namespace ReactiveUI.Avalonia;
 #endif
 
 /// <summary>A non-generic ReactiveUI <see cref="Window"/> base that owns the Avalonia view model property.</summary>
+[System.Diagnostics.DebuggerDisplay("ReactiveWindowBase: {ToString(),nq}")]
 public class ReactiveWindowBase : Window, IViewFor
 {
     /// <summary>Identifies the ViewModel dependency property for a ReactiveWindow.</summary>

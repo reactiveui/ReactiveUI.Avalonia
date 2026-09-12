@@ -2,6 +2,7 @@
 // ReactiveUI Association Incorporated licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for full license information.
 
+using System.Runtime.CompilerServices;
 using Avalonia;
 using Avalonia.Headless;
 
@@ -19,5 +20,6 @@ public static class ExampleAvaloniaTestSession
 
     /// <summary>Uses the production application setup with a headless rendering backend.</summary>
     /// <returns>The configured application builder.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static AppBuilder BuildAvaloniaApp() => Program.BuildAvaloniaApp().UseHeadless(new());
 }

@@ -37,21 +37,12 @@ public class AvaloniaUIThreadTestsMain
     /// <summary>Verifies that AvaloniaScheduler provides the sequencer abstraction used by ReactiveUI.</summary>
     /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
-    public async Task AvaloniaScheduler_ImplementsISequencer()
-    {
-        var scheduler = AvaloniaScheduler.Instance;
-        await Assert.That(scheduler).IsAssignableTo<ISequencer>();
-    }
+    public async Task AvaloniaScheduler_ImplementsISequencer() => await Assert.That(AvaloniaScheduler.Instance).IsAssignableTo<ISequencer>();
 
     /// <summary>Verifies that the Timestamp property returns a monotonic timestamp.</summary>
     /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
-    public async Task AvaloniaScheduler_Timestamp_ReturnsPositiveValue()
-    {
-        var scheduler = AvaloniaScheduler.Instance;
-
-        await Assert.That(scheduler.Timestamp).IsGreaterThan(0);
-    }
+    public async Task AvaloniaScheduler_Timestamp_ReturnsPositiveValue() => await Assert.That(AvaloniaScheduler.Instance.Timestamp).IsGreaterThan(0);
 
     /// <summary>Verifies that Schedule throws ArgumentNullException for a null work item.</summary>
     /// <returns>A task representing the asynchronous test operation.</returns>

@@ -12,8 +12,5 @@ public sealed partial class MemoryMetricCardView : ReactiveUserControl<MetricCar
 {
     /// <summary>Initializes a new instance of the <see cref="MemoryMetricCardView"/> class.</summary>
     [RequiresUnreferencedCode("ReactiveUserControl activation evaluates expression-based member chains via reflection.")]
-    public MemoryMetricCardView()
-    {
-        InitializeComponent();
-    }
+    public MemoryMetricCardView() => InitializeComponent();
 }

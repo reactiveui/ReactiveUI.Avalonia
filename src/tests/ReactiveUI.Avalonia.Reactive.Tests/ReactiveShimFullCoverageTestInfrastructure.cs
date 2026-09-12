@@ -44,23 +44,23 @@ public partial class ReactiveShimFullCoverageTests
     /// <summary>Invokes the private view factory used by assembly view registration.</summary>
     /// <param name="viewType">The view type to create.</param>
     /// <returns>The created view instance.</returns>
-    private static object InvokePrivateCreateView(Type viewType) => AppBuilderExtensions.CreateView(viewType);
+    private static object InvokePrivateCreateView(Type viewType) => ViewRegistrar.CreateView(viewType);
 
     /// <summary>Invokes the private Activator-based view factory.</summary>
     /// <param name="viewType">The view type to create.</param>
     /// <returns>The created view instance.</returns>
-    private static object InvokePrivateCreateViewWithActivator(Type viewType) => AppBuilderExtensions.CreateViewWithActivator(viewType);
+    private static object InvokePrivateCreateViewWithActivator(Type viewType) => ViewRegistrar.CreateViewWithActivator(viewType);
 
     /// <summary>Invokes the private resolver-failure fallback view factory.</summary>
     /// <param name="viewType">The view type to create.</param>
     /// <returns>The created view instance.</returns>
     private static object InvokePrivateCreateViewAfterResolutionFailure(Type viewType) =>
-        AppBuilderExtensions.CreateViewAfterResolutionFailure(viewType, new InvalidOperationException("expected"));
+        ViewRegistrar.CreateViewAfterResolutionFailure(viewType, new InvalidOperationException("expected"));
 
     /// <summary>Invokes the private view-contract attribute helper.</summary>
     /// <param name="viewType">The view type to inspect.</param>
     /// <returns>The reflected contract value.</returns>
-    private static string? InvokePrivateGetViewContract(Type viewType) => AppBuilderExtensions.GetViewContract(viewType);
+    private static string? InvokePrivateGetViewContract(Type viewType) => ViewRegistrar.GetViewContract(viewType);
 
     /// <summary>Invokes the private entry-assembly view registration helper.</summary>
     /// <param name="builder">The builder instance.</param>
@@ -73,7 +73,7 @@ public partial class ReactiveShimFullCoverageTests
     /// <param name="resolver">The resolver instance.</param>
     /// <param name="assemblies">The assemblies to scan.</param>
     private static void InvokePrivateRegisterReactiveUIViews(IMutableDependencyResolver? resolver, Assembly[]? assemblies) =>
-        AppBuilderExtensions.RegisterReactiveUIViews(resolver, assemblies);
+        ViewRegistrar.RegisterViews(resolver, assemblies);
 
     /// <summary>Invokes the private dependency-injection container helper.</summary>
     /// <typeparam name="TContainer">The container type.</typeparam>
@@ -87,7 +87,7 @@ public partial class ReactiveShimFullCoverageTests
         Action<TContainer> containerConfig,
         Func<TContainer, IDependencyResolver> dependencyResolverFactory)
         where TContainer : class =>
-        AppBuilderExtensions.ConfigureReactiveUIDIContainer(
+        StartupConfiguration.ConfigureReactiveUIDIContainer(
             resolver,
             containerFactory,
             containerConfig,
@@ -389,10 +389,7 @@ public partial class ReactiveShimFullCoverageTests
     {
         /// <summary>Initializes a new instance of the <see cref="VmA"/> class.</summary>
         /// <param name="screen">The host screen.</param>
-        public VmA(ReactiveIScreen screen)
-        {
-            HostScreen = screen;
-        }
+        public VmA(ReactiveIScreen screen) => HostScreen = screen;
 
         /// <summary>Gets the URL path segment.</summary>
         public string? UrlPathSegment => "A";

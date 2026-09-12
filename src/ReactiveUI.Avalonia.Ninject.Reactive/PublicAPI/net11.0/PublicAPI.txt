@@ -1,0 +1,11 @@
+namespace ReactiveUI.Avalonia.Reactive.Splat;
+
+public static class AvaloniaMixins
+{
+    extension(Avalonia.AppBuilder builder)
+    {
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public Avalonia.AppBuilder UseReactiveUIWithNinject(System.Action<Ninject.StandardKernel> containerConfig) { }
+        public Avalonia.AppBuilder UseReactiveUIWithNinject(System.Action<Ninject.StandardKernel> containerConfig, System.Action<ReactiveUI.Reactive.Builder.ReactiveUIBuilder>? withReactiveUIBuilder) { }
+    }
+}

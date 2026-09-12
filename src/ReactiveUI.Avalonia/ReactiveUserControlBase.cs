@@ -8,6 +8,7 @@ namespace ReactiveUI.Avalonia;
 #endif
 
 /// <summary>A non-generic ReactiveUI <see cref="UserControl"/> base that owns the Avalonia view model property.</summary>
+[System.Diagnostics.DebuggerDisplay("ReactiveUserControlBase: {ToString(),nq}")]
 public class ReactiveUserControlBase : UserControl, IViewFor
 {
     /// <summary>Identifies the ViewModel dependency property for a ReactiveUserControl.</summary>

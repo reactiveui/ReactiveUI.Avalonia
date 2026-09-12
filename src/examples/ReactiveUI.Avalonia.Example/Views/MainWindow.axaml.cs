@@ -3,11 +3,13 @@
 // See the LICENSE file in the project root for full license information.
 
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 using ReactiveUI.Avalonia.Example.ViewModels;
 
 namespace ReactiveUI.Avalonia.Example.Views;
 
 /// <summary>The main example shell window.</summary>
+[System.Diagnostics.DebuggerDisplay("MainWindow: {ToString(),nq}")]
 public sealed partial class MainWindow : ReactiveWindow<MainViewModel>
 {
     /// <summary>Initializes a new instance of the <see cref="MainWindow"/> class.</summary>
@@ -22,5 +24,6 @@ public sealed partial class MainWindow : ReactiveWindow<MainViewModel>
     /// <summary>Disposes the view model when the shell closes.</summary>
     /// <param name="sender">The event sender.</param>
     /// <param name="e">The event data.</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void OnClosed(object? sender, EventArgs e) => ViewModel?.Dispose();
 }

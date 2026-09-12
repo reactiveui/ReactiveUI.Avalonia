@@ -8,6 +8,7 @@ namespace ReactiveUI.Avalonia;
 #endif
 
 /// <summary>Automatically loads and displays the view associated with the ViewModel property.</summary>
+[System.Diagnostics.DebuggerDisplay("ViewModelViewHost: {ViewModel}")]
 public class ViewModelViewHost : TransitioningContentControl, IViewFor, IEnableLogger
 {
     /// <summary>Identifies the ViewModel dependency property for the ViewModelViewHost control.</summary>
@@ -69,12 +70,12 @@ public class ViewModelViewHost : TransitioningContentControl, IViewFor, IEnableL
     protected override Type StyleKeyOverride => typeof(TransitioningContentControl);
 
     /// <summary>Navigates to the view associated with the specified view model and contract.</summary>
+    /// <param name="viewModel">The view model to display, or null to display the default content.</param>
+    /// <param name="contract">The optional contract used to distinguish registered views.</param>
     /// <remarks>
     /// Missing views display the default content. A resolved view receives the supplied view model through ViewModel
     /// and DataContext.
     /// </remarks>
-    /// <param name="viewModel">The view model to display, or null to display the default content.</param>
-    /// <param name="contract">The optional contract used to distinguish registered views.</param>
     internal void NavigateToViewModel(object? viewModel, string? contract)
     {
         if (viewModel is null)

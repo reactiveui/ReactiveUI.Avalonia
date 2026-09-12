@@ -1,0 +1,13 @@
+# Relaxations for the test tree. These projects are not shipped libraries, so a rule written for
+# hot-path production code is noise here. Everything else inherits the repository-root .editorconfig.
+[*.cs]
+
+###################
+# PerformanceSharp (PSH) — relaxed for test projects
+###################
+dotnet_diagnostic.PSH1410.severity = none # A fixture helper is not a hot-path forwarder
+
+###################
+# StyleSharp (SST) — relaxed for test projects
+###################
+dotnet_diagnostic.SST2334.severity = none # Fixtures and models are read through assertions, not a debugger summary

@@ -5,6 +5,7 @@
 namespace ReactiveUI.Avalonia.Example.Models;
 
 /// <summary>Represents one local machine measurement sample.</summary>
+[System.Diagnostics.DebuggerDisplay("MachineSnapshot: {CapturedAt}")]
 public sealed record MachineSnapshot
 {
     /// <summary>Initializes a new instance of the <see cref="MachineSnapshot"/> class.</summary>

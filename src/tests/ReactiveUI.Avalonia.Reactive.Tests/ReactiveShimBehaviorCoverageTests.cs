@@ -31,7 +31,7 @@ public class ReactiveShimBehaviorCoverageTests
         var untyped = control.GetSubject((AvaloniaProperty)TestControl.IntPropProperty);
         var typed = control.GetSubject(TestControl.IntPropProperty);
         object? untypedObserved = null;
-        int typedObserved = 0;
+        var typedObserved = 0;
 
         using var untypedSubscription = untyped.Subscribe(value => untypedObserved = value);
         using var typedSubscription = typed.Subscribe(value => typedObserved = value);

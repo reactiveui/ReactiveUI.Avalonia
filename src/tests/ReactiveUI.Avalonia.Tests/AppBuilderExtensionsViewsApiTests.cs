@@ -28,7 +28,7 @@ public class AppBuilderExtensionsViewsApiTests
         await Assert.That(result).IsSameReferenceAs(builder);
 
         var resolver = global::Splat.AppLocator.CurrentMutable!;
-        AppBuilderExtensions.RegisterViewsInternal(resolver, [typeof(AppBuilderExtensionsRegistrationTests).Assembly]);
+        ViewRegistrar.RegisterViewsInternal(resolver, [typeof(AppBuilderExtensionsRegistrationTests).Assembly]);
     }
 
     /// <summary>Verifies that RegisterReactiveUIViewsFromEntryAssembly returns the same builder instance.</summary>

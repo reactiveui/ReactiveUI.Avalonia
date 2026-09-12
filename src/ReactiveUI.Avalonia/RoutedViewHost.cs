@@ -1,6 +1,8 @@
 // Copyright (c) 2019-2026 ReactiveUI Association Incorporated. All rights reserved.
 // ReactiveUI Association Incorporated licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for full license information.
+using System.Runtime.CompilerServices;
+
 #if REACTIVE_SHIM
 namespace ReactiveUI.Avalonia.Reactive;
 #else
@@ -22,6 +24,7 @@ namespace ReactiveUI.Avalonia;
 /// See <see href="https://reactiveui.net/docs/handbook/routing/">ReactiveUI routing documentation</see>.
 /// </para>
 /// </remarks>
+[System.Diagnostics.DebuggerDisplay("RoutedViewHost: {Router}")]
 public class RoutedViewHost : TransitioningContentControl, IActivatableView, IEnableLogger
 {
     /// <summary>Identifies the Router styled property for the associated RoutedViewHost control.</summary>
@@ -80,12 +83,12 @@ public class RoutedViewHost : TransitioningContentControl, IActivatableView, IEn
     protected override Type StyleKeyOverride => typeof(TransitioningContentControl);
 
     /// <summary>Navigates to the view associated with the specified view model and contract.</summary>
+    /// <param name="viewModel">The view model to display, or null to display the default content.</param>
+    /// <param name="contract">The optional view contract used during resolution.</param>
     /// <remarks>
     /// Missing routers, view models, or views display the default content. A resolved view receives the supplied view
     /// model through both ViewModel and DataContext when supported.
     /// </remarks>
-    /// <param name="viewModel">The view model to display, or null to display the default content.</param>
-    /// <param name="contract">The optional view contract used during resolution.</param>
     internal void NavigateToViewModel(object? viewModel, string? contract)
     {
         if (Router is null)
@@ -159,6 +162,7 @@ public class RoutedViewHost : TransitioningContentControl, IActivatableView, IEn
     /// <summary>Creates a stream that begins with the router's current view model and then follows future navigation.</summary>
     /// <param name="router">The router to observe.</param>
     /// <returns>The current and future routed view models.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static IObservable<object?> CreateRouterViewModelObservable(RoutingState router) =>
         Observable.Return(GetCurrentViewModel(router))
             .Merge(router.CurrentViewModel.Select(static viewModel => (object?)viewModel));
@@ -171,7 +175,7 @@ public class RoutedViewHost : TransitioningContentControl, IActivatableView, IEn
         base.OnAttachedToVisualTree(e);
 
         var disposables = new CompositeDisposable();
-        IObservable<RoutingState?> routerChanges = this.GetObservable(RouterProperty);
+        var routerChanges = this.GetObservable(RouterProperty);
         var viewContract = this.GetObservable(ViewContractProperty);
         var viewModels = routerChanges
             .Select(static router => router is null ? Observable.Return<object?>(null) : CreateRouterViewModelObservable(router))

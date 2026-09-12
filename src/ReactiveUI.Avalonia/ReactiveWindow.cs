@@ -9,6 +9,7 @@ namespace ReactiveUI.Avalonia;
 
 /// <summary>A ReactiveUI <see cref="Window"/> that implements <see cref="IViewFor{TViewModel}"/>.</summary>
 /// <typeparam name="TViewModel">ViewModel type.</typeparam>
+[System.Diagnostics.DebuggerDisplay("ReactiveWindow: {ViewModel}")]
 public class ReactiveWindow<TViewModel> : ReactiveWindowBase, IViewFor<TViewModel>
     where TViewModel : class
 {
