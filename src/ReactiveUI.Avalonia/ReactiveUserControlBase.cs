@@ -15,8 +15,10 @@ public class ReactiveUserControlBase : UserControl, IViewFor
     /// <remarks>This property enables data binding of a view model to a ReactiveUserControl instance in
     /// Avalonia applications. It is typically used to associate a view model with the control for reactive UI
     /// scenarios.</remarks>
-    public static readonly StyledProperty<object?> ViewModelProperty = AvaloniaProperty
-        .Register<ReactiveUserControlBase, object?>(nameof(IViewFor.ViewModel));
+    public static readonly StyledProperty<object?> ViewModelProperty = ViewModelPropertySync.Register<ReactiveUserControlBase>();
+
+    /// <summary>Holds the view model value filter so the property-changed path allocates nothing.</summary>
+    private readonly Func<object?, bool> _isValidViewModelValue;
 
     /// <summary>Initializes a new instance of the <see cref="ReactiveUserControlBase"/> class.</summary>
     /// <remarks>When the control is activated, this constructor ensures that any activation logic defined in
@@ -26,17 +28,14 @@ public class ReactiveUserControlBase : UserControl, IViewFor
     [RequiresUnreferencedCode("ReactiveUI activation evaluates expression-based member chains via reflection; members may be trimmed.")]
     protected ReactiveUserControlBase()
     {
-        // This WhenActivated block calls ViewModel's WhenActivated
-        // block if the ViewModel implements IActivatableViewModel.
-        _ = this.WhenActivated(static (ActivationDisposables disposables) => { });
+        _isValidViewModelValue = IsValidViewModelValue;
+        ViewModelPropertySync.ForwardActivation(this);
     }
 
     /// <inheritdoc/>
-    /// <remarks>This member is implemented explicitly so that a strongly typed derived class (such as
-    /// <c>ReactiveUserControl&lt;TViewModel&gt;</c>) can expose the single public <c>ViewModel</c> property. Exposing a
-    /// public <c>object?</c> property here as well would result in two public <c>ViewModel</c> properties of differing
-    /// types in the hierarchy, causing <see cref="System.Reflection.AmbiguousMatchException"/> when ReactiveUI resolves
-    /// the property by name during view model activation.</remarks>
+    /// <remarks>Implemented explicitly so <c>ReactiveUserControl&lt;TViewModel&gt;</c> can expose the only public
+    /// <c>ViewModel</c> property; two public properties of that name and differing types would make ReactiveUI's
+    /// resolution of it by name throw <see cref="System.Reflection.AmbiguousMatchException"/>.</remarks>
     object? IViewFor.ViewModel
     {
         get => GetValue(ViewModelProperty);
@@ -49,17 +48,7 @@ public class ReactiveUserControlBase : UserControl, IViewFor
         ArgumentNullException.ThrowIfNull(change);
         base.OnPropertyChanged(change);
 
-        if (change.Property == DataContextProperty
-            && ReferenceEquals(change.OldValue, GetValue(ViewModelProperty))
-            && IsValidViewModelValue(change.NewValue))
-        {
-            SetCurrentValue(ViewModelProperty, change.NewValue);
-        }
-        else if (change.Property == ViewModelProperty
-                 && ReferenceEquals(change.OldValue, DataContext))
-        {
-            SetCurrentValue(DataContextProperty, change.NewValue);
-        }
+        ViewModelPropertySync.Apply(this, change, ViewModelProperty, _isValidViewModelValue);
     }
 
     /// <summary>Determines whether the specified value is valid for the view model property.</summary>

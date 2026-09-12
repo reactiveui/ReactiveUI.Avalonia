@@ -17,11 +17,10 @@ jobs:
       minverMinimumMajorMinor: '12.1'
       sonarProjectKey: reactiveui_ReactiveUI.Avalonia
       sonarOrganization: reactiveui
-      sonarExclusions: '**/tests/**,**/examples/**,**/TestResults/**'
+      # Attributes.cs holds XAML namespace identifiers, which are names rather than URLs.
+      sonarExclusions: '**/tests/**,**/examples/**,**/TestResults/**,**/Attributes.cs'
       sonarCoverageExclusions: '**/tests/**,**/examples/**,**/*Tests/**,**/*Tests.cs'
-      # Each container package implements the same registration shape against a different container,
-      # so the repetition across the AvaloniaMixins files is the integration, not a copy to share.
-      sonarCpdExclusions: '**/tests/**,**/examples/**,**/AvaloniaMixins.cs'
+      sonarCpdExclusions: '**/tests/**,**/examples/**'
       sonarTestExclusions: '**/tests/**,**/examples/**'
       testTimeout: '15m'
     secrets:

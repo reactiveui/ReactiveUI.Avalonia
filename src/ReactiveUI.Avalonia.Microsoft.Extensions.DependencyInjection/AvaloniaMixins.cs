@@ -64,10 +64,7 @@ public static class AvaloniaMixins
                     AppLocator.CurrentMutable.RegisterConstant(serviceCollection);
                     containerConfig(serviceCollection);
 
-                    var rxuiBuilder = AppLocator.CurrentMutable.CreateReactiveUIBuilder();
-                    _ = rxuiBuilder.WithAvalonia();
-                    withReactiveUIBuilder?.Invoke(rxuiBuilder);
-                    SplatApp.BuildIfNeeded(rxuiBuilder);
+                    SplatApp.BuildWithAvalonia(withReactiveUIBuilder);
 
                     var serviceProvider = serviceCollection.BuildServiceProvider();
                     serviceProvider.UseMicrosoftDependencyResolver();

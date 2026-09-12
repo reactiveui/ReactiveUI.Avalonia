@@ -48,10 +48,7 @@ public static class AvaloniaMixins
                     AppLocator.CurrentMutable.RegisterConstant(container);
                     containerConfig(container);
 
-                    var rxuiBuilder = AppLocator.CurrentMutable.CreateReactiveUIBuilder();
-                    _ = rxuiBuilder.WithAvalonia();
-                    withReactiveUIBuilder?.Invoke(rxuiBuilder);
-                    SplatApp.BuildIfNeeded(rxuiBuilder);
+                    SplatApp.BuildWithAvalonia(withReactiveUIBuilder);
                 })
             };
     }

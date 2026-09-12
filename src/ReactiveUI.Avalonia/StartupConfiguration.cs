@@ -49,9 +49,9 @@ internal static class StartupConfiguration
             return;
         }
 
-        ArgumentNullException.ThrowIfNull(containerFactory, nameof(containerFactory));
-        ArgumentNullException.ThrowIfNull(containerConfig, nameof(containerConfig));
-        ArgumentNullException.ThrowIfNull(dependencyResolverFactory, nameof(dependencyResolverFactory));
+        ArgumentNullException.ThrowIfNull(containerFactory);
+        ArgumentNullException.ThrowIfNull(containerConfig);
+        ArgumentNullException.ThrowIfNull(dependencyResolverFactory);
 
         var container = containerFactory();
         resolver.RegisterConstant(container);
