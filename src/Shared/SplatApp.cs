@@ -7,18 +7,22 @@ namespace ReactiveUI.Avalonia.Reactive.Splat;
 namespace ReactiveUI.Avalonia.Splat;
 #endif
 
-/// <summary>Guards the one-time build of the ReactiveUI Splat application.</summary>
+/// <summary>Configures Avalonia support on a ReactiveUI builder and builds the Splat application once.</summary>
 /// <remarks>
-/// Each dependency injection integration reaches this during Avalonia's post-platform-setup callback. The callback can
-/// run more than once in a process that configures several builders, and the second build would throw, so the guard
-/// makes the call idempotent.
+/// Every dependency injection integration reaches this from Avalonia's post-platform-setup callback. The callback can
+/// run more than once in a process that configures several builders, and a second build would throw, so the build is
+/// guarded.
 /// </remarks>
 internal static class SplatApp
 {
-    /// <summary>Builds the ReactiveUI Splat application when it has not already been built.</summary>
-    /// <param name="rxuiBuilder">The ReactiveUI builder.</param>
-    internal static void BuildIfNeeded(IReactiveUIBuilder rxuiBuilder)
+    /// <summary>Creates the ReactiveUI builder for Avalonia, applies the caller's configuration and builds it.</summary>
+    /// <param name="withReactiveUIBuilder">Customizes the ReactiveUI builder, or null.</param>
+    internal static void BuildWithAvalonia(Action<ReactiveUIBuilder>? withReactiveUIBuilder)
     {
+        var rxuiBuilder = AppLocator.CurrentMutable.CreateReactiveUIBuilder();
+        _ = rxuiBuilder.WithAvalonia();
+        withReactiveUIBuilder?.Invoke(rxuiBuilder);
+
         if (SplatBuilder.HasBeenBuilt)
         {
             return;

@@ -20,8 +20,7 @@ jobs:
       # Attributes.cs holds XAML namespace identifiers, which are names rather than URLs.
       sonarExclusions: '**/tests/**,**/examples/**,**/TestResults/**,**/Attributes.cs'
       sonarCoverageExclusions: '**/tests/**,**/examples/**,**/*Tests/**,**/*Tests.cs'
-      # The AvaloniaMixins files are one registration shape per container, not a copy to share.
-      sonarCpdExclusions: '**/tests/**,**/examples/**,**/AvaloniaMixins.cs'
+      sonarCpdExclusions: '**/tests/**,**/examples/**'
       sonarTestExclusions: '**/tests/**,**/examples/**'
       testTimeout: '15m'
     secrets:

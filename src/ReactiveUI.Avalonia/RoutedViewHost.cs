@@ -105,42 +105,12 @@ public class RoutedViewHost : TransitioningContentControl, IActivatableView, IEn
             return;
         }
 
-        var viewLocator = ViewLocator ?? CurrentViewLocator.Current;
-        var viewInstance = viewLocator.ResolveView(viewModel, contract);
-        if (viewInstance is null)
-        {
-            LogMissingView(viewModel, contract);
-            Content = DefaultContent;
-            return;
-        }
-
-        var resolvedMessage = contract is null
-            ? $"Ready to show {viewInstance} with autowired {viewModel}."
-            : $"Ready to show {viewInstance} with autowired {viewModel} and contract '{contract}'.";
-        this.Log().Info(resolvedMessage);
-
-        viewInstance.ViewModel = viewModel;
-        if (viewInstance is IDataContextProvider provider)
-        {
-            provider.DataContext = viewModel;
-        }
-
-        Content = viewInstance;
+        Content = ViewHostNavigation.ResolveView(this, viewModel, contract, ViewLocator) ?? DefaultContent;
     }
 
     /// <summary>Disposes the active navigation subscriptions when they exist.</summary>
-    internal void DisposeNavigationDisposables()
-    {
-        var disposables = _navigationDisposables;
-        _navigationDisposables = null;
-
-        if (disposables is null)
-        {
-            return;
-        }
-
-        disposables.Dispose();
-    }
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    internal void DisposeNavigationDisposables() => ViewHostNavigation.Release(ref _navigationDisposables);
 
     /// <inheritdoc/>
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e) =>
@@ -191,23 +161,4 @@ public class RoutedViewHost : TransitioningContentControl, IActivatableView, IEn
         disposables.Add(subscription);
         return disposables;
     }
-
-    /// <summary>Logs a missing view resolution result.</summary>
-    /// <param name="viewModel">The view model that could not be resolved.</param>
-    /// <param name="contract">The optional view contract.</param>
-    private void LogMissingView(object viewModel, string? contract)
-    {
-        if (contract is null)
-        {
-            this.Log().Warn($"Couldn't find view for '{viewModel}'. Is it registered? Falling back to default content.");
-            return;
-        }
-
-        this.Log().Warn($"Couldn't find view with contract '{contract}' for '{viewModel}'. Is it registered? Falling back to default content.");
-    }
-
-    /// <summary>Represents a pending navigation target.</summary>
-    /// <param name="ViewModel">The view model to display.</param>
-    /// <param name="Contract">The optional view contract.</param>
-    private readonly record struct NavigationTarget(object? ViewModel, string? Contract);
 }

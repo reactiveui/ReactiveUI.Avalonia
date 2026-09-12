@@ -32,11 +32,9 @@ public class ReactiveWindowBase : Window, IViewFor
     }
 
     /// <inheritdoc/>
-    /// <remarks>This member is implemented explicitly so that a strongly typed derived class (such as
-    /// <c>ReactiveWindow&lt;TViewModel&gt;</c>) can expose the single public <c>ViewModel</c> property. Exposing a
-    /// public <c>object?</c> property here as well would result in two public <c>ViewModel</c> properties of differing
-    /// types in the hierarchy, causing <see cref="System.Reflection.AmbiguousMatchException"/> when ReactiveUI resolves
-    /// the property by name during view model activation.</remarks>
+    /// <remarks>Implemented explicitly so <c>ReactiveWindow&lt;TViewModel&gt;</c> can expose the only public
+    /// <c>ViewModel</c> property; two public properties of that name and differing types would make ReactiveUI's
+    /// resolution of it by name throw <see cref="System.Reflection.AmbiguousMatchException"/>.</remarks>
     object? IViewFor.ViewModel
     {
         get => GetValue(ViewModelProperty);
@@ -49,14 +47,12 @@ public class ReactiveWindowBase : Window, IViewFor
         ArgumentNullException.ThrowIfNull(change);
         base.OnPropertyChanged(change);
 
-        if (change.Property == DataContextProperty
-            && ReferenceEquals(change.OldValue, GetValue(ViewModelProperty))
-            && IsValidViewModelValue(change.NewValue))
+        var step = ViewModelPropertySync.Classify(this, change, ViewModelProperty);
+        if (step == ViewModelSyncStep.AdoptDataContext && IsValidViewModelValue(change.NewValue))
         {
             SetCurrentValue(ViewModelProperty, change.NewValue);
         }
-        else if (change.Property == ViewModelProperty
-                 && ReferenceEquals(change.OldValue, DataContext))
+        else if (step == ViewModelSyncStep.PushToDataContext)
         {
             SetCurrentValue(DataContextProperty, change.NewValue);
         }

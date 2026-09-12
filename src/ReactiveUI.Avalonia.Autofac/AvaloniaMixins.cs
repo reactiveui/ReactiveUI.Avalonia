@@ -62,10 +62,7 @@ public static class AvaloniaMixins
                 module.Configure(default!);
                 containerConfig(containerBuilder);
 
-                var rxuiBuilder = AppLocator.CurrentMutable.CreateReactiveUIBuilder();
-                _ = rxuiBuilder.WithAvalonia();
-                withReactiveUIBuilder?.Invoke(rxuiBuilder);
-                SplatApp.BuildIfNeeded(rxuiBuilder);
+                SplatApp.BuildWithAvalonia(withReactiveUIBuilder);
 
                 var container = containerBuilder.Build();
                 var autofacResolver = container.Resolve<AutofacDependencyResolver>();
