@@ -54,7 +54,7 @@ jobs:
       bump: ${{ inputs.versionOverride != '' && '' || inputs.bump }}
       preRelease: ${{ inputs.channel != 'none' && inputs.channel || '' }}
       versionOverride: ${{ inputs.versionOverride }}
-      ref: ${{ inputs.sourceRef }}
+      sourceRef: ${{ inputs.sourceRef }}
     secrets:
       CERTUM_USER_ID: ${{ secrets.CERTUM_USER_ID }}
       CERTUM_OTP_URI: ${{ secrets.CERTUM_OTP_URI }}
