@@ -7,7 +7,7 @@
     <!-- StyleSharp.Analyzers, PerformanceSharp.Analyzers and SecuritySharp.Analyzers ship from the
          same release pipeline and always share a version. -->
     <RoslynCommonAnalyzersVersion>5.0.3</RoslynCommonAnalyzersVersion>
-    <ReactiveUIPrimitivesVersion>7.5.0</ReactiveUIPrimitivesVersion>
+    <ReactiveUIPrimitivesVersion>8.0.0</ReactiveUIPrimitivesVersion>
   </PropertyGroup>
 
   <ItemGroup Label="Core packages">
