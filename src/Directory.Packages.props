@@ -6,7 +6,7 @@
     <SplatVersion>21.0.0</SplatVersion>
     <!-- StyleSharp.Analyzers, PerformanceSharp.Analyzers and SecuritySharp.Analyzers ship from the
          same release pipeline and always share a version. -->
-    <RoslynCommonAnalyzersVersion>5.0.3</RoslynCommonAnalyzersVersion>
+    <RoslynCommonAnalyzersVersion>5.1.2</RoslynCommonAnalyzersVersion>
     <ReactiveUIPrimitivesVersion>8.0.0</ReactiveUIPrimitivesVersion>
   </PropertyGroup>
 
