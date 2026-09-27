@@ -15,7 +15,8 @@ public class ReactiveWindowBase : Window, IViewFor
     /// <remarks>This field is used to register and reference the ViewModel property within Avalonia's
     /// property system. It enables data binding and change notification for the ViewModel associated with the
     /// window.</remarks>
-    public static readonly StyledProperty<object?> ViewModelProperty = ViewModelPropertySync.Register<ReactiveWindowBase>();
+    public static readonly StyledProperty<object?> ViewModelProperty =
+        AvaloniaProperty.Register<ReactiveWindowBase, object?>(nameof(IViewFor.ViewModel));
 
     /// <summary>Holds the view model value filter so the property-changed path allocates nothing.</summary>
     private readonly Func<object?, bool> _isValidViewModelValue;

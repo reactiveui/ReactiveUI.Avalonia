@@ -359,23 +359,15 @@ public partial class ReactiveShimFullCoverageTests
         /// <summary>The contract that must match.</summary>
         private readonly string? _contract = contract;
 
-        /// <inheritdoc/>
-        public IViewFor<TViewModel>? ResolveView<TViewModel>()
-            where TViewModel : class =>
-            ResolveView<TViewModel>(contract: null);
-
-        /// <inheritdoc/>
-        public IViewFor<TViewModel>? ResolveView<TViewModel>(string? contract)
-            where TViewModel : class =>
-            IsMatch(contract) ? _view as IViewFor<TViewModel> : null;
-
-        /// <inheritdoc/>
-        public IViewFor? ResolveView(object? instance) =>
-            ResolveView(instance, contract: null);
-
-        /// <inheritdoc/>
-        public IViewFor? ResolveView(object? instance, string? contract) =>
+        IViewFor? IViewLocator.ResolveView<TViewModel>(TViewModel viewModel, string? contract) =>
             IsMatch(contract) ? _view : null;
+
+        IViewFor? IViewLocator.ResolveView(object? viewModel, string? contract) =>
+            IsMatch(contract) ? _view : null;
+
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Test locator implementation mirrors the runtime-type service lookup.")]
+        IViewFor? IViewLocator.ResolveViewUnsafe(object? viewModel, string? contract) =>
+            ((IViewLocator)this).ResolveView(viewModel, contract);
 
         /// <summary>Returns whether the requested contract matches this locator.</summary>
         /// <param name="contract">The requested contract.</param>

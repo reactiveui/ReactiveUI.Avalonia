@@ -33,7 +33,8 @@
     <Using Include="Avalonia.Interactivity" />
     <Using Include="ReactiveUI.Builder" />
     <Using Include="ReactiveUI.Primitives" />
-    <Using Include="ReactiveUI.ViewLocator" Alias="CurrentViewLocator" />
+    <Using Include="ReactiveUI.Binding" />
+    <Using Include="ReactiveUI.Binding.ViewLocator" Alias="CurrentViewLocator" />
     <Using Include="ReactiveUI.Primitives.Concurrency" />
     <Using Include="ReactiveUI.Primitives.Disposables" />
     <Using Include="ReactiveUI.Primitives.Signals" />

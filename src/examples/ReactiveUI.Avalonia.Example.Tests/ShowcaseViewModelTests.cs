@@ -22,6 +22,9 @@ public sealed class ShowcaseViewModelTests
     /// <summary>The warning threshold below the sample utilization.</summary>
     private const double WarningThreshold = 10;
 
+    /// <summary>The maximum wait for a reactive state update.</summary>
+    private static readonly TimeSpan StateUpdateTimeout = TimeSpan.FromSeconds(5);
+
     /// <summary>Verifies navigation, back availability, and reset through the real routing commands.</summary>
     /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
@@ -74,6 +77,24 @@ public sealed class ShowcaseViewModelTests
         await Assert.That(viewModel.InteractionStatus).Contains("acknowledged");
     }
 
+    /// <summary>Verifies command failures report when no active view handles the interaction.</summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
+    [Test]
+    public async Task Command_Lab_Reports_Unhandled_Error_Interaction()
+    {
+        using var shell = MainViewModel.Create(new FixedMetricsService());
+        var viewModel = shell.Commands;
+        var statusUpdate = viewModel.WhenAnyValue(static model => model.InteractionStatus)
+            .Where(static status => status.StartsWith("No active view handled", StringComparison.Ordinal))
+            .Take(1)
+            .ToTask();
+
+        await Assert.That(() => viewModel.FailWork.Execute(Unit.Default).ToTask())
+            .ThrowsExactly<InvalidOperationException>();
+        await Assert.That(await statusUpdate.WaitAsync(StateUpdateTimeout))
+            .Contains("No active view handled the interaction");
+    }
+
     /// <summary>Verifies computed warning state follows both incoming measurements and user input.</summary>
     /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
@@ -91,6 +112,37 @@ public sealed class ShowcaseViewModelTests
         await Assert.That(viewModel.LoadLabel).Contains("at or above");
         viewModel.CpuWarningThreshold = ProcessorPercent + 1;
         await Assert.That(viewModel.LoadLabel).Contains("below");
+    }
+
+    /// <summary>Verifies the immediate sample command reads and applies a measurement.</summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
+    [Test]
+    public async Task Metrics_SampleOnce_Reads_And_Applies_Snapshot()
+    {
+        using var shell = MainViewModel.Create(new FixedMetricsService());
+        var result = await shell.Metrics.SampleOnce.Execute(Unit.Default).ToTask();
+
+        await Assert.That(result).IsEqualTo(FixedMetricsService.Snapshot);
+        await Assert.That(shell.Metrics.Latest).IsEqualTo(result);
+        await Assert.That(shell.Metrics.SampleCount).IsEqualTo(1);
+    }
+
+    /// <summary>Verifies a failed immediate sample appears in the latest metric status.</summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
+    [Test]
+    public async Task Metrics_SampleOnce_Failure_Updates_Latest_Status()
+    {
+        const string expectedError = "sample failed";
+        using var shell = MainViewModel.Create(new ThrowingMetricsService(expectedError));
+        var statusUpdate = shell.Metrics.WhenAnyValue(static model => model.Latest)
+            .Where(static snapshot => snapshot.Status == "sample failed")
+            .Take(1)
+            .ToTask();
+
+        var sample = shell.Metrics.SampleOnce.Execute(Unit.Default).ToTask();
+        await Assert.That(async () => await sample).ThrowsExactly<InvalidOperationException>();
+        var updatedSnapshot = await statusUpdate.WaitAsync(StateUpdateTimeout);
+        await Assert.That(updatedSnapshot?.Status).IsEqualTo(expectedError);
     }
 
     /// <summary>A deterministic measurement source for view-model tests.</summary>
@@ -115,5 +167,18 @@ public sealed class ShowcaseViewModelTests
         /// <inheritdoc/>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public IObservable<MachineSnapshot> Watch(TimeSpan interval) => Signal.Return(Snapshot);
+    }
+
+    /// <summary>A measurement source that fails immediate reads.</summary>
+    /// <param name="message">The error message to report.</param>
+    private sealed class ThrowingMetricsService(string message) : ILocalMachineMetricsService
+    {
+        /// <inheritdoc/>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public MachineSnapshot ReadSnapshot() => throw new InvalidOperationException(message);
+
+        /// <inheritdoc/>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public IObservable<MachineSnapshot> Watch(TimeSpan interval) => Signal.Return(MachineSnapshot.Empty);
     }
 }

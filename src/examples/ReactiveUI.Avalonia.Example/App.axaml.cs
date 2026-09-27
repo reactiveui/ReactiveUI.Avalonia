@@ -7,7 +7,6 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
-using ReactiveUI;
 using ReactiveUI.Avalonia.Example.Services;
 using ReactiveUI.Avalonia.Example.ViewModels;
 using ReactiveUI.Avalonia.Example.Views;

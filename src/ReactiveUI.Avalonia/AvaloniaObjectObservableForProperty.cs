@@ -14,20 +14,14 @@ namespace ReactiveUI.Avalonia;
 /// notifications for AvaloniaObject instances. It supports both standard and 'before changed' notifications, and
 /// integrates with Avalonia's property registry to identify observable properties. Thread safety and error handling are
 /// managed according to Avalonia and ReactiveUI conventions.</remarks>
-internal class AvaloniaObjectObservableForProperty : ICreatesObservableForProperty
+internal class AvaloniaObjectObservableForProperty : ICreatesObservableForProperty, IEnableLogger
 {
     /// <summary>The affinity assigned to registered Avalonia properties.</summary>
     private const int AvaloniaPropertyAffinity = 4;
 
     /// <inheritdoc/>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     [RequiresUnreferencedCode("Uses reflection over runtime types which is not trim- or AOT-safe.")]
-    public int GetAffinityForObject(Type type, string propertyName) =>
-        GetAffinityForObject(type, propertyName, beforeChanged: false);
-
-    /// <inheritdoc/>
-    [RequiresUnreferencedCode("Uses reflection over runtime types which is not trim- or AOT-safe.")]
-    public int GetAffinityForObject(Type? type, string propertyName, bool beforeChanged)
+    int ICreatesObservableForProperty.GetAffinityForObject(Type? type, string propertyName, bool beforeChanged)
     {
         if (type is null)
         {
@@ -43,27 +37,8 @@ internal class AvaloniaObjectObservableForProperty : ICreatesObservableForProper
     }
 
     /// <inheritdoc/>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     [RequiresUnreferencedCode("Uses reflection over runtime types which is not trim- or AOT-safe.")]
-    public IObservable<IObservedChange<object?, object?>> GetNotificationForProperty(
-        object sender,
-        Expression expression,
-        string propertyName) =>
-        GetNotificationForProperty(sender, expression, propertyName, beforeChanged: false, suppressWarnings: false);
-
-    /// <inheritdoc/>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    [RequiresUnreferencedCode("Uses reflection over runtime types which is not trim- or AOT-safe.")]
-    public IObservable<IObservedChange<object?, object?>> GetNotificationForProperty(
-        object sender,
-        Expression expression,
-        string propertyName,
-        bool beforeChanged) =>
-        GetNotificationForProperty(sender, expression, propertyName, beforeChanged, suppressWarnings: false);
-
-    /// <inheritdoc/>
-    [RequiresUnreferencedCode("Uses reflection over runtime types which is not trim- or AOT-safe.")]
-    public IObservable<IObservedChange<object?, object?>> GetNotificationForProperty(
+    IObservable<IObservedChange<object, object?>> ICreatesObservableForProperty.GetNotificationForProperty(
         object sender,
         Expression expression,
         string propertyName,
@@ -93,7 +68,7 @@ internal class AvaloniaObjectObservableForProperty : ICreatesObservableForProper
 
         return avaloniaObject
             .GetPropertyChangedObservable(avaloniaProperty)
-            .Select(args => new ObservedChange<object?, object?>(args.Sender, expression, args.NewValue));
+            .Select(args => new ObservedChange<object, object?>(args.Sender, expression, args.NewValue));
     }
 
     /// <summary>Retrieves the registered Avalonia property with the specified name for the given type.</summary>

@@ -33,13 +33,13 @@ public class AvaloniaObjectObservableForPropertyTests
         await Assert.That(affinity).IsEqualTo(0);
     }
 
-    /// <summary>Verifies that GetAffinity returns zero for a null type.</summary>
+    /// <summary>Verifies that GetAffinity returns zero for a non-Avalonia type.</summary>
     /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
-    public async Task GetAffinity_NullType_ReturnsZero()
+    public async Task GetAffinity_NonAvaloniaType_ReturnsZero()
     {
         var sut = new AvaloniaObjectObservableForProperty();
-        var affinity = sut.GetAffinityForObject(null, "Foo", beforeChanged: false);
+        var affinity = ((ICreatesObservableForProperty)sut).GetAffinityForObject(typeof(object), "Foo", beforeChanged: false);
         await Assert.That(affinity).IsEqualTo(0);
     }
 
@@ -63,7 +63,7 @@ public class AvaloniaObjectObservableForPropertyTests
         Expression<Func<string?>> expr = () => ctrl.Text;
         var changes = ((ICreatesObservableForProperty)sut).GetNotificationForProperty(ctrl, expr, nameof(TestControl.Text));
 
-        IObservedChange<object?, object?>? last = null;
+        IObservedChange<object, object?>? last = null;
         using var sub = changes.SubscribeSafe(c => last = c, static error => throw error);
 
         ctrl.Text = "hello";
@@ -83,7 +83,7 @@ public class AvaloniaObjectObservableForPropertyTests
         Expression<Func<string?>> expr = () => ctrl.Text;
         var changes = ((ICreatesObservableForProperty)sut).GetNotificationForProperty(ctrl, expr, nameof(TestControl.Text), beforeChanged: true);
 
-        IObservedChange<object?, object?>? last = null;
+        IObservedChange<object, object?>? last = null;
         using var sub = changes.SubscribeSafe(c => last = c, static error => throw error);
 
         ctrl.Text = "before";

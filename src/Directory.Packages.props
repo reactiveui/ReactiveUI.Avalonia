@@ -18,12 +18,12 @@
     <PackageVersion Include="Avalonia.Themes.Fluent" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="10.0.401" />
     <PackageVersion Include="MinVer" Version="8.0.0" />
-    <PackageVersion Include="ReactiveUI" Version="24.3.0" />
+    <PackageVersion Include="ReactiveUI" Version="25.0.1" />
     <PackageVersion Include="ReactiveUI.Primitives" Version="$(ReactiveUIPrimitivesVersion)" />
     <PackageVersion Include="ReactiveUI.Primitives.Reactive" Version="$(ReactiveUIPrimitivesVersion)" />
     <PackageVersion Include="ReactiveUI.Primitives.Avalonia" Version="$(ReactiveUIPrimitivesVersion)" />
     <PackageVersion Include="ReactiveUI.Primitives.Avalonia.Reactive" Version="$(ReactiveUIPrimitivesVersion)" />
-    <PackageVersion Include="ReactiveUI.Reactive" Version="24.3.0" />
+    <PackageVersion Include="ReactiveUI.Reactive" Version="25.0.1" />
     <PackageVersion Include="Splat" Version="$(SplatVersion)" />
     <PackageVersion Include="Splat.Autofac" Version="$(SplatVersion)" />
     <PackageVersion Include="Splat.Drawing" Version="$(SplatVersion)" />
@@ -42,6 +42,6 @@
   <ItemGroup Label="Test packages">
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.10.1" />
     <PackageVersion Include="Microsoft.Testing.Extensions.CodeCoverage" Version="18.11.2" />
-    <PackageVersion Include="TUnit" Version="1.69.0" />
+    <PackageVersion Include="TUnit" Version="1.70.1" />
   </ItemGroup>
 </Project>

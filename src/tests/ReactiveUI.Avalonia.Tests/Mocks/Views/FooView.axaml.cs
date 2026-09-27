@@ -3,7 +3,6 @@
 // See the LICENSE file in the project root for full license information.
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
-using ReactiveUI;
 using ReactiveUIDemo.ViewModels;
 
 namespace ReactiveUIDemo.Views;

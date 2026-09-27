@@ -77,7 +77,7 @@ public class AvaloniaCreatesCommandBindingNullCommandTests
     }
 
     /// <summary>A view model with the nullable command property used by the public binding regression.</summary>
-    private sealed class CommandViewModel : ReactiveObject
+    internal sealed class CommandViewModel : ReactiveObject
     {
         /// <summary>Gets or sets the command bound to the test button.</summary>
         public System.Windows.Input.ICommand? Command
@@ -88,7 +88,7 @@ public class AvaloniaCreatesCommandBindingNullCommandTests
     }
 
     /// <summary>A view exposing the test button to the public command-binding extension.</summary>
-    private sealed class CommandView : ReactiveUserControl<CommandViewModel>
+    internal sealed class CommandView : ReactiveUserControl<CommandViewModel>
     {
         /// <summary>Gets the button bound by the test.</summary>
         public Button Button { get; } = new();

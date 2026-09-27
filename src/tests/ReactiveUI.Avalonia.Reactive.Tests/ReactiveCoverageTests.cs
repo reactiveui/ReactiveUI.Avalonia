@@ -172,28 +172,28 @@ public class ReactiveCoverageTests
     public async Task AvaloniaObjectObservableForProperty_CoversReactivePaths()
     {
         var sut = new AvaloniaObjectObservableForProperty();
+        var propertyObserver = (ICreatesObservableForProperty)sut;
         var control = new TestControl();
         Expression<Func<string?>> expression = () => control.Text;
 
-        await Assert.That(sut.GetAffinityForObject(typeof(TestControl), nameof(TestControl.Text))).IsEqualTo(AvaloniaPropertyAffinity);
-        await Assert.That(sut.GetAffinityForObject((Type?)null, nameof(TestControl.Text), beforeChanged: false)).IsEqualTo(0);
-        await Assert.That(sut.GetAffinityForObject(typeof(object), "Text")).IsEqualTo(0);
-        await Assert.That(sut.GetAffinityForObject(typeof(TestControl), Missing)).IsEqualTo(0);
+        await Assert.That(propertyObserver.GetAffinityForObject(typeof(TestControl), nameof(TestControl.Text))).IsEqualTo(AvaloniaPropertyAffinity);
+        await Assert.That(propertyObserver.GetAffinityForObject(typeof(object), "Text")).IsEqualTo(0);
+        await Assert.That(propertyObserver.GetAffinityForObject(typeof(TestControl), Missing)).IsEqualTo(0);
 
-        IObservedChange<object?, object?>? observed = null;
-        using (sut.GetNotificationForProperty(control, expression, nameof(TestControl.Text), beforeChanged: false)
-            .Subscribe(new RecordingObserver<IObservedChange<object?, object?>>(value => observed = value)))
+        IObservedChange<object, object?>? observed = null;
+        using (propertyObserver.GetNotificationForProperty(control, expression, nameof(TestControl.Text), beforeChanged: false)
+            .Subscribe(new RecordingObserver<IObservedChange<object, object?>>(value => observed = value)))
         {
             control.Text = ReactiveContract;
             await Assert.That(observed).IsNotNull();
             await Assert.That(observed!.Value).IsEqualTo(ReactiveContract);
         }
 
-        await Assert.That(() => sut.GetNotificationForProperty(new(), expression, "Text"))
+        await Assert.That(() => propertyObserver.GetNotificationForProperty(new(), expression, "Text"))
             .ThrowsExactly<InvalidOperationException>();
-        await Assert.That(() => sut.GetNotificationForProperty(control, expression, Missing, beforeChanged: false, suppressWarnings: false))
+        await Assert.That(() => propertyObserver.GetNotificationForProperty(control, expression, Missing, beforeChanged: false, suppressWarnings: false))
             .ThrowsExactly<MissingMemberException>();
-        await Assert.That(() => sut.GetNotificationForProperty(null!, expression, "Text"))
+        await Assert.That(() => propertyObserver.GetNotificationForProperty(null!, expression, "Text"))
             .ThrowsExactly<ArgumentNullException>();
     }
 
@@ -1256,23 +1256,15 @@ public class ReactiveCoverageTests
         /// <summary>The matching contract.</summary>
         private readonly string? _contract = contract;
 
-        /// <inheritdoc/>
-        public IViewFor<TViewModel>? ResolveView<TViewModel>()
-            where TViewModel : class =>
-            ResolveView<TViewModel>(contract: null);
-
-        /// <inheritdoc/>
-        public IViewFor<TViewModel>? ResolveView<TViewModel>(string? contract)
-            where TViewModel : class =>
-            IsMatch(contract) ? _view as IViewFor<TViewModel> : null;
-
-        /// <inheritdoc/>
-        public IViewFor? ResolveView(object? instance) =>
-            ResolveView(instance, contract: null);
-
-        /// <inheritdoc/>
-        public IViewFor? ResolveView(object? instance, string? contract) =>
+        IViewFor? IViewLocator.ResolveView<TViewModel>(TViewModel viewModel, string? contract) =>
             IsMatch(contract) ? _view : null;
+
+        IViewFor? IViewLocator.ResolveView(object? viewModel, string? contract) =>
+            IsMatch(contract) ? _view : null;
+
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Test locator implementation mirrors the runtime-type service lookup.")]
+        IViewFor? IViewLocator.ResolveViewUnsafe(object? viewModel, string? contract) =>
+            ((IViewLocator)this).ResolveView(viewModel, contract);
 
         /// <summary>Returns whether the contract matches.</summary>
         /// <param name="contract">The requested contract.</param>

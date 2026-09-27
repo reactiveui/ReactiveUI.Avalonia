@@ -464,35 +464,35 @@ public partial class ReactiveShimFullCoverageTests
     public async Task ReactiveAvaloniaObjectObservableForProperty_CoversNotificationPaths()
     {
         var sut = new AvaloniaObjectObservableForProperty();
+        var propertyObserver = (ICreatesObservableForProperty)sut;
         var control = new TestControl();
         Expression<Func<string?>> expression = () => control.Text;
 
-        await Assert.That(sut.GetAffinityForObject(typeof(TestControl), nameof(TestControl.Text))).IsEqualTo(StyledPropertyAffinity);
-        await Assert.That(sut.GetAffinityForObject((Type?)null, nameof(TestControl.Text), beforeChanged: false)).IsEqualTo(0);
-        await Assert.That(sut.GetAffinityForObject(typeof(object), "Text")).IsEqualTo(0);
-        await Assert.That(sut.GetAffinityForObject(typeof(TestControl), MissingPropertyName)).IsEqualTo(0);
+        await Assert.That(propertyObserver.GetAffinityForObject(typeof(TestControl), nameof(TestControl.Text))).IsEqualTo(StyledPropertyAffinity);
+        await Assert.That(propertyObserver.GetAffinityForObject(typeof(object), "Text")).IsEqualTo(0);
+        await Assert.That(propertyObserver.GetAffinityForObject(typeof(TestControl), MissingPropertyName)).IsEqualTo(0);
 
-        IObservedChange<object?, object?>? observed = null;
-        using (sut.GetNotificationForProperty(control, expression, nameof(TestControl.Text))
-            .Subscribe(new RecordingObserver<IObservedChange<object?, object?>>(value => observed = value)))
+        IObservedChange<object, object?>? observed = null;
+        using (propertyObserver.GetNotificationForProperty(control, expression, nameof(TestControl.Text))
+            .Subscribe(new RecordingObserver<IObservedChange<object, object?>>(value => observed = value)))
         {
             control.Text = "reactive";
             await Assert.That(observed).IsNotNull();
             await Assert.That(observed!.Value).IsEqualTo("reactive");
         }
 
-        await Assert.That(() => sut.GetNotificationForProperty(new(), expression, "Text"))
+        await Assert.That(() => propertyObserver.GetNotificationForProperty(new(), expression, "Text"))
             .ThrowsExactly<InvalidOperationException>();
-        await Assert.That(() => sut.GetNotificationForProperty(control, expression, MissingPropertyName, beforeChanged: false, suppressWarnings: false))
+        await Assert.That(() => propertyObserver.GetNotificationForProperty(control, expression, MissingPropertyName, beforeChanged: false, suppressWarnings: false))
             .ThrowsExactly<MissingMemberException>();
-        await Assert.That(() => sut.GetNotificationForProperty(control, expression, MissingPropertyName, beforeChanged: false, suppressWarnings: true))
+        await Assert.That(() => propertyObserver.GetNotificationForProperty(control, expression, MissingPropertyName, beforeChanged: false, suppressWarnings: true))
             .ThrowsExactly<MissingMemberException>();
-        await Assert.That(() => sut.GetNotificationForProperty(null!, expression, "Text"))
+        await Assert.That(() => propertyObserver.GetNotificationForProperty(null!, expression, "Text"))
             .ThrowsExactly<ArgumentNullException>();
 
-        IObservedChange<object?, object?>? observedFromOverload = null;
-        using (sut.GetNotificationForProperty(control, expression, nameof(TestControl.Text), beforeChanged: false)
-            .Subscribe(new RecordingObserver<IObservedChange<object?, object?>>(value => observedFromOverload = value)))
+        IObservedChange<object, object?>? observedFromOverload = null;
+        using (propertyObserver.GetNotificationForProperty(control, expression, nameof(TestControl.Text), beforeChanged: false)
+            .Subscribe(new RecordingObserver<IObservedChange<object, object?>>(value => observedFromOverload = value)))
         {
             control.Text = "overload";
             await Assert.That(observedFromOverload).IsNotNull();
