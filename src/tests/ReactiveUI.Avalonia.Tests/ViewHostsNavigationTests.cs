@@ -3,7 +3,6 @@
 // See the LICENSE file in the project root for full license information.
 using Avalonia.Controls;
 using Avalonia.Rendering;
-using Splat;
 
 namespace ReactiveUI.Avalonia.Tests;
 
@@ -578,8 +577,9 @@ public class ViewHostsNavigationTests
     /// <summary>Registers test views into the locator.</summary>
     private static void RegisterViews()
     {
-        Locator.CurrentMutable.Register(static () => new ViewA(), typeof(IViewFor<VmA>));
-        Locator.CurrentMutable.Register(static () => new ViewB(), typeof(IViewFor<VmB>));
+        var locator = (DefaultViewLocator)ViewLocator.GetCurrent();
+        locator.Map<VmA, ViewA>();
+        locator.Map<VmB, ViewB>();
     }
 
     /// <summary>Gets a real presentation source from a headless window.</summary>
@@ -640,23 +640,15 @@ public class ViewHostsNavigationTests
         /// <summary>The contract that must match.</summary>
         private readonly string? _contract = contract;
 
-        /// <inheritdoc/>
-        public IViewFor<TViewModel>? ResolveView<TViewModel>()
-            where TViewModel : class =>
-            ResolveView<TViewModel>(contract: null);
-
-        /// <inheritdoc/>
-        public IViewFor<TViewModel>? ResolveView<TViewModel>(string? contract)
-            where TViewModel : class =>
-            IsMatch(contract) ? _view as IViewFor<TViewModel> : null;
-
-        /// <inheritdoc/>
-        public IViewFor? ResolveView(object? instance) =>
-            ResolveView(instance, contract: null);
-
-        /// <inheritdoc/>
-        public IViewFor? ResolveView(object? instance, string? contract) =>
+        IViewFor? IViewLocator.ResolveView<TViewModel>(TViewModel viewModel, string? contract) =>
             IsMatch(contract) ? _view : null;
+
+        IViewFor? IViewLocator.ResolveView(object? viewModel, string? contract) =>
+            IsMatch(contract) ? _view : null;
+
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Test locator implementation mirrors the runtime-type service lookup.")]
+        IViewFor? IViewLocator.ResolveViewUnsafe(object? viewModel, string? contract) =>
+            ((IViewLocator)this).ResolveView(viewModel, contract);
 
         /// <summary>Returns whether the requested contract matches this locator.</summary>
         /// <param name="contract">The requested contract.</param>

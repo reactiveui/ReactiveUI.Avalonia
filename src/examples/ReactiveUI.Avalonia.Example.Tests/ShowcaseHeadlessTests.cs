@@ -9,7 +9,6 @@ using Avalonia.Input;
 using Avalonia.Styling;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
-using ReactiveUI;
 using ReactiveUI.Avalonia.Example.Models;
 using ReactiveUI.Avalonia.Example.Services;
 using ReactiveUI.Avalonia.Example.ViewModels;

@@ -26,7 +26,7 @@ internal static class ViewHostNavigation
     internal static IViewFor? ResolveView<THost>(THost host, object viewModel, string? contract, IViewLocator? viewLocator)
         where THost : class, IEnableLogger
     {
-        var locator = viewLocator ?? CurrentViewLocator.Current;
+        var locator = viewLocator ?? CurrentViewLocator.GetCurrent();
         var viewInstance = locator.ResolveView(viewModel, contract);
         if (viewInstance is null)
         {

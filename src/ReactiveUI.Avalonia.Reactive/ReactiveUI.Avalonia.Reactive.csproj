@@ -44,7 +44,8 @@
     <Using Include="ReactiveUI.Reactive.Builder" />
     <Using Include="ReactiveUI.Primitives.Reactive.Concurrency" />
     <Using Include="ReactiveUI.Primitives.Signals" />
-    <Using Include="ReactiveUI.ViewLocator" Alias="CurrentViewLocator" />
+    <Using Include="ReactiveUI.Binding.Reactive" />
+    <Using Include="ReactiveUI.Binding.Reactive.ViewLocator" Alias="CurrentViewLocator" />
     <Using Include="ReactiveUI.Primitives.LinqExtensions" Alias="PrimitivesLinqExtensions" />
     <Using Include="ReactiveUI.Reactive.Builder.ReactiveUIBuilder" Alias="ReactiveUIBuilder" />
     <Using Include="ReactiveUI.Reactive.Builder.IReactiveUIBuilder" Alias="IReactiveUIBuilder" />

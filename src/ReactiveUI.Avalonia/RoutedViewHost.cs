@@ -146,9 +146,13 @@ public class RoutedViewHost : TransitioningContentControl, IActivatableView, IEn
 
         var routerChanges = this.GetObservable(RouterProperty);
         var viewContract = this.GetObservable(ViewContractProperty);
-        var viewModels = routerChanges
-            .Select(static router => router is null ? Observable.Return<object?>(null) : CreateRouterViewModelObservable(router))
-            .Switch();
+        var viewModelSources = routerChanges
+            .Select(static router => router is null ? Observable.Return<object?>(null) : CreateRouterViewModelObservable(router));
+#if REACTIVE_SHIM
+        var viewModels = System.Reactive.Linq.Observable.Switch(viewModelSources);
+#else
+        var viewModels = viewModelSources.SwitchTo();
+#endif
         var navigation = viewModels
             .CombineLatest(viewContract, static (viewModel, contract) => new NavigationTarget(viewModel, contract));
 

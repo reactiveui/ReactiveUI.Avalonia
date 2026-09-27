@@ -12,6 +12,9 @@ namespace ReactiveUI.Avalonia.Example.Tests;
 /// <summary>Tests suspension persistence and deferral release against isolated temporary session files.</summary>
 public sealed class ShowcaseSessionTests
 {
+    /// <summary>The prefix used for recoverable session storage errors.</summary>
+    private const string StorageErrorPrefix = "Session storage:";
+
     /// <summary>Verifies a persistence request saves settings and the next launch restores them.</summary>
     /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
@@ -49,7 +52,7 @@ public sealed class ShowcaseSessionTests
             using var recovered = MainViewModel.Create(new LocalMachineMetricsService());
             using var recovery = new ShowcaseSession(new ClassicDesktopStyleApplicationLifetime(), recovered, path);
             recovery.Start();
-            await Assert.That(recovered.SessionStatus).StartsWith("Session storage:");
+            await Assert.That(recovered.SessionStatus).StartsWith(StorageErrorPrefix);
             await Assert.That(recovered.Commands.WorkItemText).IsEqualTo(string.Empty);
         }
         finally
@@ -79,7 +82,39 @@ public sealed class ShowcaseSessionTests
             var released = new StrongBox<bool>();
             session.Persist(Scope.Create(released, static state => state.Value = true));
             await Assert.That(released.Value).IsTrue();
-            await Assert.That(shell.SessionStatus).StartsWith("Session storage:");
+            await Assert.That(shell.SessionStatus).StartsWith(StorageErrorPrefix);
+        }
+        finally
+        {
+            Directory.Delete(directory, recursive: true);
+        }
+    }
+
+    /// <summary>Verifies crash invalidation deletes valid state and reports a failed deletion.</summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
+    [Test]
+    public async Task Invalidation_Deletes_State_And_Reports_Storage_Failure()
+    {
+        var directory = Path.Combine(Path.GetTempPath(), $"AvaloniaShowcase-{Guid.NewGuid():N}");
+        _ = Directory.CreateDirectory(directory);
+        var path = Path.Combine(directory, "session.json");
+        var invalidPath = Path.Combine(directory, "directory-instead-of-file");
+        _ = Directory.CreateDirectory(invalidPath);
+        await File.WriteAllTextAsync(path, "{}");
+        try
+        {
+            using (var shell = MainViewModel.Create(new LocalMachineMetricsService()))
+            using (var session = new ShowcaseSession(new ClassicDesktopStyleApplicationLifetime(), shell, path))
+            {
+                session.Invalidate();
+                await Assert.That(File.Exists(path)).IsFalse();
+            }
+
+            using var failedShell = MainViewModel.Create(new LocalMachineMetricsService());
+            using var failedSession = new ShowcaseSession(new ClassicDesktopStyleApplicationLifetime(), failedShell, invalidPath);
+            failedSession.Invalidate();
+            await Assert.That(failedShell.SessionStatus).StartsWith(StorageErrorPrefix);
+            await Assert.That(Directory.Exists(invalidPath)).IsTrue();
         }
         finally
         {

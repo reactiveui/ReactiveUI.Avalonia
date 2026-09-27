@@ -1,8 +1,6 @@
 // Copyright (c) 2019-2026 ReactiveUI Association Incorporated. All rights reserved.
 // ReactiveUI Association Incorporated licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for full license information.
-using System.Runtime.CompilerServices;
-
 #if REACTIVE_SHIM
 namespace ReactiveUI.Avalonia.Reactive;
 #else
@@ -17,14 +15,6 @@ namespace ReactiveUI.Avalonia;
 /// </remarks>
 internal static class ViewModelPropertySync
 {
-    /// <summary>Registers the Avalonia view model property for a view type.</summary>
-    /// <typeparam name="TOwner">The view type that owns the property.</typeparam>
-    /// <returns>The registered property.</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static StyledProperty<object?> Register<TOwner>()
-        where TOwner : AvaloniaObject =>
-        AvaloniaProperty.Register<TOwner, object?>(nameof(IViewFor.ViewModel));
-
     /// <summary>Forwards the view's activation to its view model when the view model takes part in activation.</summary>
     /// <typeparam name="TView">The view type.</typeparam>
     /// <param name="view">The view to activate with.</param>

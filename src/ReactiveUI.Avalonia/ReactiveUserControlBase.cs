@@ -15,7 +15,8 @@ public class ReactiveUserControlBase : UserControl, IViewFor
     /// <remarks>This property enables data binding of a view model to a ReactiveUserControl instance in
     /// Avalonia applications. It is typically used to associate a view model with the control for reactive UI
     /// scenarios.</remarks>
-    public static readonly StyledProperty<object?> ViewModelProperty = ViewModelPropertySync.Register<ReactiveUserControlBase>();
+    public static readonly StyledProperty<object?> ViewModelProperty =
+        AvaloniaProperty.Register<ReactiveUserControlBase, object?>(nameof(IViewFor.ViewModel));
 
     /// <summary>Holds the view model value filter so the property-changed path allocates nothing.</summary>
     private readonly Func<object?, bool> _isValidViewModelValue;

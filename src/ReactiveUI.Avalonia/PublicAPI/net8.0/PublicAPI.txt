@@ -39,10 +39,10 @@ public static class AppBuilderExtensions
         public ReactiveUI.Builder.IReactiveUIBuilder WithAvalonia() { }
     }
 }
-public class AutoDataTemplateBindingHook : ReactiveUI.IPropertyBindingHook
+public class AutoDataTemplateBindingHook : ReactiveUI.Binding.IPropertyBindingHook
 {
     public AutoDataTemplateBindingHook() { }
-    public bool ExecuteHook(object? source, object target, System.Func<ReactiveUI.IObservedChange<object, object>[]> getCurrentViewModelProperties, System.Func<ReactiveUI.IObservedChange<object, object>[]> getCurrentViewProperties, ReactiveUI.BindingDirection direction) { }
+    public bool ExecuteHook(object? source, object target, System.Func<ReactiveUI.Binding.IObservedChange<object, object>[]> getCurrentViewModelProperties, System.Func<ReactiveUI.Binding.IObservedChange<object, object>[]> getCurrentViewProperties, ReactiveUI.Binding.BindingDirection direction) { }
 }
 [System.Diagnostics.DebuggerDisplay("AutoSuspendHelper: {_shouldPersistState}")]
 public sealed class AutoSuspendHelper : Splat.IEnableLogger, System.IDisposable
@@ -55,7 +55,7 @@ public sealed class AutoSuspendHelper : Splat.IEnableLogger, System.IDisposable
 public class AvaloniaActivationForViewFetcher : ReactiveUI.IActivationForViewFetcher
 {
     public AvaloniaActivationForViewFetcher() { }
-    public System.IObservable<bool> GetActivationForView(ReactiveUI.IActivatableView view) { }
+    public System.IObservable<bool> GetActivationForView(ReactiveUI.Binding.IActivatableView view) { }
     public int GetAffinityForView(System.Type view) { }
 }
 public static class AvaloniaObjectReactiveExtensions
@@ -73,45 +73,45 @@ public static class AvaloniaObjectReactiveExtensions
     }
 }
 [System.Diagnostics.DebuggerDisplay("ReactiveUserControl: {ViewModel}")]
-public class ReactiveUserControl<TViewModel> : ReactiveUI.Avalonia.ReactiveUserControlBase, ReactiveUI.IViewFor<TViewModel> where TViewModel : class
+public class ReactiveUserControl<TViewModel> : ReactiveUI.Avalonia.ReactiveUserControlBase, ReactiveUI.Binding.IViewFor<TViewModel> where TViewModel : class
 {
     [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("ReactiveUI activation evaluates expression-based member chains via reflection; members may be trimmed.")]
     public ReactiveUserControl() { }
-    object? ReactiveUI.IViewFor.ViewModel { get; set; }
+    object? ReactiveUI.Binding.IViewFor.ViewModel { get; set; }
     public TViewModel? ViewModel { get; set; }
     protected override bool IsValidViewModelValue(object? value) { }
 }
 [System.Diagnostics.DebuggerDisplay("ReactiveUserControlBase: {ToString(),nq}")]
-public class ReactiveUserControlBase : Avalonia.Controls.UserControl, ReactiveUI.IViewFor
+public class ReactiveUserControlBase : Avalonia.Controls.UserControl, ReactiveUI.Binding.IViewFor
 {
     [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("ReactiveUI activation evaluates expression-based member chains via reflection; members may be trimmed.")]
     protected ReactiveUserControlBase() { }
     public static readonly Avalonia.StyledProperty<object?> ViewModelProperty;
-    object? ReactiveUI.IViewFor.ViewModel { get; set; }
+    object? ReactiveUI.Binding.IViewFor.ViewModel { get; set; }
     protected virtual bool IsValidViewModelValue(object? value) { }
     protected override void OnPropertyChanged(Avalonia.AvaloniaPropertyChangedEventArgs change) { }
 }
 [System.Diagnostics.DebuggerDisplay("ReactiveWindow: {ViewModel}")]
-public class ReactiveWindow<TViewModel> : ReactiveUI.Avalonia.ReactiveWindowBase, ReactiveUI.IViewFor<TViewModel> where TViewModel : class
+public class ReactiveWindow<TViewModel> : ReactiveUI.Avalonia.ReactiveWindowBase, ReactiveUI.Binding.IViewFor<TViewModel> where TViewModel : class
 {
     [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("ReactiveUI activation evaluates expression-based member chains via reflection; members may be trimmed.")]
     public ReactiveWindow() { }
-    object? ReactiveUI.IViewFor.ViewModel { get; set; }
+    object? ReactiveUI.Binding.IViewFor.ViewModel { get; set; }
     public TViewModel? ViewModel { get; set; }
     protected override bool IsValidViewModelValue(object? value) { }
 }
 [System.Diagnostics.DebuggerDisplay("ReactiveWindowBase: {ToString(),nq}")]
-public class ReactiveWindowBase : Avalonia.Controls.Window, ReactiveUI.IViewFor
+public class ReactiveWindowBase : Avalonia.Controls.Window, ReactiveUI.Binding.IViewFor
 {
     [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("ReactiveUI activation evaluates expression-based member chains via reflection; members may be trimmed.")]
     protected ReactiveWindowBase() { }
     public static readonly Avalonia.StyledProperty<object?> ViewModelProperty;
-    object? ReactiveUI.IViewFor.ViewModel { get; set; }
+    object? ReactiveUI.Binding.IViewFor.ViewModel { get; set; }
     protected virtual bool IsValidViewModelValue(object? value) { }
     protected override void OnPropertyChanged(Avalonia.AvaloniaPropertyChangedEventArgs change) { }
 }
 [System.Diagnostics.DebuggerDisplay("RoutedViewHost: {Router}")]
-public class RoutedViewHost : Avalonia.Controls.TransitioningContentControl, ReactiveUI.IActivatableView, Splat.IEnableLogger
+public class RoutedViewHost : Avalonia.Controls.TransitioningContentControl, ReactiveUI.Binding.IActivatableView, Splat.IEnableLogger
 {
     public RoutedViewHost() { }
     public static readonly Avalonia.StyledProperty<object?> DefaultContentProperty;
@@ -121,12 +121,12 @@ public class RoutedViewHost : Avalonia.Controls.TransitioningContentControl, Rea
     public ReactiveUI.RoutingState? Router { get; set; }
     protected override System.Type StyleKeyOverride { get; }
     public string? ViewContract { get; set; }
-    public ReactiveUI.IViewLocator? ViewLocator { get; set; }
+    public ReactiveUI.Binding.IViewLocator? ViewLocator { get; set; }
     protected override void OnAttachedToVisualTree(Avalonia.VisualTreeAttachmentEventArgs e) { }
     protected override void OnDetachedFromVisualTree(Avalonia.VisualTreeAttachmentEventArgs e) { }
 }
 [System.Diagnostics.DebuggerDisplay("ViewModelViewHost: {ViewModel}")]
-public class ViewModelViewHost : Avalonia.Controls.TransitioningContentControl, ReactiveUI.IViewFor, Splat.IEnableLogger
+public class ViewModelViewHost : Avalonia.Controls.TransitioningContentControl, ReactiveUI.Binding.IViewFor, Splat.IEnableLogger
 {
     public ViewModelViewHost() { }
     public static readonly Avalonia.StyledProperty<object?> DefaultContentProperty;
@@ -135,7 +135,7 @@ public class ViewModelViewHost : Avalonia.Controls.TransitioningContentControl, 
     public object? DefaultContent { get; set; }
     protected override System.Type StyleKeyOverride { get; }
     public string? ViewContract { get; set; }
-    public ReactiveUI.IViewLocator? ViewLocator { get; set; }
+    public ReactiveUI.Binding.IViewLocator? ViewLocator { get; set; }
     public object? ViewModel { get; set; }
     protected override void OnAttachedToVisualTree(Avalonia.VisualTreeAttachmentEventArgs e) { }
     protected override void OnDetachedFromVisualTree(Avalonia.VisualTreeAttachmentEventArgs e) { }

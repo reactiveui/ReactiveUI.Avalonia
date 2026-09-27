@@ -39,9 +39,11 @@ public sealed class MetricsViewModel : PageViewModel
         _ = Track(SampleOnce.ThrownExceptions.SubscribeSafe(ApplyError, ApplyError));
 
         _loadLabel = this.WhenAnyValue(
-            static x => x.Latest.ProcessorPercent,
+            static x => x.Latest,
             static x => x.CpuWarningThreshold,
-            static (cpu, threshold) => cpu >= threshold ? "CPU is at or above the warning threshold." : "CPU is below the warning threshold.")
+            static (snapshot, threshold) => snapshot.ProcessorPercent >= threshold
+                ? "CPU is at or above the warning threshold."
+                : "CPU is below the warning threshold.")
             .ToProperty(this, static x => x.LoadLabel, "Waiting for live data.");
 
         this.WhenActivated(disposables =>

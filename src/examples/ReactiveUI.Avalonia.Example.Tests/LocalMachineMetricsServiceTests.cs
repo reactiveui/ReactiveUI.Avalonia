@@ -31,4 +31,23 @@ public sealed class LocalMachineMetricsServiceTests
         await Assert.That(snapshot.ProcessorPercent).IsGreaterThanOrEqualTo(0);
         await Assert.That(snapshot.ProcessorPercent).IsLessThanOrEqualTo(maximumPercentage);
     }
+
+    /// <summary>Verifies a non-advancing clock produces a zero processor percentage.</summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
+    [Test]
+    public async Task ReadSnapshot_NonAdvancingClock_ProducesZeroProcessorPercentage()
+    {
+        var service = new LocalMachineMetricsService(new FixedTimeProvider(DateTimeOffset.UnixEpoch));
+        _ = service.ReadSnapshot();
+
+        await Assert.That(service.ReadSnapshot().ProcessorPercent).IsEqualTo(0);
+    }
+
+    /// <summary>A clock fixed to one instant for deterministic elapsed-time paths.</summary>
+    /// <param name="instant">The instant returned by the clock.</param>
+    private sealed class FixedTimeProvider(DateTimeOffset instant) : TimeProvider
+    {
+        /// <inheritdoc/>
+        public override DateTimeOffset GetUtcNow() => instant;
+    }
 }

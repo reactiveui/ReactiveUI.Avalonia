@@ -25,5 +25,6 @@
     <Using Include="ReactiveUI.Primitives.Disposables" />
     <Using Include="ReactiveUI.Primitives.Signals" />
     <Using Include="ReactiveUI.Reactive.ReactiveObject" Alias="ReactiveObject" />
+    <Using Include="ReactiveUI.Binding.Reactive" />
   </ItemGroup>
 </Project>

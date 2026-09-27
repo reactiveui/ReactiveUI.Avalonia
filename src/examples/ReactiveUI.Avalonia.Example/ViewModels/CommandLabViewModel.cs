@@ -122,7 +122,7 @@ public sealed class CommandLabViewModel : PageViewModel
     private void HandleError(Exception error)
     {
         LastError = error.Message;
-        _ = ReportError.Handle(error.Message).SubscribeSafe(
+        _ = ReportError.WhenHandled(error.Message).SubscribeSafe<Unit>(
             static _ => { },
             interactionError => InteractionStatus = $"No active view handled the interaction: {interactionError.Message}");
     }

@@ -75,6 +75,19 @@ public sealed class ShowcaseSession : IDisposable
         }
     }
 
+    /// <summary>Removes settings after an unhandled application exception.</summary>
+    internal void Invalidate()
+    {
+        try
+        {
+            File.Delete(_path);
+        }
+        catch (Exception error) when (error is IOException or UnauthorizedAccessException)
+        {
+            ReportFailure(error);
+        }
+    }
+
     /// <summary>Restores the last session or reports a recoverable storage error.</summary>
     /// <exception cref="JsonException">Thrown when <c>JsonSerializer.Deserialize(File.ReadAllText(_path), ShowcaseJsonContext.Default.ShowcaseState)</c> is <see langword="null"/>.</exception>
     private void Restore()
@@ -94,19 +107,6 @@ public sealed class ShowcaseSession : IDisposable
             _shell.SessionStatus = "Previous input and threshold restored.";
         }
         catch (Exception error) when (error is IOException or UnauthorizedAccessException or JsonException)
-        {
-            ReportFailure(error);
-        }
-    }
-
-    /// <summary>Removes settings after an unhandled application exception.</summary>
-    private void Invalidate()
-    {
-        try
-        {
-            File.Delete(_path);
-        }
-        catch (Exception error) when (error is IOException or UnauthorizedAccessException)
         {
             ReportFailure(error);
         }

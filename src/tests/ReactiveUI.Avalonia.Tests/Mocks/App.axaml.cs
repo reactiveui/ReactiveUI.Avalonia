@@ -4,7 +4,6 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
-using ReactiveUI;
 using ReactiveUIDemo.ViewModels;
 using ReactiveUIDemo.Views;
 using Splat;
