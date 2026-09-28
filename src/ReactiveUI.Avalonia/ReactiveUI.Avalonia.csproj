@@ -12,6 +12,7 @@
     <PackageReference Include="ReactiveUI" ExcludeAssets="analyzers" />
     <PackageReference Include="ReactiveUI.Primitives" ExcludeAssets="analyzers" />
     <PackageReference Include="ReactiveUI.Primitives.Avalonia" ExcludeAssets="analyzers" />
+    <PackageReference Include="ReactiveUI.Binding.Avalonia" ExcludeAssets="analyzers" />
   </ItemGroup>
 
   <ItemGroup>

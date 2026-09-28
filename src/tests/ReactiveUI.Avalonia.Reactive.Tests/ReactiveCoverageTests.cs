@@ -21,14 +21,8 @@ namespace ReactiveUI.Avalonia.Reactive.Tests;
 /// <summary>Coverage tests for the normally referenced ReactiveUI.Avalonia.Reactive assembly.</summary>
 public class ReactiveCoverageTests
 {
-    /// <summary>The affinity assigned to Avalonia property notifications.</summary>
-    private const int AvaloniaPropertyAffinity = 4;
-
     /// <summary>The default host content used by navigation tests.</summary>
     private const string DefaultContentValue = "default";
-
-    /// <summary>The missing property name used by notification tests.</summary>
-    private const string Missing = nameof(Missing);
 
     /// <summary>The view contract used by registration tests.</summary>
     private const string ReactiveContract = "reactive";
@@ -164,37 +158,6 @@ public class ReactiveCoverageTests
 
         await Assert.That(CoverReactiveUserControlsBeforeFirstAwait(control, vm, second)).IsTrue();
         await Assert.That(CoverReactiveWindowsBeforeFirstAwait(control, vm, second)).IsTrue();
-    }
-
-    /// <summary>Covers reactive property observation and missing-property paths.</summary>
-    /// <returns>A task representing the asynchronous test operation.</returns>
-    [Test]
-    public async Task AvaloniaObjectObservableForProperty_CoversReactivePaths()
-    {
-        var sut = new AvaloniaObjectObservableForProperty();
-        var propertyObserver = (ICreatesObservableForProperty)sut;
-        var control = new TestControl();
-        Expression<Func<string?>> expression = () => control.Text;
-
-        await Assert.That(propertyObserver.GetAffinityForObject(typeof(TestControl), nameof(TestControl.Text))).IsEqualTo(AvaloniaPropertyAffinity);
-        await Assert.That(propertyObserver.GetAffinityForObject(typeof(object), "Text")).IsEqualTo(0);
-        await Assert.That(propertyObserver.GetAffinityForObject(typeof(TestControl), Missing)).IsEqualTo(0);
-
-        IObservedChange<object, object?>? observed = null;
-        using (propertyObserver.GetNotificationForProperty(control, expression, nameof(TestControl.Text), beforeChanged: false)
-            .Subscribe(new RecordingObserver<IObservedChange<object, object?>>(value => observed = value)))
-        {
-            control.Text = ReactiveContract;
-            await Assert.That(observed).IsNotNull();
-            await Assert.That(observed!.Value).IsEqualTo(ReactiveContract);
-        }
-
-        await Assert.That(() => propertyObserver.GetNotificationForProperty(new(), expression, "Text"))
-            .ThrowsExactly<InvalidOperationException>();
-        await Assert.That(() => propertyObserver.GetNotificationForProperty(control, expression, Missing, beforeChanged: false, suppressWarnings: false))
-            .ThrowsExactly<MissingMemberException>();
-        await Assert.That(() => propertyObserver.GetNotificationForProperty(null!, expression, "Text"))
-            .ThrowsExactly<ArgumentNullException>();
     }
 
     /// <summary>Covers reactive view-host navigation and visual-tree subscriptions.</summary>
@@ -1066,41 +1029,6 @@ public class ReactiveCoverageTests
         /// <summary>Disposes this resolver. It owns no managed or unmanaged resources.</summary>
         /// <param name="disposing">Whether the caller is disposing managed resources.</param>
         protected virtual void Dispose(bool disposing) => _ = disposing;
-    }
-
-    /// <summary>A recording observer.</summary>
-    /// <typeparam name="T">The observed type.</typeparam>
-    /// <param name="onNext">The observed-value action.</param>
-    private sealed class RecordingObserver<T>(Action<T> onNext) : IObserver<T>
-    {
-        /// <summary>The action invoked for observed values.</summary>
-        private readonly Action<T> _onNext = onNext;
-
-        /// <inheritdoc/>
-        public void OnCompleted()
-        {
-        }
-
-        /// <inheritdoc/>
-        public void OnError(Exception error) => throw error;
-
-        /// <inheritdoc/>
-        public void OnNext(T value) => _onNext(value);
-    }
-
-    /// <summary>A test control with a styled text property.</summary>
-    private sealed class TestControl : Control
-    {
-        /// <summary>The text property.</summary>
-        private static readonly StyledProperty<string?> TextProperty =
-            AvaloniaProperty.Register<TestControl, string?>(nameof(Text));
-
-        /// <summary>Gets or sets text.</summary>
-        public string? Text
-        {
-            get => GetValue(TextProperty);
-            set => SetValue(TextProperty, value);
-        }
     }
 
     /// <summary>A test view model.</summary>

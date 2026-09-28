@@ -4,8 +4,12 @@
 using System.Runtime.CompilerServices;
 
 #if REACTIVE_SHIM
+using AvaloniaBindingModule = ReactiveUI.Binding.Reactive.Avalonia.AvaloniaBindingModule;
+
 namespace ReactiveUI.Avalonia.Reactive;
 #else
+using AvaloniaBindingModule = ReactiveUI.Binding.Avalonia.AvaloniaBindingModule;
+
 namespace ReactiveUI.Avalonia;
 #endif
 
@@ -133,8 +137,9 @@ public static class AppBuilderExtensions
         /// <returns>The configured IReactiveUIBuilder instance with Avalonia support enabled.</returns>
         /// <exception cref="ArgumentNullException">Thrown if the builder parameter is null.</exception>
         /// <remarks>
-        /// This sets the main-thread and task-pool schedulers and registers Avalonia command-binding and property
-        /// observation services.
+        /// This sets the main-thread and task-pool schedulers, registers ReactiveUI's Avalonia services, and adds
+        /// ReactiveUI.Binding.Avalonia's module, which registers the property observer, the command binder and the
+        /// view thread invoker.
         /// </remarks>
         public IReactiveUIBuilder WithAvalonia()
         {
@@ -147,9 +152,9 @@ public static class AppBuilderExtensions
                 {
                     splat.RegisterConstant<IActivationForViewFetcher>(new AvaloniaActivationForViewFetcher());
                     splat.RegisterConstant<IPropertyBindingHook>(new AutoDataTemplateBindingHook());
-                    splat.RegisterConstant<ICreatesCommandBinding>(new AvaloniaCreatesCommandBinding());
-                    splat.RegisterConstant<ICreatesObservableForProperty>(new AvaloniaObjectObservableForProperty());
-                }).WithSuspensionHost<Unit>();
+                })
+                .UsingSplatModule(new AvaloniaBindingModule())
+                .WithSuspensionHost<Unit>();
         }
     }
 }
