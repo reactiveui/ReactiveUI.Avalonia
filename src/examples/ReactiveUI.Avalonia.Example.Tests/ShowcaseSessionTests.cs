@@ -15,6 +15,9 @@ public sealed class ShowcaseSessionTests
     /// <summary>The prefix used for recoverable session storage errors.</summary>
     private const string StorageErrorPrefix = "Session storage:";
 
+    /// <summary>The file name each test saves its session to.</summary>
+    private const string SessionFileName = "session.json";
+
     /// <summary>Verifies a persistence request saves settings and the next launch restores them.</summary>
     /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
@@ -23,7 +26,7 @@ public sealed class ShowcaseSessionTests
         const string savedInput = "Inspect working set";
         const double savedThreshold = 63;
         var directory = Path.Combine(Path.GetTempPath(), $"AvaloniaShowcase-{Guid.NewGuid():N}");
-        var path = Path.Combine(directory, "session.json");
+        var path = Path.Combine(directory, SessionFileName);
         try
         {
             using (var shell = MainViewModel.Create(new LocalMachineMetricsService()))
@@ -64,6 +67,55 @@ public sealed class ShowcaseSessionTests
         }
     }
 
+    /// <summary>Verifies a saved session holding JSON null is reported as a storage error rather than restored.</summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
+    [Test]
+    public async Task Empty_Saved_Session_Reports_Storage_Error()
+    {
+        var directory = Path.Combine(Path.GetTempPath(), $"AvaloniaShowcase-{Guid.NewGuid():N}");
+        var path = Path.Combine(directory, SessionFileName);
+        _ = Directory.CreateDirectory(directory);
+        try
+        {
+            await File.WriteAllTextAsync(path, "null");
+            using var shell = MainViewModel.Create(new LocalMachineMetricsService());
+            using var session = new ShowcaseSession(new ClassicDesktopStyleApplicationLifetime(), shell, path);
+            session.Start();
+
+            await Assert.That(shell.SessionStatus).StartsWith(StorageErrorPrefix);
+        }
+        finally
+        {
+            Directory.Delete(directory, recursive: true);
+        }
+    }
+
+    /// <summary>Verifies a saved session without input text restores an empty input and the saved threshold.</summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
+    [Test]
+    public async Task Saved_Session_Without_Input_Restores_Empty_Input()
+    {
+        const double savedThreshold = 42;
+        var directory = Path.Combine(Path.GetTempPath(), $"AvaloniaShowcase-{Guid.NewGuid():N}");
+        var path = Path.Combine(directory, SessionFileName);
+        _ = Directory.CreateDirectory(directory);
+        try
+        {
+            await File.WriteAllTextAsync(path, "{\"CpuWarningThreshold\":42}");
+            using var shell = MainViewModel.Create(new LocalMachineMetricsService());
+            shell.Commands.WorkItemText = "Replaced by the restore";
+            using var session = new ShowcaseSession(new ClassicDesktopStyleApplicationLifetime(), shell, path);
+            session.Start();
+
+            await Assert.That(shell.Commands.WorkItemText).IsEqualTo(string.Empty);
+            await Assert.That(shell.Metrics.CpuWarningThreshold).IsEqualTo(savedThreshold);
+        }
+        finally
+        {
+            Directory.Delete(directory, recursive: true);
+        }
+    }
+
     /// <summary>Verifies a failed save still releases the platform shutdown deferral.</summary>
     /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
@@ -97,7 +149,7 @@ public sealed class ShowcaseSessionTests
     {
         var directory = Path.Combine(Path.GetTempPath(), $"AvaloniaShowcase-{Guid.NewGuid():N}");
         _ = Directory.CreateDirectory(directory);
-        var path = Path.Combine(directory, "session.json");
+        var path = Path.Combine(directory, SessionFileName);
         var invalidPath = Path.Combine(directory, "directory-instead-of-file");
         _ = Directory.CreateDirectory(invalidPath);
         await File.WriteAllTextAsync(path, "{}");
