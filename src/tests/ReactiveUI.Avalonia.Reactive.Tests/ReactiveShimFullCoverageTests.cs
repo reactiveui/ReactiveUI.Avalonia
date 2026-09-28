@@ -1,12 +1,9 @@
 // Copyright (c) 2019-2026 ReactiveUI Association Incorporated. All rights reserved.
 // ReactiveUI Association Incorporated licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for full license information.
-using System.Linq.Expressions;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
-using Avalonia.Input;
-using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Splat;
 
@@ -29,24 +26,6 @@ public partial class ReactiveShimFullCoverageTests
 
     /// <summary>The matching view contract used by view-host tests.</summary>
     private const string ViewContractValue = "contract";
-
-    /// <summary>The event parameter used by command-binding tests.</summary>
-    private const string EventParameter = "event";
-
-    /// <summary>The command event name used by command-binding tests.</summary>
-    private const string ClickEventName = "Click";
-
-    /// <summary>The missing property name used by notification tests.</summary>
-    private const string MissingPropertyName = "Missing";
-
-    /// <summary>The affinity assigned to generic input elements with event targets.</summary>
-    private const int InputElementEventAffinity = 6;
-
-    /// <summary>The affinity assigned to button command bindings.</summary>
-    private const int ButtonCommandBindingAffinity = 10;
-
-    /// <summary>The affinity assigned to Avalonia styled properties.</summary>
-    private const int StyledPropertyAffinity = 4;
 
     /// <summary>Verifies reactive AppBuilder null guards and callback setup paths.</summary>
     /// <returns>A task representing the asynchronous test operation.</returns>
@@ -400,103 +379,6 @@ public partial class ReactiveShimFullCoverageTests
         finally
         {
             window.Close();
-        }
-    }
-
-    /// <summary>Verifies reactive command binding behavior.</summary>
-    /// <returns>A task representing the asynchronous test operation.</returns>
-    [Test]
-    public async Task ReactiveAvaloniaCreatesCommandBinding_CoversCommandPaths()
-    {
-        var sut = new AvaloniaCreatesCommandBinding();
-        var command = new TestCommand();
-        var parameter = new Signal<object?>();
-        var button = new Button();
-
-        await Assert.That(sut.GetAffinityForObject<object>(hasEventTarget: false)).IsEqualTo(0);
-        await Assert.That(sut.GetAffinityForObject<InputElement>(hasEventTarget: false)).IsEqualTo(0);
-        await Assert.That(sut.GetAffinityForObject<InputElement>(hasEventTarget: true)).IsEqualTo(InputElementEventAffinity);
-        await Assert.That(sut.GetAffinityForObject<Button>(hasEventTarget: false)).IsEqualTo(ButtonCommandBindingAffinity);
-
-        using (var binding = sut.BindCommandToObject(command, button, parameter))
-        {
-            parameter.OnNext("button");
-            await Assert.That(button.CommandParameter).IsEqualTo("button");
-            await Assert.That(button.Command).IsSameReferenceAs(command);
-        }
-
-        await Assert.That(button.Command).IsNull();
-        await Assert.That(sut.BindCommandToObject(null, button, parameter)).IsNotNull();
-        await Assert.That(sut.BindCommandToObject<Button>(command, null, parameter)).IsNull();
-        await Assert.That(CaptureInvalidOperation(() => sut.BindCommandToObject<object>(command, new(), parameter))).IsNotNull();
-        await Assert.That(CaptureInvalidOperation(() => sut.BindCommandToObject(command, new TextBox(), parameter))).IsNotNull();
-
-        using (var eventBinding = sut.BindCommandToObject<Button, RoutedEventArgs>(command, button, parameter, nameof(InputElement.GotFocus)))
-        {
-            parameter.OnNext(EventParameter);
-            button.RaiseEvent(new(InputElement.GotFocusEvent));
-            await Assert.That(command.LastParameter).IsEqualTo(EventParameter);
-
-            command.SetCanExecute(false);
-            parameter.OnNext("blocked");
-            button.RaiseEvent(new(InputElement.GotFocusEvent));
-            await Assert.That(command.LastParameter).IsEqualTo(EventParameter);
-        }
-
-        await Assert.That(button.IsSet(InputElement.IsEnabledProperty)).IsFalse();
-        await Assert.That(sut.BindCommandToObject<object, RoutedEventArgs>(null, new(), parameter, ClickEventName)).IsNull();
-        await Assert.That(sut.BindCommandToObject<object, RoutedEventArgs>(command, null, parameter, ClickEventName)).IsNull();
-        await Assert.That(CaptureInvalidOperation(() => sut.BindCommandToObject<object, RoutedEventArgs>(command, new(), parameter, ClickEventName))).IsNotNull();
-        await Assert.That(CaptureInvalidOperation(() => sut.BindCommandToObject<Button, RoutedEventArgs>(command, button, parameter, "MissingEvent"))).IsNotNull();
-
-        using var addRemove = sut.BindCommandToObject<Button, EventArgs>(
-            command,
-            button,
-            parameter,
-            static _ => { },
-            static _ => { });
-        await Assert.That(addRemove).IsNotNull();
-    }
-
-    /// <summary>Verifies reactive property notification behavior.</summary>
-    /// <returns>A task representing the asynchronous test operation.</returns>
-    [Test]
-    public async Task ReactiveAvaloniaObjectObservableForProperty_CoversNotificationPaths()
-    {
-        var sut = new AvaloniaObjectObservableForProperty();
-        var propertyObserver = (ICreatesObservableForProperty)sut;
-        var control = new TestControl();
-        Expression<Func<string?>> expression = () => control.Text;
-
-        await Assert.That(propertyObserver.GetAffinityForObject(typeof(TestControl), nameof(TestControl.Text))).IsEqualTo(StyledPropertyAffinity);
-        await Assert.That(propertyObserver.GetAffinityForObject(typeof(object), "Text")).IsEqualTo(0);
-        await Assert.That(propertyObserver.GetAffinityForObject(typeof(TestControl), MissingPropertyName)).IsEqualTo(0);
-
-        IObservedChange<object, object?>? observed = null;
-        using (propertyObserver.GetNotificationForProperty(control, expression, nameof(TestControl.Text))
-            .Subscribe(new RecordingObserver<IObservedChange<object, object?>>(value => observed = value)))
-        {
-            control.Text = "reactive";
-            await Assert.That(observed).IsNotNull();
-            await Assert.That(observed!.Value).IsEqualTo("reactive");
-        }
-
-        await Assert.That(() => propertyObserver.GetNotificationForProperty(new(), expression, "Text"))
-            .ThrowsExactly<InvalidOperationException>();
-        await Assert.That(() => propertyObserver.GetNotificationForProperty(control, expression, MissingPropertyName, beforeChanged: false, suppressWarnings: false))
-            .ThrowsExactly<MissingMemberException>();
-        await Assert.That(() => propertyObserver.GetNotificationForProperty(control, expression, MissingPropertyName, beforeChanged: false, suppressWarnings: true))
-            .ThrowsExactly<MissingMemberException>();
-        await Assert.That(() => propertyObserver.GetNotificationForProperty(null!, expression, "Text"))
-            .ThrowsExactly<ArgumentNullException>();
-
-        IObservedChange<object, object?>? observedFromOverload = null;
-        using (propertyObserver.GetNotificationForProperty(control, expression, nameof(TestControl.Text), beforeChanged: false)
-            .Subscribe(new RecordingObserver<IObservedChange<object, object?>>(value => observedFromOverload = value)))
-        {
-            control.Text = "overload";
-            await Assert.That(observedFromOverload).IsNotNull();
-            await Assert.That(observedFromOverload!.Value).IsEqualTo("overload");
         }
     }
 

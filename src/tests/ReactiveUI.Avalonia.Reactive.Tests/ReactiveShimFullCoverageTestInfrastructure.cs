@@ -178,22 +178,6 @@ public partial class ReactiveShimFullCoverageTests
         return (window, source!);
     }
 
-    /// <summary>Executes an action and returns the expected invalid-operation exception.</summary>
-    /// <param name="action">The action to execute.</param>
-    /// <returns>The captured exception, or null when the action did not throw.</returns>
-    private static InvalidOperationException? CaptureInvalidOperation(Action action)
-    {
-        try
-        {
-            action();
-            return null;
-        }
-        catch (InvalidOperationException exception)
-        {
-            return exception;
-        }
-    }
-
     /// <summary>Attribute to specify a view contract name.</summary>
     /// <param name="contract">The contract name.</param>
     [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
@@ -234,21 +218,6 @@ public partial class ReactiveShimFullCoverageTests
         public void OnNext(T value) => _onNext(value);
     }
 
-    /// <summary>A test control with styled properties.</summary>
-    private sealed class TestControl : Control
-    {
-        /// <summary>The styled text property.</summary>
-        private static readonly StyledProperty<string?> TextProperty =
-            AvaloniaProperty.Register<TestControl, string?>(nameof(Text));
-
-        /// <summary>Gets or sets the text value.</summary>
-        public string? Text
-        {
-            get => GetValue(TextProperty);
-            set => SetValue(TextProperty, value);
-        }
-    }
-
     /// <summary>A button that implements IActivatableView for testing activation.</summary>
     private sealed class ActivatableButton : Button, IActivatableView;
 
@@ -271,33 +240,6 @@ public partial class ReactiveShimFullCoverageTests
 
     /// <summary>An activatable non-control visual.</summary>
     private sealed class ActivatableVisual : Visual, IActivatableView;
-
-    /// <summary>A test command implementation for verifying command binding.</summary>
-    private sealed class TestCommand : System.Windows.Input.ICommand
-    {
-        /// <summary>Whether the command can currently execute.</summary>
-        private bool _canExecute = true;
-
-        /// <inheritdoc/>
-        public event EventHandler? CanExecuteChanged;
-
-        /// <summary>Gets the last parameter passed to Execute.</summary>
-        public object? LastParameter { get; private set; }
-
-        /// <summary>Sets whether the command can execute and raises CanExecuteChanged.</summary>
-        /// <param name="can">Whether the command can execute.</param>
-        public void SetCanExecute(bool can)
-        {
-            _canExecute = can;
-            CanExecuteChanged?.Invoke(this, EventArgs.Empty);
-        }
-
-        /// <inheritdoc/>
-        public bool CanExecute(object? parameter) => _canExecute;
-
-        /// <inheritdoc/>
-        public void Execute(object? parameter) => LastParameter = parameter;
-    }
 
     /// <summary>A test view model.</summary>
     private sealed class ShimVm : ReactiveObject;

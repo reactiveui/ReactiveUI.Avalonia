@@ -1,6 +1,7 @@
 // Copyright (c) 2019-2026 ReactiveUI Association Incorporated. All rights reserved.
 // ReactiveUI Association Incorporated licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for full license information.
+using ReactiveUI.Binding.Avalonia;
 using ReactiveUI.Builder;
 using Splat;
 using TUnit.Core.Interfaces;
@@ -27,9 +28,8 @@ public class AvaloniaTestExecutor : ITestExecutor
                     {
                         splat.RegisterConstant<IActivationForViewFetcher>(new AvaloniaActivationForViewFetcher());
                         splat.RegisterConstant<IPropertyBindingHook>(new AutoDataTemplateBindingHook());
-                        splat.RegisterConstant<ICreatesCommandBinding>(new AvaloniaCreatesCommandBinding());
-                        splat.RegisterConstant<ICreatesObservableForProperty>(new AvaloniaObjectObservableForProperty());
                     })
+                    .UsingSplatModule(new AvaloniaBindingModule())
                     .WithSuspensionHost()
                     .WithCoreServices()
                     .BuildApp();

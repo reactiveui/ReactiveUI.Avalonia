@@ -242,8 +242,7 @@ Key extension methods on `AppBuilder`:
 Important types registered by default:
 - `IActivationForViewFetcher` ? `AvaloniaActivationForViewFetcher`
 - `IPropertyBindingHook` ? `AutoDataTemplateBindingHook`
-- `ICreatesCommandBinding` ? `AvaloniaCreatesCommandBinding`
-- `ICreatesObservableForProperty` ? `AvaloniaObjectObservableForProperty`
+- `AvaloniaBindingModule` from `ReactiveUI.Binding.Avalonia`, which registers the property observer, the command binder and the view thread invoker. Those types live in that package; see its [threading page](https://www.reactiveui.net/docs/binding/threading/avalonia/).
 - The main-thread sequencer/scheduler set to the matching `ReactiveUI.Primitives.Avalonia.*` `AvaloniaScheduler.Instance`
 
 Controls and helpers:

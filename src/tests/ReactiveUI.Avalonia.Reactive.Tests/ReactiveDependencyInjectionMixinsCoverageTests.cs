@@ -8,7 +8,6 @@ extern alias reactiveninject;
 
 using Autofac;
 using Avalonia;
-using Avalonia.Controls;
 using Microsoft.Extensions.DependencyInjection;
 using ReactiveUI.Avalonia.Reactive;
 using ReactiveUI.Reactive.Builder;
@@ -72,17 +71,6 @@ public class ReactiveDependencyInjectionMixinsCoverageTests
             Locator.SetLocator(originalLocator);
             ReactiveUIBuilder.ResetBuilderStateForTests();
         }
-    }
-
-    /// <summary>Verifies null command binding ignores targets that cannot source commands.</summary>
-    /// <returns>A task representing the asynchronous test operation.</returns>
-    [Test]
-    public async Task BindCommandToObject_NullCommand_IgnoresNonCommandSource()
-    {
-        var sut = new AvaloniaCreatesCommandBinding();
-        var parameter = new Signal<object?>();
-
-        await Assert.That(sut.BindCommandToObject(null, new TextBlock(), parameter)).IsNull();
     }
 
     /// <summary>Verifies reactive DI overload forwarding and null argument validation.</summary>

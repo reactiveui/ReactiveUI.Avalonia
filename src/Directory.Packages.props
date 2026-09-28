@@ -7,7 +7,8 @@
     <!-- StyleSharp.Analyzers, PerformanceSharp.Analyzers and SecuritySharp.Analyzers ship from the
          same release pipeline and always share a version. -->
     <RoslynCommonAnalyzersVersion>5.1.2</RoslynCommonAnalyzersVersion>
-    <ReactiveUIPrimitivesVersion>8.2.0</ReactiveUIPrimitivesVersion>
+    <ReactiveUIPrimitivesVersion>8.4.0</ReactiveUIPrimitivesVersion>
+    <ReactiveUIBindingVersion>8.7.0</ReactiveUIBindingVersion>
   </PropertyGroup>
 
   <ItemGroup Label="Core packages">
@@ -18,12 +19,14 @@
     <PackageVersion Include="Avalonia.Themes.Fluent" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="10.0.401" />
     <PackageVersion Include="MinVer" Version="8.0.0" />
-    <PackageVersion Include="ReactiveUI" Version="25.0.1" />
+    <PackageVersion Include="ReactiveUI" Version="25.1.0" />
     <PackageVersion Include="ReactiveUI.Primitives" Version="$(ReactiveUIPrimitivesVersion)" />
     <PackageVersion Include="ReactiveUI.Primitives.Reactive" Version="$(ReactiveUIPrimitivesVersion)" />
     <PackageVersion Include="ReactiveUI.Primitives.Avalonia" Version="$(ReactiveUIPrimitivesVersion)" />
     <PackageVersion Include="ReactiveUI.Primitives.Avalonia.Reactive" Version="$(ReactiveUIPrimitivesVersion)" />
-    <PackageVersion Include="ReactiveUI.Reactive" Version="25.0.1" />
+    <PackageVersion Include="ReactiveUI.Reactive" Version="25.1.0" />
+    <PackageVersion Include="ReactiveUI.Binding.Avalonia" Version="$(ReactiveUIBindingVersion)" />
+    <PackageVersion Include="ReactiveUI.Binding.Avalonia.Reactive" Version="$(ReactiveUIBindingVersion)" />
     <PackageVersion Include="Splat" Version="$(SplatVersion)" />
     <PackageVersion Include="Splat.Autofac" Version="$(SplatVersion)" />
     <PackageVersion Include="Splat.Drawing" Version="$(SplatVersion)" />
