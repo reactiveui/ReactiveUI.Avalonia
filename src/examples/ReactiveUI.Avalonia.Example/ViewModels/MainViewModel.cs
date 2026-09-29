@@ -25,6 +25,12 @@ public sealed class MainViewModel : ViewModelBase, IScreen
         ShowCommands = Track(ReactiveCommand.Create(() => Navigate(Commands)));
         GoBack = Router.NavigateBack;
         Reset = Track(ReactiveCommand.Create(ResetNavigation));
+
+        // A router command that fails reports the error through ThrownExceptions as well as to the caller. Nothing
+        // observing it sends the error to ReactiveUI's default handler, which throws, so the shell observes all three.
+        _ = Track(Router.Navigate.ThrownExceptions.SubscribeSafe(HandleNavigationError, HandleNavigationError));
+        _ = Track(Router.NavigateAndReset.ThrownExceptions.SubscribeSafe(HandleNavigationError, HandleNavigationError));
+        _ = Track(Router.NavigateBack.ThrownExceptions.SubscribeSafe(HandleNavigationError, HandleNavigationError));
     }
 
     /// <inheritdoc/>

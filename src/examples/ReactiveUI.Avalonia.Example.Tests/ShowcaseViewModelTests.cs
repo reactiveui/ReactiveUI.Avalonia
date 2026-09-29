@@ -47,6 +47,45 @@ public sealed class ShowcaseViewModelTests
         await Assert.That(((ICommand)viewModel.GoBack).CanExecute(null)).IsFalse();
     }
 
+    /// <summary>Verifies each page command navigates to its page and reports it.</summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
+    [Test]
+    public async Task Page_Commands_Navigate_To_Their_Pages()
+    {
+        using var viewModel = MainViewModel.Create(new FixedMetricsService());
+
+        ((ICommand)viewModel.ShowMetrics).Execute(null);
+        global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+        await Assert.That(viewModel.Router.NavigationStack[^1]).IsSameReferenceAs(viewModel.Metrics);
+
+        ((ICommand)viewModel.ShowCommands).Execute(null);
+        global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+        await Assert.That(viewModel.Router.NavigationStack[^1]).IsSameReferenceAs(viewModel.Commands);
+
+        ((ICommand)viewModel.ShowOverview).Execute(null);
+        global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+        await Assert.That(viewModel.Router.NavigationStack[^1]).IsTypeOf<OverviewViewModel>();
+        await Assert.That(viewModel.NavigationStatus).StartsWith("Navigated to");
+    }
+
+    /// <summary>Verifies a navigation the router rejects reports its error as the navigation status.</summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
+    [Test]
+    public async Task Shell_Reports_A_Rejected_Navigation()
+    {
+        using var viewModel = MainViewModel.Create(new FixedMetricsService());
+        var initialStatus = viewModel.NavigationStatus;
+
+        viewModel.Navigate(null!);
+
+        // The router reports the error on the UI thread; drain it while the shell still observes it.
+        global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+
+        await Assert.That(viewModel.NavigationStatus).IsNotEqualTo(initialStatus);
+        await Assert.That(viewModel.NavigationStatus).DoesNotStartWith("Navigated to");
+        await Assert.That(viewModel.Router.NavigationStack).Count().IsEqualTo(1);
+    }
+
     /// <summary>Verifies can-execute, input capture during async work, and error interaction acknowledgement.</summary>
     /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
