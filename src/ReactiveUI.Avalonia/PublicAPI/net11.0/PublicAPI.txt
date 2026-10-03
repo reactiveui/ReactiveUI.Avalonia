@@ -75,7 +75,6 @@ public static class AvaloniaObjectReactiveExtensions
 [System.Diagnostics.DebuggerDisplay("ReactiveUserControl: {ViewModel}")]
 public class ReactiveUserControl<TViewModel> : ReactiveUI.Avalonia.ReactiveUserControlBase, ReactiveUI.Binding.IViewFor<TViewModel> where TViewModel : class
 {
-    [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("ReactiveUI activation evaluates expression-based member chains via reflection; members may be trimmed.")]
     public ReactiveUserControl() { }
     object? ReactiveUI.Binding.IViewFor.ViewModel { get; set; }
     public TViewModel? ViewModel { get; set; }
@@ -84,7 +83,6 @@ public class ReactiveUserControl<TViewModel> : ReactiveUI.Avalonia.ReactiveUserC
 [System.Diagnostics.DebuggerDisplay("ReactiveUserControlBase: {ToString(),nq}")]
 public class ReactiveUserControlBase : Avalonia.Controls.UserControl, ReactiveUI.Binding.IViewFor
 {
-    [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("ReactiveUI activation evaluates expression-based member chains via reflection; members may be trimmed.")]
     protected ReactiveUserControlBase() { }
     public static readonly Avalonia.StyledProperty<object?> ViewModelProperty;
     object? ReactiveUI.Binding.IViewFor.ViewModel { get; set; }
@@ -94,7 +92,6 @@ public class ReactiveUserControlBase : Avalonia.Controls.UserControl, ReactiveUI
 [System.Diagnostics.DebuggerDisplay("ReactiveWindow: {ViewModel}")]
 public class ReactiveWindow<TViewModel> : ReactiveUI.Avalonia.ReactiveWindowBase, ReactiveUI.Binding.IViewFor<TViewModel> where TViewModel : class
 {
-    [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("ReactiveUI activation evaluates expression-based member chains via reflection; members may be trimmed.")]
     public ReactiveWindow() { }
     object? ReactiveUI.Binding.IViewFor.ViewModel { get; set; }
     public TViewModel? ViewModel { get; set; }
@@ -103,7 +100,6 @@ public class ReactiveWindow<TViewModel> : ReactiveUI.Avalonia.ReactiveWindowBase
 [System.Diagnostics.DebuggerDisplay("ReactiveWindowBase: {ToString(),nq}")]
 public class ReactiveWindowBase : Avalonia.Controls.Window, ReactiveUI.Binding.IViewFor
 {
-    [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("ReactiveUI activation evaluates expression-based member chains via reflection; members may be trimmed.")]
     protected ReactiveWindowBase() { }
     public static readonly Avalonia.StyledProperty<object?> ViewModelProperty;
     object? ReactiveUI.Binding.IViewFor.ViewModel { get; set; }

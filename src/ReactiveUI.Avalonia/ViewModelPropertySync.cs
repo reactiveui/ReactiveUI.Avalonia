@@ -18,12 +18,13 @@ internal static class ViewModelPropertySync
     /// <summary>Forwards the view's activation to its view model when the view model takes part in activation.</summary>
     /// <typeparam name="TView">The view type.</typeparam>
     /// <param name="view">The view to activate with.</param>
-    [RequiresUnreferencedCode("ReactiveUI activation evaluates expression-based member chains via reflection; members may be trimmed.")]
-    internal static void ForwardActivation<TView>(TView view)
-        where TView : IActivatableView
+    /// <param name="viewModelProperty">The view's view model property.</param>
+    internal static void ForwardActivation<TView>(TView view, StyledProperty<object?> viewModelProperty)
+        where TView : AvaloniaObject, IActivatableView
     {
-        // The empty block is the point: WhenActivated runs the view model's own activation.
-        _ = view.WhenActivated(static (ActivationDisposables disposables) => { });
+        // The Avalonia property observable tells ReactiveUI when the view model changes.
+        // Without it, ReactiveUI finds the view model by reflection, which trimming can break.
+        _ = view.WhenActivated(view.GetObservable(viewModelProperty));
     }
 
     /// <summary>Propagates a change between the view model property and the data context.</summary>

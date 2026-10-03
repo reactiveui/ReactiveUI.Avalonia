@@ -6,6 +6,8 @@ using Avalonia.Controls.ApplicationLifetimes;
 using ReactiveUI.Avalonia.Example.Services;
 using ReactiveUI.Avalonia.Example.ViewModels;
 using ReactiveUI.Primitives.Disposables;
+using ReactiveUI.Primitives.Signals;
+using Unit = ReactiveUI.Primitives.RxVoid;
 
 namespace ReactiveUI.Avalonia.Example.Tests;
 
@@ -64,6 +66,56 @@ public sealed class ShowcaseSessionTests
             {
                 Directory.Delete(directory, recursive: true);
             }
+        }
+    }
+
+    /// <summary>Verifies a null path or a lifetime that cannot be controlled leaves the session unavailable.</summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
+    [Test]
+    public async Task Without_Storage_Or_Controlled_Lifetime_Session_Is_Unavailable()
+    {
+        var (singleView, _) = AppTests.SingleViewLifetimeProxy.Create();
+        using var noPathShell = MainViewModel.Create(new LocalMachineMetricsService());
+        using var noPath = new ShowcaseSession(new ClassicDesktopStyleApplicationLifetime(), noPathShell, null);
+        noPath.Start();
+        await Assert.That(noPathShell.SessionStatus).IsEqualTo(ShowcaseSession.UnavailableStatus);
+
+        using var uncontrolledShell = MainViewModel.Create(new LocalMachineMetricsService());
+        using var uncontrolled = new ShowcaseSession(singleView, uncontrolledShell, "unused.json");
+        uncontrolled.Start();
+        await Assert.That(uncontrolledShell.SessionStatus).IsEqualTo(ShowcaseSession.UnavailableStatus);
+    }
+
+    /// <summary>Verifies the default path is absent in a browser and a session file otherwise.</summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
+    [Test]
+    public async Task DefaultPath_Depends_On_Platform()
+    {
+        await Assert.That(ShowcaseSession.DefaultPath(isBrowser: true)).IsNull();
+        await Assert.That(ShowcaseSession.DefaultPath(isBrowser: false)).EndsWith(SessionFileName);
+        await Assert.That(ShowcaseSession.DefaultPath()).IsEqualTo(ShowcaseSession.DefaultPath(OperatingSystem.IsBrowser()));
+    }
+
+    /// <summary>Verifies an unhandled application exception deletes the saved session.</summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
+    [Test]
+    public async Task Unhandled_Exception_Deletes_Saved_Session()
+    {
+        var directory = Path.Combine(Path.GetTempPath(), $"AvaloniaShowcase-{Guid.NewGuid():N}");
+        var path = Path.Combine(directory, SessionFileName);
+        _ = Directory.CreateDirectory(directory);
+        await File.WriteAllTextAsync(path, "{}");
+        try
+        {
+            using var shell = MainViewModel.Create(new LocalMachineMetricsService());
+            using var invalidation = new Signal<Unit>();
+            using var session = new ShowcaseSession(new ClassicDesktopStyleApplicationLifetime(), shell, path, invalidation);
+            invalidation.OnNext(Unit.Default);
+            await Assert.That(File.Exists(path)).IsFalse();
+        }
+        finally
+        {
+            Directory.Delete(directory, recursive: true);
         }
     }
 

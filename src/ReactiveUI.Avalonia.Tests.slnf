@@ -1,0 +1,12 @@
+{
+  "solution": {
+    "path": "ReactiveUI.Avalonia.slnx",
+    "projects": [
+      "examples/ReactiveUI.Avalonia.Example.Tests/ReactiveUI.Avalonia.Example.Tests.csproj",
+      "tests/ReactiveUI.Avalonia.DryIoc1.Tests/ReactiveUI.Avalonia.DryIoc.Tests.csproj",
+      "tests/ReactiveUI.Avalonia.Microsoft1.Tests/ReactiveUI.Avalonia.Microsoft.Tests.csproj",
+      "tests/ReactiveUI.Avalonia.Reactive.Tests/ReactiveUI.Avalonia.Reactive.Tests.csproj",
+      "tests/ReactiveUI.Avalonia.Tests/ReactiveUI.Avalonia.Tests.csproj"
+    ]
+  }
+}

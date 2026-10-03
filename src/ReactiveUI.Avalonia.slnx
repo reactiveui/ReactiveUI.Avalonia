@@ -30,6 +30,10 @@
   </Folder>
   <Folder Name="/Examples/">
     <Project Path="examples/ReactiveUI.Avalonia.Example/ReactiveUI.Avalonia.Example.csproj" />
+    <Project Path="examples/ReactiveUI.Avalonia.Example.Android/ReactiveUI.Avalonia.Example.Android.csproj" />
+    <Project Path="examples/ReactiveUI.Avalonia.Example.Browser/ReactiveUI.Avalonia.Example.Browser.csproj" />
+    <Project Path="examples/ReactiveUI.Avalonia.Example.Desktop/ReactiveUI.Avalonia.Example.Desktop.csproj" />
+    <Project Path="examples/ReactiveUI.Avalonia.Example.iOS/ReactiveUI.Avalonia.Example.iOS.csproj" />
   </Folder>
   <Project Path="ReactiveUI.Avalonia.Autofac/ReactiveUI.Avalonia.Autofac.csproj" />
   <Project Path="ReactiveUI.Avalonia.DryIoc/ReactiveUI.Avalonia.DryIoc.csproj" />

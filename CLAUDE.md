@@ -40,11 +40,12 @@ dotnet clean ReactiveUI.Avalonia.slnx
 **CRITICAL:** The working folder must be `./src`. TUnit/MTP arguments are passed directly — no `--` separator needed.
 
 **IMPORTANT:**
+- Run tests through `ReactiveUI.Avalonia.Tests.slnf`, not the `.slnx`. The solution also holds the example's Android, iOS and Browser app heads. `dotnet test` asks those for a device and stops.
 - Do NOT use `--no-build` flag when running tests. Always build before testing to ensure all code changes (including test changes) are compiled. Using `--no-build` can cause tests to run against stale binaries and produce misleading results.
 
 ```powershell
 # Run all tests in the solution
-dotnet test --solution ReactiveUI.Avalonia.slnx -c Release
+dotnet test --solution ReactiveUI.Avalonia.Tests.slnf -c Release
 
 # Run all tests in a specific project
 dotnet test --project tests/ReactiveUI.Avalonia.Tests/ReactiveUI.Avalonia.Tests.csproj -c Release
@@ -60,31 +61,31 @@ dotnet test --project tests/ReactiveUI.Avalonia.Tests/ReactiveUI.Avalonia.Tests.
 dotnet test --project tests/ReactiveUI.Avalonia.Tests/ReactiveUI.Avalonia.Tests.csproj --treenode-filter "/*/MyNamespace/*/*"
 
 # Filter by test property (e.g., Category)
-dotnet test --solution ReactiveUI.Avalonia.slnx --treenode-filter "/*/*/*/*[Category=Integration]"
+dotnet test --solution ReactiveUI.Avalonia.Tests.slnf --treenode-filter "/*/*/*/*[Category=Integration]"
 
 # Run tests with code coverage (Microsoft Code Coverage)
-dotnet test --solution ReactiveUI.Avalonia.slnx --coverage --coverage-output-format cobertura
+dotnet test --solution ReactiveUI.Avalonia.Tests.slnf --coverage --coverage-output-format cobertura
 
 # Run tests with detailed output
-dotnet test --solution ReactiveUI.Avalonia.slnx --output Detailed
+dotnet test --solution ReactiveUI.Avalonia.Tests.slnf --output Detailed
 
 # List all available tests without running them
 dotnet test --project tests/ReactiveUI.Avalonia.Tests/ReactiveUI.Avalonia.Tests.csproj --list-tests
 
 # Fail fast (stop on first failure)
-dotnet test --solution ReactiveUI.Avalonia.slnx --fail-fast
+dotnet test --solution ReactiveUI.Avalonia.Tests.slnf --fail-fast
 
 # Control parallel test execution
-dotnet test --solution ReactiveUI.Avalonia.slnx --maximum-parallel-tests 4
+dotnet test --solution ReactiveUI.Avalonia.Tests.slnf --maximum-parallel-tests 4
 
 # Generate TRX report
-dotnet test --solution ReactiveUI.Avalonia.slnx --report-trx
+dotnet test --solution ReactiveUI.Avalonia.Tests.slnf --report-trx
 
 # Disable logo for cleaner output
 dotnet test --project tests/ReactiveUI.Avalonia.Tests/ReactiveUI.Avalonia.Tests.csproj --disable-logo
 
 # Combine options: coverage + TRX report + detailed output
-dotnet test --solution ReactiveUI.Avalonia.slnx --coverage --coverage-output-format cobertura --report-trx --output Detailed
+dotnet test --solution ReactiveUI.Avalonia.Tests.slnf --coverage --coverage-output-format cobertura --report-trx --output Detailed
 ```
 
 **Alternative: Using `dotnet run` for single project**

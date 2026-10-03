@@ -15,6 +15,10 @@ jobs:
     with:
       solutionFile: ReactiveUI.Avalonia.slnx
       minverMinimumMajorMinor: '12.1'
+      # Test only the test projects: the solution also builds the example's app heads, which are not tests.
+      testProjects: |
+        tests/**/*.csproj
+        examples/**/*.Tests.csproj
       sonarProjectKey: reactiveui_ReactiveUI.Avalonia
       sonarOrganization: reactiveui
       # Attributes.cs holds XAML namespace identifiers, which are names rather than URLs.
