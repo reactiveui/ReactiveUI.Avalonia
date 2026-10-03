@@ -26,11 +26,10 @@ public class ReactiveUserControlBase : UserControl, IViewFor
     /// the associated ViewModel is also executed, provided the ViewModel implements IActivatableViewModel. This enables
     /// coordinated activation and deactivation between the view and its ViewModel, which is useful for managing
     /// resources and subscriptions in reactive UI scenarios.</remarks>
-    [RequiresUnreferencedCode("ReactiveUI activation evaluates expression-based member chains via reflection; members may be trimmed.")]
     protected ReactiveUserControlBase()
     {
         _isValidViewModelValue = IsValidViewModelValue;
-        ViewModelPropertySync.ForwardActivation(this);
+        ViewModelPropertySync.ForwardActivation(this, ViewModelProperty);
     }
 
     /// <inheritdoc/>

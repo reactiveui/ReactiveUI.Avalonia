@@ -13,12 +13,6 @@ namespace ReactiveUI.Avalonia;
 public class ReactiveUserControl<TViewModel> : ReactiveUserControlBase, IViewFor<TViewModel>
     where TViewModel : class
 {
-    /// <summary>Initializes a new instance of the <see cref="ReactiveUserControl{TViewModel}"/> class.</summary>
-    [RequiresUnreferencedCode("ReactiveUI activation evaluates expression-based member chains via reflection; members may be trimmed.")]
-    public ReactiveUserControl()
-    {
-    }
-
     /// <inheritdoc cref="IViewFor{TViewModel}.ViewModel"/>
     public TViewModel? ViewModel
     {

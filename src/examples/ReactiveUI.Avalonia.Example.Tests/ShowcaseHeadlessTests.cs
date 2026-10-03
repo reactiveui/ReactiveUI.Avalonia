@@ -54,7 +54,7 @@ public sealed class ShowcaseHeadlessTests
             Dispatcher.UIThread.RunJobs();
             shell.Navigate(shell.Commands);
             Dispatcher.UIThread.RunJobs();
-            var view = (CommandLabView)window.FindControl<RoutedViewHost>("RouterHost")!.Content!;
+            var view = (CommandLabView)window.FindControl<MainView>("Main")!.FindControl<RoutedViewHost>("RouterHost")!.Content!;
             var button = view.FindControl<Button>("FailWorkButton")!;
             await Assert.That(button.Command).IsSameReferenceAs(shell.Commands.FailWork);
             await Assert.That(button.IsEffectivelyEnabled).IsTrue();
@@ -189,7 +189,7 @@ public sealed class ShowcaseHeadlessTests
             Dispatcher.UIThread.RunJobs();
             await Assert.That(AppLocator.Current.GetService<IViewFor<MetricCardViewModel>>("performance")).IsTypeOf<PerformanceMetricCardView>();
             await Assert.That(AppLocator.Current.GetService<IViewFor<MetricCardViewModel>>("memory")).IsTypeOf<MemoryMetricCardView>();
-            var host = window.FindControl<RoutedViewHost>("RouterHost")!;
+            var host = window.FindControl<MainView>("Main")!.FindControl<RoutedViewHost>("RouterHost")!;
             await Assert.That(host.Content).IsTypeOf<OverviewView>();
             var overview = (OverviewView)host.Content!;
             var items = overview.FindControl<ItemsControl>("FeatureItems")!;

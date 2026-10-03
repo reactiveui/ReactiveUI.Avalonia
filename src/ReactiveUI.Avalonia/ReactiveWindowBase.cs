@@ -26,11 +26,10 @@ public class ReactiveWindowBase : Window, IViewFor
     /// the associated view model implements IActivatableViewModel, its activation logic will be invoked when the window
     /// is activated. This enables coordinated resource management and event handling between the view and its view
     /// model.</remarks>
-    [RequiresUnreferencedCode("ReactiveUI activation evaluates expression-based member chains via reflection; members may be trimmed.")]
     protected ReactiveWindowBase()
     {
         _isValidViewModelValue = IsValidViewModelValue;
-        ViewModelPropertySync.ForwardActivation(this);
+        ViewModelPropertySync.ForwardActivation(this, ViewModelProperty);
     }
 
     /// <inheritdoc/>

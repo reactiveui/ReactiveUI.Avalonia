@@ -3,7 +3,7 @@
         <Border Padding="24" />
     </Design.PreviewWith>
 
-    <Style Selector="Window.showcase">
+    <Style Selector="Window.showcase, UserControl.showcase">
         <Setter Property="Background" Value="#F4F6F8" />
         <Setter Property="FontFamily" Value="Inter, Segoe UI" />
     </Style>

@@ -137,6 +137,7 @@ internal static class ViewRegistrar
     /// <param name="viewType">The view type that failed to resolve.</param>
     /// <param name="error">The service locator error.</param>
     /// <returns>The created view instance.</returns>
+    [RequiresUnreferencedCode("Creates runtime-discovered view types by reflection.")]
     internal static object CreateViewAfterResolutionFailure(Type viewType, Exception error)
     {
         LogHost.Default.Warn(error, $"Failed to resolve view type '{viewType}' from the service locator. Falling back to Activator.");
@@ -147,6 +148,7 @@ internal static class ViewRegistrar
     /// <param name="viewType">The view type to create.</param>
     /// <returns>The created view instance.</returns>
     /// <exception cref="InvalidOperationException">Thrown when <c>Activator.CreateInstance(viewType)</c> is <see langword="null"/>.</exception>
+    [RequiresUnreferencedCode("Creates runtime-discovered view types by reflection.")]
     internal static object CreateViewWithActivator(Type viewType) =>
         Activator.CreateInstance(viewType)
         ?? throw new InvalidOperationException($"Failed to create view type '{viewType}'.");

@@ -8,7 +8,7 @@ using ReactiveUI.Avalonia.Example.ViewModels;
 
 namespace ReactiveUI.Avalonia.Example.Views;
 
-/// <summary>The main example shell window.</summary>
+/// <summary>The desktop window that hosts <see cref="MainView"/>.</summary>
 [System.Diagnostics.DebuggerDisplay("MainWindow: {ToString(),nq}")]
 public sealed partial class MainWindow : ReactiveWindow<MainViewModel>
 {

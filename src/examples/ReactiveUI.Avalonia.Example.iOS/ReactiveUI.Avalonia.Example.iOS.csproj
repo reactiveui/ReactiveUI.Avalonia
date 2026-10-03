@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- The iOS workload links an app only on macOS, so only macOS builds the iOS TFM. Every other host compiles a
+       placeholder, the same approach as ReactiveUI's platform-apple example, so the solution builds on every OS.
+       Pass -p:BuildAppleHead=true on a host with the iOS workload to compile the iOS code without linking it. -->
+  <PropertyGroup>
+    <BuildAppleHead Condition="'$(BuildAppleHead)' == ''">$([MSBuild]::IsOsPlatform('OSX'))</BuildAppleHead>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(BuildAppleHead)' == 'true'">
+    <TargetFrameworks>net10.0-ios</TargetFrameworks>
+    <TargetFramework></TargetFramework>
+    <SupportedOSPlatformVersion>13.0</SupportedOSPlatformVersion>
+    <!-- The showcase deliberately uses reflection-based ReactiveUI bindings, so the app is not linked. -->
+    <MtouchLink>None</MtouchLink>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(BuildAppleHead)' != 'true'">
+    <TargetFramework>net10.0</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <Nullable>enable</Nullable>
+    <RootNamespace>ReactiveUI.Avalonia.Example.iOS</RootNamespace>
+    <PackageDescription>iOS head for the ReactiveUI.Avalonia showcase.</PackageDescription>
+    <IsPackable>false</IsPackable>
+    <IsAotCompatible>false</IsAotCompatible>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(BuildAppleHead)' != 'true'">
+    <Compile Remove="**/*.cs" />
+    <Compile Include="LinuxPlaceholder/Program.cs" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(BuildAppleHead)' == 'true'">
+    <Compile Remove="LinuxPlaceholder/**" />
+    <PackageReference Include="Avalonia.iOS" />
+    <ProjectReference Include="..\ReactiveUI.Avalonia.Example\ReactiveUI.Avalonia.Example.csproj" />
+  </ItemGroup>
+</Project>

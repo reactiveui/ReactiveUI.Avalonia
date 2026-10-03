@@ -21,5 +21,5 @@ public static class ExampleAvaloniaTestSession
     /// <summary>Uses the production application setup with a headless rendering backend.</summary>
     /// <returns>The configured application builder.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static AppBuilder BuildAvaloniaApp() => Program.BuildAvaloniaApp().UseHeadless(new());
+    public static AppBuilder BuildAvaloniaApp() => ExampleAppBuilderExtensions.Create().UseHeadless(new());
 }

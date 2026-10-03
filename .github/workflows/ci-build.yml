@@ -18,5 +18,11 @@ jobs:
       configuration: Release
       productNamespacePrefix: "ReactiveUI"
       solutionFile: "ReactiveUI.Avalonia.slnx"
+      installWorkloads: true
+      # Test only the test projects. The solution also holds the example heads (Android, Browser, iOS, Desktop),
+      # which are apps, not tests. 'dotnet test' asks the Android head for a device and fails when none exists.
+      testProjects: |
+        tests/**/*.csproj
+        examples/**/*.Tests.csproj
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

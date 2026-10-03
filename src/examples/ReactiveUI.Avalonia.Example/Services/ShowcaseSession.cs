@@ -9,6 +9,7 @@ using ReactiveUI.Avalonia.Example.Models;
 using ReactiveUI.Avalonia.Example.ViewModels;
 using ReactiveUI.Primitives;
 using ReactiveUI.Primitives.Disposables;
+using Unit = ReactiveUI.Primitives.RxVoid;
 
 namespace ReactiveUI.Avalonia.Example.Services;
 
@@ -16,42 +17,80 @@ namespace ReactiveUI.Avalonia.Example.Services;
 [System.Diagnostics.DebuggerDisplay("ShowcaseSession: {_shell}")]
 public sealed class ShowcaseSession : IDisposable
 {
+    /// <summary>The status shown when the platform has no session storage.</summary>
+    public static readonly string UnavailableStatus ="Session storage is not available on this platform. Input and threshold reset on each launch.";
+
     /// <summary>The view model whose settings are persisted.</summary>
     private readonly MainViewModel _shell;
 
-    /// <summary>The settings file path.</summary>
-    private readonly string _path;
+    /// <summary>The settings file path. It is empty, and never used, when the platform has no session storage.</summary>
+    private readonly string _path = string.Empty;
 
-    /// <summary>The platform lifetime adapter.</summary>
-    private readonly AutoSuspendHelper _suspension;
+    /// <summary>The platform lifetime adapter, or <see langword="null"/> when the session is not persisted.</summary>
+    private readonly AutoSuspendHelper? _suspension;
 
     /// <summary>The lifetime subscriptions.</summary>
     private readonly MultipleDisposable _subscriptions = new();
 
     /// <summary>Initializes a new instance of the <see cref="ShowcaseSession"/> class.</summary>
-    /// <param name="lifetime">The running desktop lifetime.</param>
+    /// <param name="lifetime">The running application lifetime. Only a controlled lifetime can persist a session.</param>
     /// <param name="shell">The shell to persist.</param>
-    /// <param name="path">The settings file path.</param>
-    public ShowcaseSession(IApplicationLifetime lifetime, MainViewModel shell, string path)
+    /// <param name="path">The settings file path, or <see langword="null"/> when the platform has no session storage.</param>
+    public ShowcaseSession(IApplicationLifetime lifetime, MainViewModel shell, string? path)
+        : this(lifetime, shell, path, null)
+    {
+    }
+
+    /// <summary>Initializes a new instance of the <see cref="ShowcaseSession"/> class.</summary>
+    /// <param name="lifetime">The running application lifetime. Only a controlled lifetime can persist a session.</param>
+    /// <param name="shell">The shell to persist.</param>
+    /// <param name="path">The settings file path, or <see langword="null"/> when the platform has no session storage.</param>
+    /// <param name="invalidation">Signals that saved state is invalid, or <see langword="null"/> to use the suspension host.</param>
+    internal ShowcaseSession(IApplicationLifetime lifetime, MainViewModel shell, string? path, IObservable<Unit>? invalidation)
     {
         _shell = shell;
+        if (path is null || lifetime is not IControlledApplicationLifetime)
+        {
+            return;
+        }
+
         _path = path;
         _suspension = new(lifetime);
         _subscriptions.Add(RxSuspension.SuspensionHost.IsLaunchingNew.SubscribeSafe(_ => Restore(), ReportFailure));
         _subscriptions.Add(RxSuspension.SuspensionHost.ShouldPersistState.SubscribeSafe(Persist, ReportFailure));
-        _subscriptions.Add(RxSuspension.SuspensionHost.ShouldInvalidateState.SubscribeSafe(_ => Invalidate(), ReportFailure));
+        _subscriptions.Add((invalidation ?? RxSuspension.SuspensionHost.ShouldInvalidateState).SubscribeSafe(_ => Invalidate(), ReportFailure));
     }
 
-    /// <summary>Signals startup after the shell and its services have been composed.</summary>
+    /// <summary>Gets the default settings file path, or <see langword="null"/> in a browser, which has no file storage.</summary>
+    /// <returns>The settings file path, or <see langword="null"/> when the platform has no session storage.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Start() => _suspension.OnFrameworkInitializationCompleted();
+    public static string? DefaultPath() => DefaultPath(OperatingSystem.IsBrowser());
+
+    /// <summary>Signals startup after the shell and its services have been composed.</summary>
+    public void Start()
+    {
+        if (_suspension is null)
+        {
+            _shell.SessionStatus = UnavailableStatus;
+            return;
+        }
+
+        _suspension.OnFrameworkInitializationCompleted();
+    }
 
     /// <inheritdoc/>
     public void Dispose()
     {
         _subscriptions.Dispose();
-        _suspension.Dispose();
+        _suspension?.Dispose();
     }
+
+    /// <summary>Gets the default settings file path for a platform.</summary>
+    /// <param name="isBrowser">Whether the app runs in a browser.</param>
+    /// <returns>The settings file path, or <see langword="null"/> in a browser.</returns>
+    internal static string? DefaultPath(bool isBrowser) => isBrowser
+        ? null
+        : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "ReactiveUI.Avalonia.Example", "session.json");
 
     /// <summary>Saves state and always releases the shutdown deferral.</summary>
     /// <param name="deferral">The token allowing platform shutdown to finish.</param>
