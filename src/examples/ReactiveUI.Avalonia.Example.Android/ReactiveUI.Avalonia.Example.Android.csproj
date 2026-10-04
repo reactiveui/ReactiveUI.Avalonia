@@ -11,6 +11,8 @@
     <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
     <AndroidPackageFormat>apk</AndroidPackageFormat>
     <AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
+    <!-- CI compiles and packages the sample without full AOT compilation. -->
+    <RunAOTCompilation Condition="'$(ContinuousIntegrationBuild)' == 'true'">false</RunAOTCompilation>
     <PackageDescription>Android head for the ReactiveUI.Avalonia showcase.</PackageDescription>
     <IsPackable>false</IsPackable>
     <IsAotCompatible>false</IsAotCompatible>  </PropertyGroup>
