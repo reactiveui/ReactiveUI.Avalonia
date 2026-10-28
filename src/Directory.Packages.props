@@ -26,7 +26,7 @@
     <PackageVersion Include="Xamarin.AndroidX.Lifecycle.LiveData.Core" Version="$(AndroidXLifecycleVersion)" />
     <PackageVersion Include="Xamarin.AndroidX.Lifecycle.ViewModelSavedState" Version="$(AndroidXLifecycleVersion)" />
     <PackageVersion Include="Xamarin.AndroidX.Lifecycle.ViewModelSavedState.Android" Version="$(AndroidXLifecycleVersion)" />
-    <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="10.0.401" />
+    <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="10.0.403" />
     <PackageVersion Include="MinVer" Version="8.0.0" />
     <PackageVersion Include="ReactiveUI" Version="26.0.1" />
     <PackageVersion Include="ReactiveUI.Primitives" Version="$(ReactiveUIPrimitivesVersion)" />
