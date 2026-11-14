@@ -2,10 +2,10 @@ name: Build
 
 on:
   push:
-    branches:
-      - main          # ✅ run on main
-  pull_request:        # (optional) run on PRs targeting any branch
-  
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
 # Needed so the reusable workflow can optionally delete the temp per-OS artifacts it creates.
 permissions:
   contents: read
@@ -16,8 +16,8 @@ jobs:
     uses: reactiveui/actions-common/.github/workflows/workflow-common-setup-and-build.yml@main
     with:
       configuration: Release
-      productNamespacePrefix: "ReactiveUI"
-      solutionFile: "ReactiveUI.Avalonia.slnx"
+      productNamespacePrefix: ReactiveUI.Avalonia
+      solutionFile: ReactiveUI.Avalonia.slnx
       installWorkloads: true
       # Test only the test projects. The solution also holds the example heads (Android, Browser, iOS, Desktop),
       # which are apps, not tests. 'dotnet test' asks the Android head for a device and fails when none exists.
