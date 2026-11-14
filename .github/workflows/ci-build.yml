@@ -19,6 +19,7 @@ jobs:
       productNamespacePrefix: ReactiveUI.Avalonia
       solutionFile: ReactiveUI.Avalonia.slnx
       installWorkloads: true
+      macosXcodeVersion: '26.0.1'
       # Test only the test projects. The solution also holds the example heads (Android, Browser, iOS, Desktop),
       # which are apps, not tests. 'dotnet test' asks the Android head for a device and fails when none exists.
       testProjects: |

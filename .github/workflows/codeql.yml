@@ -20,6 +20,7 @@ jobs:
     with:
       srcFolder: src
       solutionFile: ReactiveUI.Avalonia.slnx
+      installWorkloads: true
       analyzeCSharp: true
       analyzeActions: true
       analyzeJavaScript: false

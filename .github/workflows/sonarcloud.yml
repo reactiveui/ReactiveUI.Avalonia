@@ -14,6 +14,7 @@ jobs:
     uses: reactiveui/actions-common/.github/workflows/workflow-common-sonarcloud.yml@main
     with:
       solutionFile: ReactiveUI.Avalonia.slnx
+      installWorkloads: true
       minverMinimumMajorMinor: '12.1'
       # Test only the test projects: the solution also builds the example's app heads, which are not tests.
       testProjects: |
