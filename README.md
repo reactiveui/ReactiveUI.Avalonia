@@ -27,7 +27,7 @@ Install the packages that match your preferred dependency injection container. T
   - [![ReactiveUI.Avalonia.Microsoft.Extensions.DependencyInjection](https://img.shields.io/nuget/v/ReactiveUI.Avalonia.Microsoft.Extensions.DependencyInjection.svg)](https://www.nuget.org/packages/ReactiveUI.Avalonia.Microsoft.Extensions.DependencyInjection)
   - [![ReactiveUI.Avalonia.Ninject](https://img.shields.io/nuget/v/ReactiveUI.Avalonia.Ninject.svg)](https://www.nuget.org/packages/ReactiveUI.Avalonia.Ninject)
 
-All libraries target .NET 8, 9, 10, and 11. The core and DI packages also have `.Reactive` variants for applications using System.Reactive; new applications can use the lean packages backed by ReactiveUI.Primitives.
+All libraries target .NET 10 and 11. The core and DI packages also have `.Reactive` variants for applications using System.Reactive; new applications can use the lean packages backed by ReactiveUI.Primitives.
 
 ## Runnable showcase
 
