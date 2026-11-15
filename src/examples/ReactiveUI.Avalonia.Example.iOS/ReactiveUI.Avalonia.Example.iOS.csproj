@@ -14,6 +14,7 @@
     <TargetFrameworks>net10.0-ios;net11.0-ios</TargetFrameworks>
     <TargetFramework></TargetFramework>
     <SupportedOSPlatformVersion>15.0</SupportedOSPlatformVersion>
+    <AppBundleManifest>Info.plist</AppBundleManifest>
     <!-- The showcase deliberately uses reflection-based ReactiveUI bindings, so the app is not linked. -->
     <MtouchLink>None</MtouchLink>
   </PropertyGroup>
