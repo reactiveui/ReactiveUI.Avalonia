@@ -19,7 +19,6 @@ jobs:
       productNamespacePrefix: ReactiveUI.Avalonia
       solutionFile: ReactiveUI.Avalonia.slnx
       installWorkloads: true
-      macosXcodeVersion: '26.0.1'
       # Test only the test projects. The solution also holds the example heads (Android, Browser, iOS, Desktop),
       # which are apps, not tests. 'dotnet test' asks the Android head for a device and fails when none exists.
       testProjects: |
@@ -27,3 +26,20 @@ jobs:
         examples/**/*.Tests.csproj
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+  apple-examples:
+    runs-on: xcode-27
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+      - name: Setup .NET
+        uses: reactiveui/actions-common/.github/actions/dotnet-environment@main
+        with:
+          solution-file: ReactiveUI.Avalonia.Apple.slnx
+          install-workloads: 'true'
+      - name: Build Apple examples
+        uses: reactiveui/actions-common/.github/actions/dotnet-build@main
+        with:
+          solution-file: ReactiveUI.Avalonia.Apple.slnx

@@ -1,4 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AfterTargetFrameworkInferenceTargets>$(MSBuildThisFileDirectory)AppleSdk.props</AfterTargetFrameworkInferenceTargets>
+  </PropertyGroup>
 
   <!-- The iOS workload links an app only on macOS, so only macOS builds the iOS TFM. Every other host compiles a
        placeholder, the same approach as ReactiveUI's platform-apple example, so the solution builds on every OS.
@@ -8,7 +11,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(BuildAppleHead)' == 'true'">
-    <TargetFrameworks>net10.0-ios</TargetFrameworks>
+    <TargetFrameworks>net10.0-ios;net11.0-ios</TargetFrameworks>
     <TargetFramework></TargetFramework>
     <SupportedOSPlatformVersion>13.0</SupportedOSPlatformVersion>
     <!-- The showcase deliberately uses reflection-based ReactiveUI bindings, so the app is not linked. -->
@@ -16,7 +19,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(BuildAppleHead)' != 'true'">
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFrameworks>net10.0;net11.0</TargetFrameworks>
   </PropertyGroup>
 
   <!-- CI packages the sample with interpreted assemblies. -->
