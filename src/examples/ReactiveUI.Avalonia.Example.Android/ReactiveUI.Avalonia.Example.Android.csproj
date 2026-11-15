@@ -12,8 +12,9 @@
     <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
     <AndroidPackageFormat>apk</AndroidPackageFormat>
     <AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
-    <!-- CI compiles and packages the sample without full AOT compilation. -->
-    <RunAOTCompilation Condition="'$(ContinuousIntegrationBuild)' == 'true'">false</RunAOTCompilation>
+    <!-- Mono and CoreCLR use different properties to control native compilation. -->
+    <RunAOTCompilation Condition="'$(ContinuousIntegrationBuild)' == 'true' and '$(TargetFramework)' == 'net10.0-android'">false</RunAOTCompilation>
+    <PublishReadyToRun Condition="'$(ContinuousIntegrationBuild)' == 'true' and '$(TargetFramework)' == 'net11.0-android'">false</PublishReadyToRun>
     <PackageDescription>Android head for the ReactiveUI.Avalonia showcase.</PackageDescription>
     <IsPackable>false</IsPackable>
     <IsAotCompatible>false</IsAotCompatible>  </PropertyGroup>
