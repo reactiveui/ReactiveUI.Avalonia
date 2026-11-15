@@ -32,6 +32,7 @@
     <Using Include="ReactiveUI.Builder" />
     <Using Include="ReactiveUI.Primitives" />
     <Using Include="ReactiveUI.Binding" />
+    <Using Include="ReactiveUI.Binding.ObservableForProperty" />
     <Using Include="ReactiveUI.Binding.ViewLocator" Alias="CurrentViewLocator" />
     <Using Include="ReactiveUI.Primitives.Concurrency" />
     <Using Include="ReactiveUI.Primitives.Disposables" />

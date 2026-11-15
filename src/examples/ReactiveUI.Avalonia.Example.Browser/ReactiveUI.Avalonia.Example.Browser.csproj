@@ -1,5 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.WebAssembly">
   <PropertyGroup>
+    <!-- Avalonia 12.1's native WebAssembly dependencies require the .NET 10 toolchain.
+         https://github.com/AvaloniaUI/Avalonia/issues/21700 -->
     <TargetFramework>net10.0-browser</TargetFramework>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <WasmBuildNative>true</WasmBuildNative>

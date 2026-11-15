@@ -2,18 +2,18 @@
 
 This example shows the lean ReactiveUI.Avalonia package graph on every platform that Avalonia ships an official head for. It uses `ReactiveUI`, `ReactiveUI.Primitives`, project-referenced `ReactiveUI.Avalonia`, and the Microsoft dependency resolver integration.
 
-It targets .NET 10 and runs untrimmed. Traditional expression-based ReactiveUI binding and activation use reflection. This example does not claim trim or Native AOT compatibility. Package projects keep their own trimming and AOT analysis.
+It targets .NET 10 and .NET 11 and runs untrimmed. The browser head targets .NET 10 while Avalonia's native WebAssembly dependencies await .NET 11 compatibility. Traditional expression-based ReactiveUI binding and activation use reflection. This example does not claim trim or Native AOT compatibility. Package projects keep their own trimming and AOT analysis.
 
 ## Projects
 
 | Project | Target | Role |
 | --- | --- | --- |
-| `ReactiveUI.Avalonia.Example` | `net10.0` | Shared library: `App`, views, view models, models and services. The root view is the `MainView` user control. |
-| `ReactiveUI.Avalonia.Example.Desktop` | `net10.0` | Windows, macOS and Linux head. `MainWindow` hosts `MainView`. |
+| `ReactiveUI.Avalonia.Example` | `net10.0;net11.0` | Shared library: `App`, views, view models, models and services. The root view is the `MainView` user control. |
+| `ReactiveUI.Avalonia.Example.Desktop` | `net10.0;net11.0` | Windows, macOS and Linux head. `MainWindow` hosts `MainView`. |
 | `ReactiveUI.Avalonia.Example.Browser` | `net10.0-browser` | WebAssembly head. |
-| `ReactiveUI.Avalonia.Example.Android` | `net10.0-android` | Android head. |
-| `ReactiveUI.Avalonia.Example.iOS` | `net10.0-ios` | iOS head. It builds only on macOS. |
-| `ReactiveUI.Avalonia.Example.Tests` | `net10.0` | Headless TUnit tests for the shared library. |
+| `ReactiveUI.Avalonia.Example.Android` | `net10.0-android;net11.0-android` | Android head. |
+| `ReactiveUI.Avalonia.Example.iOS` | `net10.0-ios;net11.0-ios` | iOS head. It builds only on macOS. |
+| `ReactiveUI.Avalonia.Example.Tests` | `net10.0;net11.0` | Headless TUnit tests for the shared library. |
 
 `App.OnFrameworkInitializationCompleted` handles both lifetimes. A desktop lifetime gets a `MainWindow`. A single-view lifetime (browser, Android, iOS) gets a `MainView`.
 
@@ -31,27 +31,28 @@ Run every command from the `src` folder.
 
 ```powershell
 # Desktop
-dotnet run --project examples/ReactiveUI.Avalonia.Example.Desktop/ReactiveUI.Avalonia.Example.Desktop.csproj -c Release
+dotnet run --project examples/ReactiveUI.Avalonia.Example.Desktop/ReactiveUI.Avalonia.Example.Desktop.csproj -f net11.0 -c Release
 
 # Browser. This needs the wasm-tools workload: dotnet workload restore ReactiveUI.Avalonia.slnx
-dotnet run --project examples/ReactiveUI.Avalonia.Example.Browser/ReactiveUI.Avalonia.Example.Browser.csproj -c Release
+dotnet run --project examples/ReactiveUI.Avalonia.Example.Browser/ReactiveUI.Avalonia.Example.Browser.csproj -f net10.0-browser -c Release
 
 # Android. This needs the android workload and a running emulator or a connected device.
-dotnet run --project examples/ReactiveUI.Avalonia.Example.Android/ReactiveUI.Avalonia.Example.Android.csproj -f net10.0-android
+dotnet run --project examples/ReactiveUI.Avalonia.Example.Android/ReactiveUI.Avalonia.Example.Android.csproj -f net11.0-android
 
 # iOS. This needs macOS, Xcode and the ios workload. It runs on a simulator.
-dotnet build examples/ReactiveUI.Avalonia.Example.iOS/ReactiveUI.Avalonia.Example.iOS.csproj -f net10.0-ios -t:Run
+dotnet build examples/ReactiveUI.Avalonia.Example.iOS/ReactiveUI.Avalonia.Example.iOS.csproj -f net11.0-ios -t:Run
 ```
 
 `dotnet workload restore ReactiveUI.Avalonia.slnx` installs the workloads the solution needs on the current OS.
 
 ## Platform notes
 
-- **Per-OS builds.** The iOS project sets `TargetFrameworks` to `net10.0-ios` only on macOS. On Windows and Linux it compiles a small placeholder for `net10.0`, so `dotnet build ReactiveUI.Avalonia.slnx` works on every OS. The pattern comes from ReactiveUI's `platform-apple` example.
+- **Per-OS builds.** The iOS project targets `net10.0-ios` and `net11.0-ios` on macOS. On Windows and Linux it compiles a small placeholder for `net10.0` and `net11.0`, so `dotnet build ReactiveUI.Avalonia.slnx` works on every OS. The pattern comes from ReactiveUI's `platform-apple` example.
 - **Running tests.** Use `dotnet test --project` for each test project, or a solution filter. `dotnet test --solution ReactiveUI.Avalonia.slnx` asks the Android head for a device and fails when none is attached. CI passes `testProjects` to select the test projects.
 
 ## Browser limitations
 
+- **Framework.** Avalonia 12.1's SkiaSharp 3.x and HarfBuzzSharp native libraries do not link with the .NET 11 WebAssembly toolchain. The browser example stays on .NET 10 until the [upstream dependency issue](https://github.com/AvaloniaUI/Avalonia/issues/21700) is resolved in a compatible Avalonia release.
 - **Metrics.** `Process` is not supported in a browser. `App.RegisterViews` registers `BrowserMachineMetricsService` there. It reports managed memory (`GC.GetTotalMemory`), the gen0 collection count (`GC.CollectionCount`) and uptime (`Environment.TickCount64`). The CPU percentage is always 0. The thread count is always 1. The working-set card shows managed memory.
 - **Session storage.** A browser has no `LocalApplicationData` folder. `ShowcaseSession.DefaultPath()` returns `null` there, so the session does nothing. The input and threshold reset on each launch. The sidebar says so.
 - **Single-view platforms.** Android and iOS also use a single-view lifetime. That lifetime has no exit event for `AutoSuspendHelper`, so they do not persist the session either. Only the desktop lifetime does.
