@@ -2,28 +2,5 @@
     "$schema": "https://docs.renovatebot.com/renovate-schema.json",
     "extends": [
         "local>reactiveui/.github:renovate"
-    ],
-    "packageRules": [
-        {
-            "description": "Analyzer packages all gate the build through the same warnings-as-errors pass, so landing them separately just means several red CI runs in a row. Move them in one PR.",
-            "matchManagers": [
-                "nuget"
-            ],
-            "groupName": "analyzers",
-            "matchPackageNames": [
-                "/Sharp\\.Analyzers$/"
-            ]
-        },
-        {
-            "description": "Packaging, versioning and symbol tooling. These affect how the package is produced, never the shipped API, so they are safe to move as one.",
-            "matchManagers": [
-                "nuget"
-            ],
-            "groupName": "build tooling",
-            "matchPackageNames": [
-                "/^MinVer$/",
-                "/^Microsoft\\.SourceLink\\./"
-            ]
-        }
     ]
 }
