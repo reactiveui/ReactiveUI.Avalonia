@@ -8,7 +8,7 @@
          same release pipeline and always share a version. -->
     <RoslynCommonAnalyzersVersion>5.2.0</RoslynCommonAnalyzersVersion>
     <ReactiveUIPrimitivesVersion>10.0.0</ReactiveUIPrimitivesVersion>
-    <ReactiveUIBindingVersion>10.0.0</ReactiveUIBindingVersion>
+    <ReactiveUIBindingVersion>10.1.0</ReactiveUIBindingVersion>
     <AndroidXLifecycleVersion>2.11.0.1</AndroidXLifecycleVersion>
   </PropertyGroup>
 
@@ -28,12 +28,12 @@
     <PackageVersion Include="Xamarin.AndroidX.Lifecycle.ViewModelSavedState.Android" Version="$(AndroidXLifecycleVersion)" />
     <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="11.0.100" />
     <PackageVersion Include="MinVer" Version="8.0.0" />
-    <PackageVersion Include="ReactiveUI" Version="27.0.0" />
+    <PackageVersion Include="ReactiveUI" Version="27.0.1" />
     <PackageVersion Include="ReactiveUI.Primitives" Version="$(ReactiveUIPrimitivesVersion)" />
     <PackageVersion Include="ReactiveUI.Primitives.Reactive" Version="$(ReactiveUIPrimitivesVersion)" />
     <PackageVersion Include="ReactiveUI.Primitives.Avalonia" Version="$(ReactiveUIPrimitivesVersion)" />
     <PackageVersion Include="ReactiveUI.Primitives.Avalonia.Reactive" Version="$(ReactiveUIPrimitivesVersion)" />
-    <PackageVersion Include="ReactiveUI.Reactive" Version="27.0.0" />
+    <PackageVersion Include="ReactiveUI.Reactive" Version="27.0.1" />
     <PackageVersion Include="ReactiveUI.Binding.Avalonia" Version="$(ReactiveUIBindingVersion)" />
     <PackageVersion Include="ReactiveUI.Binding.Avalonia.Reactive" Version="$(ReactiveUIBindingVersion)" />
     <PackageVersion Include="Splat" Version="$(SplatVersion)" />
