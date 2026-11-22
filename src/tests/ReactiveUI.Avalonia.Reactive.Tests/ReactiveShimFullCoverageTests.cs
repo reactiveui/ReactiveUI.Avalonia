@@ -760,6 +760,31 @@ public partial class ReactiveShimFullCoverageTests
         }
     }
 
+    /// <summary>Verifies reactive LayoutViewHost wraps views in their layout, reuses it, and releases it.</summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
+    [Test]
+    public async Task ReactiveLayoutViewHost_WrapsReusesAndReleasesLayout()
+    {
+        var firstVm = new ShimLayoutVm();
+        var secondVm = new ShimLayoutVm();
+        var view = new ShimLayoutView();
+        var host = new LayoutViewHost { DefaultContent = DefaultContentValue, Router = new(), ViewLocator = new StaticViewLocator(view) };
+
+        host.NavigateToViewModel(firstVm, null);
+        var layout = await Assert.That(host.Content).IsTypeOf<ShimLayout>();
+        await Assert.That(layout!.Content).IsSameReferenceAs(view);
+
+        host.NavigateToViewModel(secondVm, null);
+        await Assert.That(host.Content).IsSameReferenceAs(layout);
+        await Assert.That(view.ViewModel).IsSameReferenceAs(secondVm);
+
+        host.NavigateToViewModel(null, null);
+        await Assert.That(host.Content).IsEqualTo(DefaultContentValue);
+
+        host.NavigateToViewModel(firstVm, null);
+        await Assert.That(host.Content).IsNotSameReferenceAs(layout);
+    }
+
     /// <summary>Verifies reactive subscription error forwarding preserves exception identity.</summary>
     /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]

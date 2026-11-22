@@ -198,6 +198,10 @@ public partial class ReactiveShimFullCoverageTests
         public sealed class ViewContractAttribute : Attribute;
     }
 
+    /// <summary>A layout that the host creates directly.</summary>
+    /// <remarks>Public because the host creates it through its parameterless constructor, not from test code.</remarks>
+    public sealed class ShimLayout : ContentControl;
+
     /// <summary>A recording observer used to avoid Subscribe extension overload ambiguity.</summary>
     /// <typeparam name="T">The observed value type.</typeparam>
     /// <param name="onNext">The observed-value action.</param>
@@ -377,6 +381,17 @@ public partial class ReactiveShimFullCoverageTests
     {
         /// <summary>Gets the routing state.</summary>
         public ReactiveRoutingState Router { get; } = new();
+    }
+
+    /// <summary>A view model that declares the layout for its view.</summary>
+    [ViewLayout(typeof(ShimLayout))]
+    private sealed class ShimLayoutVm : ReactiveObject;
+
+    /// <summary>A view shown inside the layout its view model declares.</summary>
+    private sealed class ShimLayoutView : UserControl, IViewFor
+    {
+        /// <inheritdoc/>
+        public object? ViewModel { get; set; }
     }
 
     /// <summary>A shim registration view model.</summary>
