@@ -72,6 +72,11 @@ public static class AvaloniaObjectReactiveExtensions
         public ReactiveUI.Primitives.Signals.ISignal<T> GetSubject<T>(Avalonia.AvaloniaProperty<T> property, Avalonia.Data.BindingPriority priority) { }
     }
 }
+[System.Diagnostics.DebuggerDisplay("LayoutViewHost: {Router}")]
+public class LayoutViewHost : ReactiveUI.Avalonia.RoutedViewHost
+{
+    public LayoutViewHost() { }
+}
 [System.Diagnostics.DebuggerDisplay("ReactiveUserControl: {ViewModel}")]
 public class ReactiveUserControl<TViewModel> : ReactiveUI.Avalonia.ReactiveUserControlBase, ReactiveUI.Binding.IViewFor<TViewModel> where TViewModel : class
 {
@@ -120,6 +125,14 @@ public class RoutedViewHost : Avalonia.Controls.TransitioningContentControl, Rea
     public ReactiveUI.Binding.IViewLocator? ViewLocator { get; set; }
     protected override void OnAttachedToVisualTree(Avalonia.VisualTreeAttachmentEventArgs e) { }
     protected override void OnDetachedFromVisualTree(Avalonia.VisualTreeAttachmentEventArgs e) { }
+}
+[System.AttributeUsage(System.AttributeTargets.Class)]
+[System.Diagnostics.DebuggerDisplay("ViewLayout: {LayoutType}")]
+public sealed class ViewLayoutAttribute : System.Attribute
+{
+    public ViewLayoutAttribute(System.Type layoutType) { }
+    [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
+    public System.Type LayoutType { get; }
 }
 [System.Diagnostics.DebuggerDisplay("ViewModelViewHost: {ViewModel}")]
 public class ViewModelViewHost : Avalonia.Controls.TransitioningContentControl, ReactiveUI.Binding.IViewFor, Splat.IEnableLogger

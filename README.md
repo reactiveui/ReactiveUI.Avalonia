@@ -247,6 +247,8 @@ Important types registered by default:
 
 Controls and helpers:
 - `RoutedViewHost` — view host that displays the view for the current `RoutingState`
+- `LayoutViewHost` — a `RoutedViewHost` that wraps the routed view in the layout named by `[ViewLayout]`
+- `ViewLayoutAttribute` — names the layout for a view, on the view or on its view model
 - `ReactiveUserControl<TViewModel>`, `ReactiveWindow<TViewModel>` — base classes for reactive views
 
 ### ReactiveUI.Avalonia.Autofac
@@ -457,6 +459,54 @@ Locator.CurrentMutable.Register(() => new MainView(), typeof(IViewFor<MyViewMode
 // or:
 AppBuilder.Configure<App>().UseReactiveUI().RegisterReactiveUIViewsFromEntryAssembly();
 ```
+
+### Chapter 4: Sharing a layout with `LayoutViewHost`
+
+Several routed views often share the same chrome, such as a header and footer around every sign-in page.
+`LayoutViewHost` works like `RoutedViewHost`, and also wraps each routed view in the layout the view asks for.
+
+Name the layout with `[ViewLayout]` on the view or on its view model. An attribute on the view wins.
+
+```csharp
+[ViewLayout(typeof(AuthLayoutViewModel))]
+public partial class LoginView : ReactiveUserControl<LoginViewModel>
+{
+}
+```
+
+```xml
+<rxui:LayoutViewHost Router="{Binding Router}" />
+```
+
+The attribute takes one of two kinds of type:
+
+- A layout view model type. The host gets the view model, then finds its view through the `IViewLocator`.
+- A layout view type that derives from `ContentControl`. The host uses the control directly.
+
+The host asks the dependency resolver for the type first. If the type is not registered, the host uses its public
+parameterless constructor.
+
+The layout view must be a `ContentControl`. The host assigns the routed view to the layout's `Content`, and the layout
+draws its chrome around that content through its `ContentTemplate` or `Template`:
+
+```xml
+<!-- AuthLayout.axaml: a ReactiveUserControl<AuthLayoutViewModel> -->
+<UserControl.ContentTemplate>
+    <DataTemplate>
+        <DockPanel>
+            <TextBlock DockPanel.Dock="Top" Text="Welcome" />
+            <ContentPresenter Content="{Binding}" />
+        </DockPanel>
+    </DataTemplate>
+</UserControl.ContentTemplate>
+```
+
+How the host treats layouts during navigation:
+
+- Views that name the same layout type one after another share one layout instance, so the chrome stays in place.
+- A view that names a different layout type gets a new layout.
+- A view with no `[ViewLayout]` is shown directly, and the host lets go of the previous layout.
+- If the layout type does not lead to a `ContentControl`, the host logs a warning and shows the view directly.
 
 ---
 ## Thanks

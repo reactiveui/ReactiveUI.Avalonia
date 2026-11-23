@@ -94,18 +94,18 @@ public class RoutedViewHost : TransitioningContentControl, IActivatableView, IEn
         if (Router is null)
         {
             this.Log().Warn("Router property is null. Falling back to default content.");
-            Content = DefaultContent;
+            ShowView(null);
             return;
         }
 
         if (viewModel is null)
         {
             this.Log().Info("ViewModel is null. Falling back to default content.");
-            Content = DefaultContent;
+            ShowView(null);
             return;
         }
 
-        Content = ViewHostNavigation.ResolveView(this, viewModel, contract, ViewLocator) ?? DefaultContent;
+        ShowView(ViewHostNavigation.ResolveView(this, viewModel, contract, ViewLocator));
     }
 
     /// <summary>Disposes the active navigation subscriptions when they exist.</summary>
@@ -122,6 +122,10 @@ public class RoutedViewHost : TransitioningContentControl, IActivatableView, IEn
         base.OnDetachedFromVisualTree(e);
         DisposeNavigationDisposables();
     }
+
+    /// <summary>Displays a resolved view, or the default content when there is none.</summary>
+    /// <param name="view">The resolved view, already given its view model, or null when nothing was resolved.</param>
+    private protected virtual void ShowView(IViewFor? view) => Content = view ?? DefaultContent;
 
     /// <summary>Gets the current routed view model from the navigation stack.</summary>
     /// <param name="router">The router to inspect.</param>
