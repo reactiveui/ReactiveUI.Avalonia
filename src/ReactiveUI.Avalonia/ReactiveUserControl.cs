@@ -10,13 +10,30 @@ namespace ReactiveUI.Avalonia;
 /// <summary>A ReactiveUI <see cref="UserControl"/> that implements <see cref="IViewFor{TViewModel}"/>.</summary>
 /// <typeparam name="TViewModel">ViewModel type.</typeparam>
 [System.Diagnostics.DebuggerDisplay("ReactiveUserControl: {ViewModel}")]
-public class ReactiveUserControl<TViewModel> : ReactiveUserControlBase, IViewFor<TViewModel>
+public class ReactiveUserControl<TViewModel> : UserControl, IViewFor<TViewModel>
     where TViewModel : class
 {
+    /// <summary>Identifies the <see cref="ViewModel"/> styled property.</summary>
+    /// <remarks>The property is typed as <typeparamref name="TViewModel"/>, so bindings to it need no cast.</remarks>
+    public static readonly StyledProperty<TViewModel?> ViewModelProperty =
+        AvaloniaProperty.Register<ReactiveUserControl<TViewModel>, TViewModel?>(nameof(ViewModel));
+
+    /// <summary>Holds the view model value filter so the property-changed path allocates nothing.</summary>
+    private readonly Func<object?, bool> _isValidViewModelValue;
+
+    /// <summary>Initializes a new instance of the <see cref="ReactiveUserControl{TViewModel}"/> class.</summary>
+    /// <remarks>When the control is activated, any activation logic in a view model that implements
+    /// <c>IActivatableViewModel</c> runs too.</remarks>
+    public ReactiveUserControl()
+    {
+        _isValidViewModelValue = IsValidViewModelValue;
+        ViewModelPropertySync.ForwardActivation(this, ViewModelProperty);
+    }
+
     /// <inheritdoc cref="IViewFor{TViewModel}.ViewModel"/>
     public TViewModel? ViewModel
     {
-        get => (TViewModel?)GetValue(ViewModelProperty);
+        get => GetValue(ViewModelProperty);
         set => SetValue(ViewModelProperty, value);
     }
 
@@ -28,5 +45,17 @@ public class ReactiveUserControl<TViewModel> : ReactiveUserControlBase, IViewFor
     }
 
     /// <inheritdoc/>
-    protected override bool IsValidViewModelValue(object? value) => value is null or TViewModel;
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+    {
+        ArgumentNullException.ThrowIfNull(change);
+        base.OnPropertyChanged(change);
+
+        ViewModelPropertySync.Apply(this, change, ViewModelProperty, _isValidViewModelValue);
+    }
+
+    /// <summary>Determines whether a data context value may become the view model.</summary>
+    /// <param name="value">The value to validate.</param>
+    /// <returns><see langword="true"/> when the value is <see langword="null"/> or a <typeparamref name="TViewModel"/>; otherwise, <see langword="false"/>.</returns>
+    /// <remarks>An override must still return <see langword="false"/> for any value that is not a <typeparamref name="TViewModel"/>.</remarks>
+    protected virtual bool IsValidViewModelValue(object? value) => value is null or TViewModel;
 }

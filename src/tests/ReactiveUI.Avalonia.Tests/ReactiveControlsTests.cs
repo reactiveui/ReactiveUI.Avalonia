@@ -172,6 +172,46 @@ public class ReactiveControlsTests
         await Assert.That(genericArguments.Length).IsEqualTo(1);
     }
 
+    /// <summary>Verifies that ReactiveUserControl exposes a view model property typed as its view model.</summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
+    [Test]
+    public async Task ReactiveUserControl_ViewModelProperty_IsTypedAsTheViewModel()
+    {
+        var viewModel = new TypedViewModel();
+        var control = new ReactiveUserControl<TypedViewModel>();
+
+        _ = control.SetValue(ReactiveUserControl<TypedViewModel>.ViewModelProperty, viewModel);
+        var read = control.GetValue(ReactiveUserControl<TypedViewModel>.ViewModelProperty);
+
+        using (Assert.Multiple())
+        {
+            await Assert.That(ReactiveUserControl<TypedViewModel>.ViewModelProperty.PropertyType).IsEqualTo(typeof(TypedViewModel));
+            await Assert.That(read).IsSameReferenceAs(viewModel);
+            await Assert.That(control.ViewModel).IsSameReferenceAs(viewModel);
+            await Assert.That(control.DataContext).IsSameReferenceAs(viewModel);
+        }
+    }
+
+    /// <summary>Verifies that ReactiveWindow exposes a view model property typed as its view model.</summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
+    [Test]
+    public async Task ReactiveWindow_ViewModelProperty_IsTypedAsTheViewModel()
+    {
+        var viewModel = new TypedViewModel();
+        var window = new ReactiveWindow<TypedViewModel>();
+
+        _ = window.SetValue(ReactiveWindow<TypedViewModel>.ViewModelProperty, viewModel);
+        var read = window.GetValue(ReactiveWindow<TypedViewModel>.ViewModelProperty);
+
+        using (Assert.Multiple())
+        {
+            await Assert.That(ReactiveWindow<TypedViewModel>.ViewModelProperty.PropertyType).IsEqualTo(typeof(TypedViewModel));
+            await Assert.That(read).IsSameReferenceAs(viewModel);
+            await Assert.That(window.ViewModel).IsSameReferenceAs(viewModel);
+            await Assert.That(window.DataContext).IsSameReferenceAs(viewModel);
+        }
+    }
+
     /// <summary>Verifies that ViewModelViewHost has the expected public properties.</summary>
     /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
@@ -204,5 +244,12 @@ public class ReactiveControlsTests
 
         var routerProp = hostType.GetProperty("Router");
         await Assert.That(routerProp).IsNotNull();
+    }
+
+    /// <summary>A view model type for the typed property tests.</summary>
+    private sealed class TypedViewModel
+    {
+        /// <summary>Gets the view model's name.</summary>
+        public string Name { get; } = nameof(TypedViewModel);
     }
 }
