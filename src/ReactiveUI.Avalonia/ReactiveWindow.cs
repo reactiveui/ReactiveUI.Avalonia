@@ -10,23 +10,39 @@ namespace ReactiveUI.Avalonia;
 /// <summary>A ReactiveUI <see cref="Window"/> that implements <see cref="IViewFor{TViewModel}"/>.</summary>
 /// <typeparam name="TViewModel">ViewModel type.</typeparam>
 [System.Diagnostics.DebuggerDisplay("ReactiveWindow: {ViewModel}")]
-public class ReactiveWindow<TViewModel> : ReactiveWindowBase, IViewFor<TViewModel>
+public class ReactiveWindow<TViewModel> : Window, IViewFor<TViewModel>
     where TViewModel : class
 {
+    /// <summary>Identifies the <see cref="ViewModel"/> styled property.</summary>
+    /// <remarks>The property is typed as <typeparamref name="TViewModel"/>, so bindings to it need no cast.</remarks>
+    public static readonly StyledProperty<TViewModel?> ViewModelProperty =
+        AvaloniaProperty.Register<ReactiveWindow<TViewModel>, TViewModel?>(nameof(ViewModel));
+
+    /// <summary>The view model property and data context filter, held so property changes allocate nothing.</summary>
+    private readonly ViewModelPropertyState<TViewModel> _state;
+
+    /// <summary>Initializes a new instance of the <see cref="ReactiveWindow{TViewModel}"/> class.</summary>
+    /// <remarks>When the window is activated, any activation logic in a view model that implements
+    /// <c>IActivatableViewModel</c> runs too.</remarks>
+    public ReactiveWindow() => _state = ViewModelPropertySync.Attach(this, ViewModelProperty, IsValidViewModelValue);
+
     /// <inheritdoc cref="IViewFor{TViewModel}.ViewModel"/>
     public TViewModel? ViewModel
     {
-        get => (TViewModel?)GetValue(ViewModelProperty);
-        set => SetValue(ViewModelProperty, value);
+        get => ViewModelPropertySync.GetViewModel(this, _state);
+        set => ViewModelPropertySync.SetViewModel(this, _state, value);
     }
 
     /// <inheritdoc/>
     object? IViewFor.ViewModel
     {
         get => ViewModel;
-        set => ViewModel = (TViewModel?)value;
+        set => ViewModelPropertySync.SetViewModel(this, _state, value);
     }
 
-    /// <inheritdoc/>
-    protected override bool IsValidViewModelValue(object? value) => value is null or TViewModel;
+    /// <summary>Determines whether a data context value may become the view model.</summary>
+    /// <param name="value">The value to validate.</param>
+    /// <returns><see langword="true"/> when the value is <see langword="null"/> or a <typeparamref name="TViewModel"/>; otherwise, <see langword="false"/>.</returns>
+    /// <remarks>An override must still return <see langword="false"/> for any value that is not a <typeparamref name="TViewModel"/>.</remarks>
+    protected virtual bool IsValidViewModelValue(object? value) => ViewModelPropertySync.IsViewModelOrNull<TViewModel>(value);
 }

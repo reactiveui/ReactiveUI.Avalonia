@@ -78,12 +78,13 @@ public class LayoutViewHost : ReactiveUI.Avalonia.RoutedViewHost
     public LayoutViewHost() { }
 }
 [System.Diagnostics.DebuggerDisplay("ReactiveUserControl: {ViewModel}")]
-public class ReactiveUserControl<TViewModel> : ReactiveUI.Avalonia.ReactiveUserControlBase, ReactiveUI.Binding.IViewFor<TViewModel> where TViewModel : class
+public class ReactiveUserControl<TViewModel> : Avalonia.Controls.UserControl, ReactiveUI.Binding.IViewFor<TViewModel> where TViewModel : class
 {
     public ReactiveUserControl() { }
+    public static readonly Avalonia.StyledProperty<TViewModel?> ViewModelProperty;
     object? ReactiveUI.Binding.IViewFor.ViewModel { get; set; }
     public TViewModel? ViewModel { get; set; }
-    protected override bool IsValidViewModelValue(object? value) { }
+    protected virtual bool IsValidViewModelValue(object? value) { }
 }
 [System.Diagnostics.DebuggerDisplay("ReactiveUserControlBase: {ToString(),nq}")]
 public class ReactiveUserControlBase : Avalonia.Controls.UserControl, ReactiveUI.Binding.IViewFor
@@ -95,12 +96,13 @@ public class ReactiveUserControlBase : Avalonia.Controls.UserControl, ReactiveUI
     protected override void OnPropertyChanged(Avalonia.AvaloniaPropertyChangedEventArgs change) { }
 }
 [System.Diagnostics.DebuggerDisplay("ReactiveWindow: {ViewModel}")]
-public class ReactiveWindow<TViewModel> : ReactiveUI.Avalonia.ReactiveWindowBase, ReactiveUI.Binding.IViewFor<TViewModel> where TViewModel : class
+public class ReactiveWindow<TViewModel> : Avalonia.Controls.Window, ReactiveUI.Binding.IViewFor<TViewModel> where TViewModel : class
 {
     public ReactiveWindow() { }
+    public static readonly Avalonia.StyledProperty<TViewModel?> ViewModelProperty;
     object? ReactiveUI.Binding.IViewFor.ViewModel { get; set; }
     public TViewModel? ViewModel { get; set; }
-    protected override bool IsValidViewModelValue(object? value) { }
+    protected virtual bool IsValidViewModelValue(object? value) { }
 }
 [System.Diagnostics.DebuggerDisplay("ReactiveWindowBase: {ToString(),nq}")]
 public class ReactiveWindowBase : Avalonia.Controls.Window, ReactiveUI.Binding.IViewFor

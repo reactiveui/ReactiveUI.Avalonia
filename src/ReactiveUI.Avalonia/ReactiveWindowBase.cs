@@ -33,9 +33,10 @@ public class ReactiveWindowBase : Window, IViewFor
     }
 
     /// <inheritdoc/>
-    /// <remarks>Implemented explicitly so <c>ReactiveWindow&lt;TViewModel&gt;</c> can expose the only public
-    /// <c>ViewModel</c> property; two public properties of that name and differing types would make ReactiveUI's
-    /// resolution of it by name throw <see cref="System.Reflection.AmbiguousMatchException"/>.</remarks>
+    /// <remarks>Implemented explicitly so a derived class can declare its own public, typed <c>ViewModel</c> property;
+    /// two public properties of that name and differing types would make ReactiveUI's resolution of it by name throw
+    /// <see cref="System.Reflection.AmbiguousMatchException"/>. For a typed view model, use
+    /// <see cref="ReactiveWindow{TViewModel}"/>.</remarks>
     object? IViewFor.ViewModel
     {
         get => GetValue(ViewModelProperty);
