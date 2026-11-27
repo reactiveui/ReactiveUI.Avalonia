@@ -7,14 +7,26 @@ namespace ReactiveUI.Avalonia.Reactive;
 namespace ReactiveUI.Avalonia;
 #endif
 
-/// <summary>Holds what a typed reactive view needs to keep its view model property and data context in step.</summary>
+/// <summary>Keeps a typed reactive view's view model property and data context in step.</summary>
 /// <typeparam name="TViewModel">The view model type.</typeparam>
 /// <param name="Property">The view's typed view model property.</param>
 /// <param name="IsValidViewModelValue">
 /// Decides whether an incoming data context may become the view model. It must only accept <see langword="null"/> or a
 /// <typeparamref name="TViewModel"/>. The view holds it for its whole life, so property changes allocate nothing.
 /// </param>
-internal readonly record struct ViewModelPropertyState<TViewModel>(
+internal sealed record ViewModelPropertyState<TViewModel>(
     StyledProperty<TViewModel?> Property,
     Func<object?, bool> IsValidViewModelValue)
-    where TViewModel : class;
+    where TViewModel : class
+{
+    /// <summary>Propagates the view's property change between its view model property and its data context.</summary>
+    /// <param name="sender">The view whose property changed.</param>
+    /// <param name="change">The property change to propagate.</param>
+    internal void OnPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs change)
+    {
+        if (sender is StyledElement view)
+        {
+            ViewModelPropertySync.Apply(view, change, Property, IsValidViewModelValue);
+        }
+    }
+}

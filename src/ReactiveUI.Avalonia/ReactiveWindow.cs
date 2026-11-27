@@ -40,14 +40,6 @@ public class ReactiveWindow<TViewModel> : Window, IViewFor<TViewModel>
         set => ViewModelPropertySync.SetViewModel(this, _state, value);
     }
 
-    /// <inheritdoc/>
-    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
-    {
-        ArgumentNullException.ThrowIfNull(change);
-        base.OnPropertyChanged(change);
-        ViewModelPropertySync.Apply(this, change, _state);
-    }
-
     /// <summary>Determines whether a data context value may become the view model.</summary>
     /// <param name="value">The value to validate.</param>
     /// <returns><see langword="true"/> when the value is <see langword="null"/> or a <typeparamref name="TViewModel"/>; otherwise, <see langword="false"/>.</returns>

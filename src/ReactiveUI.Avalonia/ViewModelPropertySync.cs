@@ -31,7 +31,7 @@ internal static class ViewModelPropertySync
         _ = view.WhenActivated(view.GetObservable(viewModelProperty));
     }
 
-    /// <summary>Sets up a typed reactive view: forwards its activation and returns the state its other members use.</summary>
+    /// <summary>Sets up a typed reactive view: forwards its activation, keeps its data context in step, and returns its state.</summary>
     /// <typeparam name="TView">The view type.</typeparam>
     /// <typeparam name="TViewModel">The view model type.</typeparam>
     /// <param name="view">The view being constructed.</param>
@@ -42,11 +42,15 @@ internal static class ViewModelPropertySync
         TView view,
         StyledProperty<TViewModel?> property,
         Func<object?, bool> isValidViewModelValue)
-        where TView : AvaloniaObject, IActivatableView
+        where TView : StyledElement, IActivatableView
         where TViewModel : class
     {
         ForwardActivation(view, property);
-        return new(property, isValidViewModelValue);
+        ViewModelPropertyState<TViewModel> state = new(property, isValidViewModelValue);
+
+        // The view raises this for its own changes, so the handler lives exactly as long as the view.
+        view.PropertyChanged += state.OnPropertyChanged;
+        return state;
     }
 
     /// <summary>Reads a typed view's view model.</summary>
@@ -55,7 +59,7 @@ internal static class ViewModelPropertySync
     /// <param name="state">The view's state.</param>
     /// <returns>The view model, or <see langword="null"/>.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static TViewModel? GetViewModel<TViewModel>(AvaloniaObject view, in ViewModelPropertyState<TViewModel> state)
+    internal static TViewModel? GetViewModel<TViewModel>(AvaloniaObject view, ViewModelPropertyState<TViewModel> state)
         where TViewModel : class => view.GetValue(state.Property);
 
     /// <summary>Sets a typed view's view model.</summary>
@@ -65,7 +69,7 @@ internal static class ViewModelPropertySync
     /// <param name="value">The view model to set, or <see langword="null"/>; any other type throws.</param>
     /// <exception cref="InvalidCastException"><paramref name="value"/> is not a <typeparamref name="TViewModel"/>.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static void SetViewModel<TViewModel>(AvaloniaObject view, in ViewModelPropertyState<TViewModel> state, object? value)
+    internal static void SetViewModel<TViewModel>(AvaloniaObject view, ViewModelPropertyState<TViewModel> state, object? value)
         where TViewModel : class => _ = view.SetValue(state.Property, (TViewModel?)value);
 
     /// <summary>Returns whether a value may become a <typeparamref name="TViewModel"/> view model.</summary>
@@ -75,15 +79,6 @@ internal static class ViewModelPropertySync
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static bool IsViewModelOrNull<TViewModel>(object? value)
         where TViewModel : class => value is null or TViewModel;
-
-    /// <summary>Propagates a typed view's property change between its view model property and its data context.</summary>
-    /// <typeparam name="TViewModel">The view model type.</typeparam>
-    /// <param name="view">The view whose property changed.</param>
-    /// <param name="change">The property change to propagate.</param>
-    /// <param name="state">The view's state.</param>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static void Apply<TViewModel>(StyledElement view, AvaloniaPropertyChangedEventArgs change, in ViewModelPropertyState<TViewModel> state)
-        where TViewModel : class => Apply(view, change, state.Property, state.IsValidViewModelValue);
 
     /// <summary>Propagates a change between the view model property and the data context.</summary>
     /// <typeparam name="TValue">The view model property's value type.</typeparam>

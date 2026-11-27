@@ -85,7 +85,6 @@ public class ReactiveUserControl<TViewModel> : Avalonia.Controls.UserControl, Re
     object? ReactiveUI.Binding.Reactive.IViewFor.ViewModel { get; set; }
     public TViewModel? ViewModel { get; set; }
     protected virtual bool IsValidViewModelValue(object? value) { }
-    protected override void OnPropertyChanged(Avalonia.AvaloniaPropertyChangedEventArgs change) { }
 }
 [System.Diagnostics.DebuggerDisplay("ReactiveUserControlBase: {ToString(),nq}")]
 public class ReactiveUserControlBase : Avalonia.Controls.UserControl, ReactiveUI.Binding.Reactive.IViewFor
@@ -104,7 +103,6 @@ public class ReactiveWindow<TViewModel> : Avalonia.Controls.Window, ReactiveUI.B
     object? ReactiveUI.Binding.Reactive.IViewFor.ViewModel { get; set; }
     public TViewModel? ViewModel { get; set; }
     protected virtual bool IsValidViewModelValue(object? value) { }
-    protected override void OnPropertyChanged(Avalonia.AvaloniaPropertyChangedEventArgs change) { }
 }
 [System.Diagnostics.DebuggerDisplay("ReactiveWindowBase: {ToString(),nq}")]
 public class ReactiveWindowBase : Avalonia.Controls.Window, ReactiveUI.Binding.Reactive.IViewFor
