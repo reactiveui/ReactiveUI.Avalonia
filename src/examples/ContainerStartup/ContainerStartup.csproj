@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFrameworks>$(AvaloniaTargetFrameworks)</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <IsPackable>false</IsPackable>
+    <PackageDescription>Starts a headless Avalonia app with each supported dependency injection container.</PackageDescription>
+  </PropertyGroup>
+  <ItemGroup>
+    <Using Include="ReactiveUI.Avalonia.Splat" />
+    <PackageReference Include="Avalonia.Headless" />
+    <ProjectReference Include="../../ReactiveUI.Avalonia.Autofac/ReactiveUI.Avalonia.Autofac.csproj" />
+    <ProjectReference Include="../../ReactiveUI.Avalonia.DryIoc/ReactiveUI.Avalonia.DryIoc.csproj" />
+    <ProjectReference Include="../../ReactiveUI.Avalonia.Microsoft.Extensions.DependencyInjection/ReactiveUI.Avalonia.Microsoft.Extensions.DependencyInjection.csproj" />
+    <ProjectReference Include="../../ReactiveUI.Avalonia.Ninject/ReactiveUI.Avalonia.Ninject.csproj" />
+  </ItemGroup>
+</Project>

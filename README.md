@@ -36,10 +36,19 @@ The [example application](src/examples/ReactiveUI.Avalonia.Example/README.md) de
 From `src`, run:
 
 ```powershell
-dotnet run --project examples/ReactiveUI.Avalonia.Example/ReactiveUI.Avalonia.Example.csproj -c Release
+dotnet run --project examples/ReactiveUI.Avalonia.Example.Desktop -f net11.0 -c Release
 ```
 
 The example includes headless TUnit tests so its behavior can be checked alongside the package tests.
+
+To try one of the four container adapters without opening a window, run the [container startup example](src/examples/ContainerStartup/Program.cs). It registers the application's clock, starts Avalonia and checks that Splat resolves the same instance.
+
+```sh
+dotnet run --project examples/ContainerStartup -f net11.0 -- autofac
+dotnet run --project examples/ContainerStartup.Reactive -f net11.0 -- microsoft
+```
+
+The example accepts `autofac`, `dryioc`, `microsoft` and `ninject`.
 
 ## Recommended setup (ReactiveUIBuilder)
 
