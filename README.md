@@ -1,20 +1,20 @@
-[![Build](https://github.com/reactiveui/ReactiveUI.Avalonia/actions/workflows/ci-build.yml/badge.svg)](https://github.com/reactiveui/ReactiveUI.Avalonia/actions/workflows/ci-build.yml)
-[![Code Coverage](https://codecov.io/gh/reactiveui/ReactiveUI.Avalonia/branch/main/graph/badge.svg)](https://codecov.io/gh/reactiveui/ReactiveUI.Avalonia)
-[![#yourfirstpr](https://img.shields.io/badge/first--timers--only-friendly-blue.svg)](https://reactiveui.net/contribute)
-[![](https://img.shields.io/badge/chat-slack-blue.svg)](https://reactiveui.net/slack)
-[![NuGet](https://img.shields.io/nuget/v/ReactiveUI.Avalonia.svg)](https://www.nuget.org/packages/ReactiveUI.Avalonia/)
+<div align="center">
 
-<br>
-<a href="https://github.com/reactiveui/reactiveui">
-  <img width="160" height="160" src="https://raw.githubusercontent.com/reactiveui/styleguide/master/logo/main.png">
-</a>
-<br>
+<a href="https://github.com/reactiveui/ReactiveUI.Avalonia"><img src="https://raw.githubusercontent.com/reactiveui/styleguide/master/logo/logo.svg" alt="ReactiveUI.Avalonia" width="128"></a>
 
 # ReactiveUI for Avalonia UI
 
+[![Build](https://img.shields.io/github/actions/workflow/status/reactiveui/ReactiveUI.Avalonia/ci-build.yml?branch=main&label=build&logo=githubactions&logoColor=white)](https://github.com/reactiveui/ReactiveUI.Avalonia/actions/workflows/ci-build.yml)
+[![NuGet](https://img.shields.io/nuget/v/ReactiveUI.Avalonia?label=nuget&logo=nuget&logoColor=white&color=004880)](https://www.nuget.org/packages/ReactiveUI.Avalonia)
+[![Downloads](https://img.shields.io/nuget/dt/ReactiveUI.Avalonia?label=downloads&logo=nuget&logoColor=white&color=004880)](https://www.nuget.org/packages/ReactiveUI.Avalonia)
+[![Coverage](https://img.shields.io/codecov/c/github/reactiveui/ReactiveUI.Avalonia?label=coverage&logo=codecov&logoColor=white)](https://codecov.io/gh/reactiveui/ReactiveUI.Avalonia)
+[![License](https://img.shields.io/github/license/reactiveui/ReactiveUI.Avalonia?color=blue)](https://github.com/reactiveui/ReactiveUI.Avalonia/blob/main/LICENSE)
+[![Discussions](https://img.shields.io/badge/discussions-ask%20a%20question-8A2BE2?logo=github&logoColor=white)](https://github.com/reactiveui/ReactiveUI.Avalonia/discussions)
+
+</div>
+
 This package provides [ReactiveUI](https://reactiveui.net/) bindings and helpers for the [Avalonia UI](https://avaloniaui.net/) framework, enabling you to build composable, cross-platform model-view-viewmodel (MVVM) applications for Windows, macOS, and Linux.
 
----
 ## Packages
 
 Install the packages that match your preferred dependency injection container. The core package is always required.
@@ -41,7 +41,6 @@ dotnet run --project examples/ReactiveUI.Avalonia.Example/ReactiveUI.Avalonia.Ex
 
 The example includes headless TUnit tests so its behavior can be checked alongside the package tests.
 
----
 ## Recommended setup (ReactiveUIBuilder)
 
 The recommended approach for new projects is to use the `ReactiveUIBuilder` via the `UseReactiveUI` and `UseReactiveUIWith...` extensions. This ensures consistent registration of schedulers, activation/binding hooks, and view discovery.
@@ -156,7 +155,6 @@ Notes
 - `RegisterReactiveUIViewsFromEntryAssembly()` scans your entry assembly and registers any types implementing `IViewFor<TViewModel>` for view location/navigation.
 - For existing apps, you can keep using `UseReactiveUI()` without a DI container and register services into `Splat` directly if you prefer.
 
----
 ## Manual setup (without container mixins)
 
 You can configure a custom container using the generic `UseReactiveUIWithDIContainer` if you don’t use one of the provided integrations:
@@ -174,7 +172,6 @@ AppBuilder
     .RegisterReactiveUIViewsFromEntryAssembly();
 ```
 
----
 ## Quick example: first reactive view
 
 ```csharp
@@ -226,7 +223,6 @@ public partial class MainView : ReactiveUserControl<MyViewModel>
 }
 ```
 
----
 ## API reference
 
 ### ReactiveUI.Avalonia (core)
@@ -287,7 +283,6 @@ Extension methods on `AppBuilder` (namespace `ReactiveUI.Avalonia.Splat`):
 What it does:
 - Wires `Splat` to Ninject, initializes ReactiveUI for Avalonia, and lets you configure bindings on the kernel.
 
----
 ## Tutorial: Mastering ReactiveUI with Avalonia
 
 Welcome to the `ReactiveUI.Avalonia` guide! This tutorial walks you through setting up an Avalonia app with ReactiveUI. We start with the basics and build up to a reactive application.
@@ -508,7 +503,6 @@ How the host treats layouts during navigation:
 - A view with no `[ViewLayout]` is shown directly, and the host lets go of the previous layout.
 - If the layout type does not lead to a `ContentControl`, the host logs a warning and shows the view directly.
 
----
 ## Thanks
 
 We want to thank the following contributors and libraries that help make ReactiveUI.Avalonia possible:
@@ -519,8 +513,6 @@ We want to thank the following contributors and libraries that help make Reactiv
   - **System.Reactive**: [Reactive Extensions for .NET](https://github.com/dotnet/reactive) - The foundation of ReactiveUI's asynchronous API.
   - **Splat**: [Splat](https://github.com/reactiveui/splat) - Cross-platform utilities and service location.
   - **ReactiveUI**: [ReactiveUI](https://github.com/reactiveui/reactiveui) - The core MVVM framework.
-
----
 
 ## Sponsors
 
@@ -542,39 +534,31 @@ See [our sponsors](https://www.reactiveui.net/sponsors/) for more information.
 JetBrains, Claude, Anthropic, OpenAI and Codex names and logos are trademarks of their respective owners.
 Snyk and the Snyk logo are trademarks of Snyk Ltd.
 
-## Sponsorship
-
-The core team members, ReactiveUI contributors and contributors in the ecosystem do this open-source work in their free time. If you use ReactiveUI, a serious task, and you'd like us to invest more time on it, please donate. This project increases your income/productivity too. It makes development and applications faster and it reduces the required bandwidth.
-
-[Become a sponsor](https://github.com/sponsors/reactivemarbles).
-
-This is how we use the donations:
-
-  * Allow the core team to work on ReactiveUI
-  * Thank contributors if they invested a large amount of time in contributing
-  * Support projects in the ecosystem
-
----
-## Support
-
-If you have a question, please see if any discussions in our [GitHub Discussions](https://github.com/reactiveui/ReactiveUI.Avalonia/discussions) or [GitHub issues](https://github.com/reactiveui/ReactiveUI.Avalonia/issues) have already answered it.
-
-If you want to discuss something or just need help, here is our [Slack room](https://reactiveui.net/slack), where there are always individuals looking to help out!
-
-Please do not open GitHub issues for support requests.
-
-Please do not open GitHub issues for general support requests.
-
----
 ## Contribute
 
-ReactiveUI.Avalonia is developed under an OSI-approved open source license, making it freely usable and distributable, even for commercial use.
+ReactiveUI.Avalonia is part of [ReactiveUI](https://github.com/reactiveui) and is released under the [MIT license](https://github.com/reactiveui/ReactiveUI.Avalonia/blob/main/LICENSE). We welcome contributions of every size, from bug reports and documentation to features and tests.
 
-If you want to submit pull requests please first open a [GitHub issue](https://github.com/reactiveui/ReactiveUI.Avalonia/issues/new/choose) to discuss. We are first time PR contributors friendly.
+- **Questions:** ask in [GitHub Discussions](https://github.com/reactiveui/ReactiveUI.Avalonia/discussions).
+- **Bugs and feature requests:** open a [GitHub issue](https://github.com/reactiveui/ReactiveUI.Avalonia/issues/new/choose).
+- **Larger changes:** open an issue or discussion first, so we can agree on the approach before you start.
+- **Contributor guide:** read [reactiveui.net/contribute](https://www.reactiveui.net/contribute/) for [building and testing](https://www.reactiveui.net/contribute/building-and-testing/) and [pull requests](https://www.reactiveui.net/contribute/pull-requests/).
 
-See [Contribution Guidelines](https://www.reactiveui.net/contribute/) for further information how to contribute changes.
+### Coding standards
 
----
+Every pull request must meet these standards. The build checks most of them.
+
+- Follow the [ReactiveUI C# style guide](https://www.reactiveui.net/contribute/software-style-guide/code-style/).
+- The repository's `.editorconfig` and the StyleSharp, PerformanceSharp and SecuritySharp analyzers run on every build. Fix each finding in the code. Do not suppress it or relax the `.editorconfig`.
+- Add tests for every bug fix and new feature.
+- Document public APIs with XML documentation comments.
+- Write commit messages in the [Conventional Commits](https://www.reactiveui.net/contribute/software-style-guide/commit-message-convention/) format.
+- Follow the [Code of Conduct](https://github.com/reactiveui/.github/blob/main/CODE_OF_CONDUCT.md).
+
+### Support the project
+
+- Sponsor the maintainers on GitHub Sponsors: [reactivemarbles](https://github.com/sponsors/reactivemarbles), [glennawatson](https://github.com/sponsors/glennawatson) and [chrispulman](https://github.com/sponsors/chrispulman).
+- Ask your employer to support open source, for example with the [balanced employee IP agreement](https://github.com/github/balanced-employee-ip-agreement).
+
 ## License
 
 ReactiveUI.Avalonia is licensed under the [MIT License](https://github.com/reactiveui/ReactiveUI.Avalonia/blob/main/LICENSE).
